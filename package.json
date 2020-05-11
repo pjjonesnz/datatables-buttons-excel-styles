@@ -1,0 +1,29 @@
+{
+  "name": "buttons-html5-styles",
+  "version": "0.3.0",
+  "description": "Easy custom styling of the Excel export from DataTables jQuery plug-in",
+  "main": "js/buttons.html5.styles.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "DataTables",
+    "buttons",
+    "excel",
+    "export",
+    "style",
+    "styling"
+  ],
+  "author": "Paul Jones",
+  "license": "MIT",
+  "dependencies": {
+    "datatables.net": "^1.10.15",
+    "datatables.net-buttons": "^1.6.1",
+    "jquery": ">=1.7",
+    "npm-check-updates": "^5.0.0"
+  },
+  "devDependencies": {
+    "datatables.net-buttons-dt": "^1.6.1",
+    "datatables.net-dt": "^1.10.20"
+  }
+}
