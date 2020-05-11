@@ -1,7 +1,7 @@
 /**
  * Styling for Datatables Buttons Excel XLSX (OOXML) creation
  *
- * @version: 0.3
+ * @version: 0.4
  * @description Add and process a custom 'excelStyles' option to easily customize the Datatables Excel Stylesheet output
  * @file buttons.html5.styles.js
  * @copyright © 2020 Beyond the Box Creative
@@ -88,13 +88,198 @@
     };
 
     /**
+     * Parse cell names into a row, col, from:to like structure
+     *
+     * @example
+     * Cell reference examples
+     * 
+     * Single Range References
+     * ['A3']   = cell A3
+     * ['4']    = row 4, all columns
+     * ['D']    = column D, all rows
+     * 
+     * Multiple Range References (seperated by :)
+     * ['4:6']      = rows 4 to 6, all columns
+     * ['B:F']      = column B to F, all rows
+     * ['D4:D20']   = column D from row 4 to 20
+     * ['3:']       = from row 3 until the last row, all columns
+     * ['A:']       = from column A until the last column, all rows
+     * ['B3:']      = from column B until the last column, from row 3 until the last row
+     * [':B3']      = from column A until column B, from row 1 to row 3 
+     * ['B3:D']     = from column B until column D, from row 3 until the last row
+     * 
+     * References to the last column 
+     * ['>']        = all rows, the last column
+     * ['>3:>20']   = the last column, row 3 to 20
+     * @todo Create reference to count back from last column (maybe use ['-1>3'] for the cell in the second to last column, row 3 - confusing syntax maybe?)
+     * 
+     * References counting back from the last row
+     * ['-0']       = all columns, the last row
+     * ['B-3:B-0']  = column B from the third to last row until the last row
+     * 
+     * Reference for everything
+     * [':']        = all columns, all rows (also ['1:'], ['A:'], [''], ['A1:'], [':-0'], [':>'], [':>-0'])
+     * 
+     *
+     * Column/Row skipping 
+     * 
+     * Used to apply styles to every nth column or row (eg. every 2nd row, every 3rd column)
+     *
+     * Format: n[0-9],[0-9]
+     * n (stands for every nth column/row), then the column increment followed by the row increment
+     *
+     * Column/Row skipping examples
+     * ['A3:D10n1,2']   = from Column A row 3, to Column D row 10, target every column, target every second row
+     * ['3:n1,2']       = every column from row 3 until the last row, target every second row (use this for row striping)
+     * [':n1,2']        = every column, every second row (also [':n,2'])
+     * [':n2,1']        = every second column, every row (also [':n2'])
+     *
+     *
+     * @param {string} cells Cell names in an Excel-like structure
+     * @param {object} sheet The worksheet to enable finding of the last column/row
+     * @return {object} Parsed rows and columns, in number format (ie. columns refernced by number, not letter)
+     */
+    var _parseExcellyReference = function (cells, sheet) {
+        var pattern = /^([A-Z]*|[>])*(-)*([0-9]*)(\:)*([A-Z]*|[>])*(-)*([0-9]*)(?:n([0-9]*)(?:,)*([0-9]*))*$/;
+        var matches = pattern.exec(cells);
+        var results = {
+            fromCol: matches[1],
+            fromRowEndSubtract: matches[2],
+            fromRow: matches[3],
+            range: matches[4],
+            toCol: matches[5],
+            toRowEndSubtract: matches[6],
+            toRow: matches[7],
+            nthCol: matches[8],
+            nthRow: matches[9],
+        };
+        console.log(results);
+        
+        // Refine column results
+
+        results.toCol = results.toCol || (results.range || !results.fromCol ? _getMaxColumnIndex(sheet) : results.fromCol); 
+        results.toCol = _parseColumnName(results.toCol, sheet);
+        results.fromCol = results.fromCol ? _parseColumnName(results.fromCol, sheet) : 1;
+        results.nthCol = results.nthCol ? parseInt(results.nthCol) : 1;
+
+        // Reverse the column results if from is higher than to
+
+        if (results.fromCol > results.toCol) {
+            var tempCol = results.fromCol;
+            results.fromCol = results.toCol;
+            results.toCol = tempCol;
+        }
+
+        // Refine row results
+        results.toRow = (results.toRow ?                // if a to row has been specified
+            (!results.toRowEndSubtract ?                    // if we are NOT subtracting from the last row
+                results.toRow                                   // return the selected row
+                : _getMaxRow(sheet) - results.toRow)        // else return last row minus this row number
+            : null)                                     // else return null and continue
+            || 
+            (results.range || !results.fromRow ?        // if there is a range selected, but no fromRow
+                _getMaxRow(sheet)                           // return the maximum row
+                : (!results.fromRowEndSubtract) ?       // else if we are NOT subtracting from the last row for the from source
+                    results.fromRow                         // return the from row
+                    : _getMaxRow(sheet) - results.fromRow   // else return the last row minus the from row number
+            );
+        
+        results.toRow = parseInt(results.toRow);
+        results.fromRow = results.fromRow ? parseInt(!results.fromRowEndSubtract ? results.fromRow : _getMaxRow(sheet) - results.fromRow) : 1;
+        results.nthRow = results.nthRow ? parseInt(results.nthRow) : 1;
+
+        // Reverse the row results if from is higher than to
+
+        if (results.fromRow > results.toRow) {
+            var tempRow = results.fromRow;
+            results.fromRow = results.toRow;
+            results.toRow = tempRow;
+        }
+
+        return results;
+    };
+
+    /**
+     * Get the maximum row number in the worksheet
+     * 
+     * @param {object} sheet Worksheet
+     * @return {int} The maximum row number
+     */
+    var _getMaxRow = function (sheet) {
+        return Number($('sheetData row', sheet).last().attr('r'));
+    };
+
+    /**
+     * Get the maximum column index in the worksheet
+     * 
+     * @param {object} sheet Worksheet
+     * @return {int} The maximum column index
+     */
+    var _getMaxColumnIndex = function (sheet) {
+        var maxColumn = 0;
+        $('cols col', sheet).each(function () {
+            var colMax = $(this).attr('max');
+            if (colMax > maxColumn) {
+                maxColumn = colMax;
+            }
+        });
+        return Number(maxColumn);
+    };
+
+    /**
+     * Convert column name to index
+     *
+     * @param {string} columnName Name of the excel column, eg. A, B, C, AB, etc.
+     * @return {number} Index number of the column
+     */
+    function _parseColumnName(columnName, sheet) {
+        if (typeof columnName == 'number' ) {
+            return columnName;
+        }
+        // Match last column selector
+        if (columnName == '>') {
+            return _getMaxColumnIndex(sheet);
+        }
+        var alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+            i,
+            j,
+            result = 0;
+
+        for (
+            i = 0, j = columnName.length - 1;
+            i < columnName.length;
+            i += 1, j -= 1
+        ) {
+            result +=
+                Math.pow(alpha.length, j) * (alpha.indexOf(columnName[i]) + 1);
+        }
+
+        return Number(result);
+    }
+
+    /**
+     * Convert index number to Excel column name
+     * 
+     * @param {int} index Index number of column
+     * @return {string} Column name
+     */
+    function _parseColumnIndex(index) {
+        index -= 1;
+        var letter = String.fromCharCode(65 + (index % 26));
+        var nextNumber = parseInt(index / 26);
+        return nextNumber > 0 ? _parseColumnIndex(nextNumber) + letter : letter;
+    }
+
+    /**
      * Apply exportOptions.excelStyles to the OOXML stylesheet
      *
      * @param {object} xlsx
      */
     var _applyStyles = function (xlsx, excelStyles) {
         var sheet = xlsx.xl.worksheets['sheet1.xml'];
-        //var excelStyles = this.exportOptions.excelStyles;
+        if (!Array.isArray(excelStyles)) {
+            excelStyles = [excelStyles];
+        }
 
         for (var i in excelStyles) {
             var style = excelStyles[i];
@@ -105,124 +290,47 @@
                 styleId = _addXMLStyle(xlsx, style);
             }
 
-            var rows = style.row !== undefined ? style.row : [0];
-            var columns = style.column !== undefined ? style.column : [];
-            if (!Array.isArray(columns)) {
-                columns = [columns];
-            }
-            if (!Array.isArray(rows)) {
-                rows = [rows];
+            
+            var cells = style.cells !== undefined ? style.cells : ['1:'];
+            if (!Array.isArray(cells)) {
+                cells = [cells];
             }
 
             var selectors = [];
 
-            for (var i in rows) {
-                var prow = _parseRowSelector(rows[i]);
-                var rowStart = prow.start;
-                var rowEnd = prow.end;
-                var rowInc = prow.inc;
-                if (rowInc < 1) {
-                    rowInc = 1;
-                }
+            for (var i in cells) {
+                var selection = _parseExcellyReference(cells[i], sheet);
 
-                if (rowEnd == '') {
-                    rowEnd = $('row', sheet).length;
-                }
-
-                if (rowEnd < rowStart) {
-                    continue;
-                }
-
-                for (var row = rowStart; row <= rowEnd; row += rowInc) {
-                    var rowSelector =
-                        'row' + (row > 0 ? '[r="' + row + '"]' : '');
-                    if (columns.length == 0) {
-                        selectors.push(rowSelector + ' c');
-                    } else {
-                        for (var i in columns) {
-                            var colSelector = ' c[r^="' + columns[i] + '"]';
-                            selectors.push(rowSelector + colSelector);
-                        }
+                for(var col = selection.fromCol; col <= selection.toCol; col+= selection.nthCol) {
+                    var colLetter = _parseColumnIndex(col);
+                    for(var row = selection.fromRow; row <= selection.toRow; row += selection.nthRow) {
+                        var tag = 'row[r="' + row + '"] c[r="' + colLetter + row + '"]';
+                        selectors.push(tag);
                     }
-                    if(style.height !== undefined) {
-                        $('row', sheet).eq(row-1).attr('ht',style.height).attr('customHeight', true);
+                    // Set column width
+                     $('col[min="' + col + '"]', sheet)
+                         .attr('width', style.width)
+                         .attr('customWidth', true);
+                }
+
+                // Set row heights
+                for (
+                    var row = selection.fromRow;
+                    row <= selection.toRow;
+                    row += selection.nthRow
+                ) {
+                    if (style.height !== undefined) {
+                        $('row[r="' + row + '"]', sheet)
+                            .attr('ht', style.height)
+                            .attr('customHeight', true);
                     }
                 }
-                
             }
             if (styleId >= 0) {
                 $(selectors.join(), sheet).attr('s', styleId);
-            } 
-            if (columns.length > 0 && style.width !== undefined) {
-                for (var i in columns) {
-                    $('col', sheet).eq(_excelColumnToIndex(columns[i])-1).attr('width', style.width).attr('customWidth', true);
-                }
             }
         }
     };
-
-    /**
-     * Convert column name to index
-     * 
-     * @param {string} columnName Name of the excel column, eg. A, B, C, AB, etc.
-     * @return {number} Index number of the column
-     */
-    function _excelColumnToIndex (columnName) {
-        var alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-            i,
-            j,
-            result = 0;
-
-        for (i = 0, j = columnName.length - 1; i < columnName.length; i += 1, j -= 1) {
-            result += Math.pow(alpha.length, j) * (alpha.indexOf(columnName[i]) + 1);
-        }
-
-        return result;
-    };
-
-
-    /**
-     * Parse the row selector to determine start row, end row and row increment
-     *
-     * Rows can be defined as follows:
-     *
-     *      number           (single row)           - eg. 7       = row 7
-     *      number-number    (from row - to row)    - eg. '4-7'   = rows 4,5,6 and 7
-     *      number-          (from row)             - eg. '5-'    = from row 5 to the last row
-     *      -number          (to row)               - eg. '-3'    = from row 1 to row 3
-     *
-     * @param {string|number} row
-     * @return {object} {start: rowStart, end: rowEnd, inc: rowIncrement}
-     */
-    function _parseRowSelector(row) {
-        if (typeof row === 'number') {
-            return { start: row, end: row, inc: 1 };
-        }
-        var matches;
-        var inc = 1;
-        matches = /^(.*)i(\d+)$/.exec(row);
-        if (matches) {
-            inc = parseInt(matches[2]);
-            row = matches[1];
-        }
-        matches = /^(\d+)$/.exec(row); // match number
-        if (matches) {
-            return {
-                start: parseInt(matches[1]),
-                end: parseInt(matches[1]),
-                inc: inc,
-            };
-        }
-        matches = /^(\d*)-(\d*)$/.exec(row); // match number range
-        if (matches) {
-            return {
-                start: matches[1] != '' ? parseInt(matches[1]) : 1,
-                end: matches[2] != '' ? parseInt(matches[2]) : '',
-                inc: inc,
-            };
-        }
-        return { start: 0, end: 0, inc: inc };
-    }
 
     /**
      * Attributes to use when translating the simplified excelStyles object
@@ -461,7 +569,7 @@
      * @param {object} addStyle Definition of style to add
      */
     var _addXMLStyle = function (xlsx, addStyle) {
-        if(addStyle.style === undefined) {
+        if (addStyle.style === undefined) {
             return -1;
         }
         var xml = xlsx.xl['styles.xml'];
