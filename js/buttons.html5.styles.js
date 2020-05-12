@@ -111,7 +111,10 @@
      * References to the last column 
      * ['>']        = all rows, the last column
      * ['>3:>20']   = the last column, row 3 to 20
-     * @todo Create reference to count back from last column (maybe use ['-1>3'] for the cell in the second to last column, row 3 - confusing syntax maybe?)
+     * 
+     * References counting back from the last column
+     * ['-3>']      = three columns back from the last column
+     * ['-2>5']     = two columns back from the last column, row 5
      * 
      * References counting back from the last row
      * ['-0']       = all columns, the last row
@@ -140,27 +143,43 @@
      * @return {object} Parsed rows and columns, in number format (ie. columns refernced by number, not letter)
      */
     var _parseExcellyReference = function (cells, sheet) {
-        var pattern = /^([A-Z]*|[>])*(-)*([0-9]*)(\:)*([A-Z]*|[>])*(-)*([0-9]*)(?:n([0-9]*)(?:,)*([0-9]*))*$/;
+        //var pattern = /^(-\d+(?=\>))*([A-Z]*|[>])*(-)*([0-9]*)(\:)*(-\d+(?=\>))*([A-Z]*|[>])*(-)*([0-9]*)(?:n([0-9]*)(?:,)*([0-9]*))*$/;
+        var pattern = /^(?:-(\d*)(?=\>))*([A-Z]*|[>])*(-(?=[0-9]+))*([0-9]*)(?:(\:)(?:-(\d*)(?=\>))*([A-Z]*|[>])*(-(?=[0-9]+))*([0-9]*)(?:n([0-9]*)(?:,)*([0-9]*))*)*$/;
         var matches = pattern.exec(cells);
         var results = {
-            fromCol: matches[1],
-            fromRowEndSubtract: matches[2],
-            fromRow: matches[3],
-            range: matches[4],
-            toCol: matches[5],
-            toRowEndSubtract: matches[6],
-            toRow: matches[7],
-            nthCol: matches[8],
-            nthRow: matches[9],
+            fromColEndSubtractAmount: matches[1],
+            fromCol: matches[2],
+            fromRowEndSubtract: matches[3],
+            fromRow: matches[4],
+            range: matches[5],
+            toColEndSubtractAmount: matches[6],
+            toCol: matches[7],
+            toRowEndSubtract: matches[8],
+            toRow: matches[9],
+            nthCol: matches[10],
+            nthRow: matches[11],
         };
         console.log(results);
         
         // Refine column results
 
-        results.toCol = results.toCol || (results.range || !results.fromCol ? _getMaxColumnIndex(sheet) : results.fromCol); 
+        results.toCol =
+            (results.toCol ?// if a to column has been specified
+                !results.toColEndSubtractAmount ? // if we are NOT subtracting from the last column
+                    results.toCol // return the selected column
+                    : _getMaxColumnIndex(sheet) - results.toColEndSubtractAmount // else return last column minus this column number
+                : null) || // else return null and continue
+            (results.range || !results.fromCol // if there is a range selected, but no fromCol
+                ? _getMaxColumnIndex(sheet) // return the maximum column
+                : !results.fromColEndSubtractAmount // else if we are NOT subtracting from the last column for the from source
+                ? results.fromCol // return the from column
+                : _getMaxColumnIndex(sheet) - results.fromColEndSubtractAmount); // else return the last column minus the from column number
+
         results.toCol = _parseColumnName(results.toCol, sheet);
-        results.fromCol = results.fromCol ? _parseColumnName(results.fromCol, sheet) : 1;
+        results.fromCol = results.fromCol ? !results.fromColEndSubtractAmount ? results.fromCol : _getMaxColumnIndex(sheet) - results.fromColEndSubtractAmount : 1;
+        results.fromCol = _parseColumnName(results.fromCol, sheet);
         results.nthCol = results.nthCol ? parseInt(results.nthCol) : 1;
+        
 
         // Reverse the column results if from is higher than to
 
@@ -238,6 +257,7 @@
         }
         // Match last column selector
         if (columnName == '>') {
+            console.log('here');
             return _getMaxColumnIndex(sheet);
         }
         var alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',

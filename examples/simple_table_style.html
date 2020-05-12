@@ -125,9 +125,13 @@
             }
         },
         last3rows: {
-            description: 'Selecting back from the last row',
+            description: 'Selecting back from the last row and column',
             help: '',
             excelStyles: [
+                {
+                    cells: '-2>',
+                    index: 40,
+                },
                 {
                     cells: '-0',
                     index: 12,
@@ -137,9 +141,10 @@
                     index: 40
                 },
                 {
-                    cells: 'B-12:C-10',
+                    cells: 'B-12:D-10',
                     index: 45
-                }
+                },
+                
             ]
         },
         everything: {
@@ -162,7 +167,7 @@
             $('#selected_style').change(function() {
                 console.log($(this).val());
                 var style = exampleStyles[$(this).val()];
-                $('#excel_styles').html('<pre>excelStyles: ' + JSON.stringify(style.excelStyles, null, 2) + '</pre>');
+                $('#excel_styles').val('"excelStyles": ' + JSON.stringify(style.excelStyles, null, 2));
                 $('#help').html(style.help);
             });
             $('#selected_style').change();
@@ -172,8 +177,33 @@
                     extend: 'excelHtml5',
                     action: function ( e, dt, node, config ) {
                         // We're only using this action to add the styles for this website example so we can have mulitple examples on one page
-                        var option_value = $('#selected_style').val();
-                        config.exportOptions.excelStyles = exampleStyles[option_value].excelStyles;
+                        var excelStyleString = '{' + $('#excel_styles').val() + '}';
+                        var test = '0123456789';
+                        console.log(test.substr(2,4));
+                        console.log(test.substring(4,2));
+                        console.log(test.slice(4,2));
+                        try {
+                            var json = JSON.parse(excelStyleString);
+                            
+                        }  catch(e) {
+                            var pattern = /Unexpected (token|string).*in JSON at position (\d+)/;
+                            var matches = pattern.exec(e);
+                            var message = e;
+                            if(matches) {
+                                message += "\n\n" + excelStyleString.slice(0,matches[2]).trim() + "\n<< POSITION " + matches[2] + " >>\n" + excelStyleString.slice(matches[2]).trim() + "\n\n";
+                            }
+                            if(matches[1] == 'token') {
+                                message += "Help: Possibly a missing speechmark";
+                            }
+                            else if(matches[1] == 'string') {
+                                message += "Help: Possibly a missing : or ,";
+                            }
+                            alert(message);
+                            return;
+                        }
+                        
+                        
+                        config.exportOptions.excelStyles = json.excelStyles;
                         $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, node, config);
                     },
                 }]
@@ -210,6 +240,7 @@
         }
         #excel_styles {
             border: 1px solid #ccc;
+            height: 250px;
         }
         td {
             vertical-align: top;
@@ -221,9 +252,10 @@
         <div id="header">
         <h2>Datatables Excel Styling Examples</h2>
         <p>Select a format you would like for the Excel export, then click on the 'Excel' button to download the spreadsheet with the selected styling</p>
+        <p><strong>Note:</strong> The style box below is a textbox. Edit the style json to try your own!</p>
         <select id="selected_style"></select>
         <table style="width: 100%;" cellpadding="0" cellspacing="0">
-        <tr><td style="width:30%"><h3>Style</h3><div id="excel_styles"></div></td><td style="width:70%"><h3>Help</h3><div id="help"></div></td></tr>
+        <tr><td style="width:30%"><h3>Style</h3><textarea spellcheck="false" id="excel_styles"></textarea></td><td style="width:70%"><h3>Help</h3><div id="help"></div></td></tr>
         </table>
         </div>
         <div id="included_content"></div>
