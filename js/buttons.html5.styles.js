@@ -290,6 +290,8 @@
         return nextNumber > 0 ? _parseColumnIndex(nextNumber) + letter : letter;
     }
 
+    
+
     /**
      * Apply exportOptions.excelStyles to the OOXML stylesheet
      *
@@ -303,12 +305,27 @@
 
         for (var i in excelStyles) {
             var style = excelStyles[i];
+
+            /**
+             * A lookup table of existing cell styles and what they should be turned into
+             * 
+             * eg. if existing style is 0, and this style becomes number 54, then any cells with style 1 get turned into 54
+             * if there isn't a match in the table, then create the new style.
+             */
+            var styleLookup = {};
+
+            /**
+             * A list of styles created and the cell selectors to apply them to
+             */
+            var applyTable = {};
+
             var styleId;
             if (style.index !== undefined && typeof style.index === 'number') {
                 styleId = style.index;
-            } else {
-                styleId = _addXMLStyle(xlsx, style);
-            }
+            } 
+            // else {
+            //     styleId = _addXMLStyle(xlsx, style);
+            // }
 
             
             var cells = style.cells !== undefined ? style.cells : ['1:'];
@@ -325,6 +342,19 @@
                     var colLetter = _parseColumnIndex(col);
                     for(var row = selection.fromRow; row <= selection.toRow; row += selection.nthRow) {
                         var tag = 'row[r="' + row + '"] c[r="' + colLetter + row + '"]';
+
+                        // Get current style from cell
+                        var currentCellStyle = $(tag, sheet).attr('s') || 0;
+
+                        // If a new style hasn't been created, based on this currentCellStyle, then...
+                        if(styleLookup[currentCellStyle] == undefined) {
+
+                            // Add a new style based on this current style
+                            var newStyleId = _addXMLStyle(xlsx, style, currentCellStyle);
+                            styleLookup[currentCellStyle] = newStyleId;
+                            applyTable[styleLookup[currentCellStyle]] = [];
+                        }
+                        applyTable[styleLookup[currentCellStyle]].push(tag);
                         selectors.push(tag);
                     }
                     // Set column width
@@ -346,9 +376,11 @@
                     }
                 }
             }
-            if (styleId >= 0) {
-                $(selectors.join(), sheet).attr('s', styleId);
+            for(var i in applyTable) {
+                $(applyTable[i].join(),sheet).attr('s', i);
             }
+            console.log('Apply Table: ', applyTable);
+            console.log('Style Lookup: ', styleLookup);
         }
     };
 
@@ -535,6 +567,8 @@
      * @param {string} attributeName
      * @param {string|object} value Attribute Value
      * @param {obj} parentNode
+     * 
+     * @todo Replace jQuery function setting attributes when passed an object with plain javascript
      */
     var _addXMLAttribute = function (
         tagName,
@@ -549,7 +583,7 @@
                 if (_isChildAttribute(tagName, attributeName, i)) {
                     _addXMLNode(tagName, i, value[i], parentNode);
                 } else {
-                    parentNode.attr(i, value[i]);
+                    $(parentNode).attr(i, value[i]);
                 }
             }
         } else if (value != '') {
@@ -559,9 +593,16 @@
                 'val',
                 value
             );
-            parentNode.attr(txAttr);
+            $(parentNode).attr(txAttr);
         }
     };
+
+    
+
+    /**
+     * The xml Doc we're working on
+     */
+    var _xmlDoc;
 
     /**
      * Add an XML Node to the tree
@@ -571,13 +612,17 @@
      * @param {string|object} value
      * @param {object} parentNode
      */
-    var _addXMLNode = function (tagName, attributeName, value, parentNode) {
+    var _addXMLNode = function (tagName, attributeName, value, parentNode, xml) {
         var key = _getTranslatedKey(tagName, attributeName);
 
-        var childNode = parentNode
-            .append('<' + key + '/>')
-            .children()
-            .last();
+        var childNode = parentNode.appendChild(
+            _xmlDoc.createElement(key)
+        );
+
+        // var childNode = parentNode
+        //     .append('<' + key + '/>')
+        //     .children()
+        //     .last();
 
         _addXMLAttribute(tagName, attributeName, value, childNode);
     };
@@ -588,49 +633,74 @@
      * @param {object} xlsx
      * @param {object} addStyle Definition of style to add
      */
-    var _addXMLStyle = function (xlsx, addStyle) {
+    var _addXMLStyle = function (xlsx, addStyle, currentCellStyle) {
         if (addStyle.style === undefined) {
             return -1;
         }
         var xml = xlsx.xl['styles.xml'];
-        var cellXfs = $('cellXfs', xml);
+        _xmlDoc = xml;
+        var cellXfs = xml.getElementsByTagName('cellXfs')[0];// $('cellXfs', xml);
+        console.log(cellXfs);
         var style = addStyle.style;
-        var xf = cellXfs
-            .append(
-                '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyFont="1" applyFill="1" applyBorder="1" />'
-            )
-            .children()
-            .last();
+        var existingStyleXf = cellXfs.getElementsByTagName('xf')[currentCellStyle];
+        console.log(existingStyleXf);
+        console.log(currentCellStyle);
+        console.log('xfs', cellXfs.getElementsByTagName('xf'));
+
+        var xf = cellXfs.appendChild(existingStyleXf.cloneNode(true));
+        
+        console.log('xf', xf);
+     
+        
+        
+        // var xf = cellXfs
+        //     .append(
+        //         existingStyleXf
+        //         //'<xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyFont="1" applyFill="1" applyBorder="1" />'
+        //     )
+        //     .children()
+        //     .last();
 
         for (var type in style) {
-            var node = $(xml)
-                .find(type + 's') // get fonts node
-                .append('<' + type + '/>') // append font
-                .children()
-                .last();
+
+            var typeNode = xml.getElementsByTagName(type + 's')[0];
+            var node = xml.createElement(type);
+            typeNode.appendChild(node);
+
+            
+            // var node = $(xml)
+            //     .find(type + 's') // get fonts node
+            //     .append('<' + type + '/>') // append font
+            //     .children()
+            //     .last();
             style[type] = _mergeDefault(type, null, style[type]);
+              
             for (var attr in style[type]) {
                 var value = style[type][attr];
                 _addXMLNode(type, attr, value, node); // fill, patternFill, object|string, parentNode
             }
+            xf.setAttribute(type + 'Id', typeNode.childNodes.length - 1);
 
-            xf.attr(
-                type + 'Id',
-                $(xml)
-                    .find(type + 's')
-                    .children().length - 1
-            );
+            // xf.attr(
+            //     type + 'Id',
+            //     $(xml)
+            //         .find(type + 's')
+            //         .children().length - 1
+            // );
 
-            var container = $(type + 's', xml);
-            _updateContainerCount(container);
+            _updateContainerCount(typeNode);
+
         }
         // Add alignment seperately
         if (addStyle.alignment !== undefined) {
             _addXMLNode('xf', 'alignment', addStyle.alignment, xf);
-            xf.attr('applyAlignment', '1');
+            xf.setAttribute('applyAlignment', '1');
         }
         _updateContainerCount(cellXfs);
-        return cellXfs.children().length - 1;
+console.log(style);
+console.log('xml', xml);
+//throw new Error(); 
+        return cellXfs.childNodes.length - 1;
     };
 
     /**
@@ -639,7 +709,8 @@
      * @param {object} Container node
      */
     var _updateContainerCount = function (container) {
-        container.attr('count', container.children().length);
+        container.setAttribute('count', container.childNodes.length);
+        //container.attr('count', container.children().length);
     };
 
     //return DataTable.Buttons;
