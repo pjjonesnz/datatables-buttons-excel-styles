@@ -1,7 +1,7 @@
 /**
  * Styling for Datatables Buttons Excel XLSX (OOXML) creation
  *
- * @version: 0.4
+ * @version: 0.5
  * @description Add and process a custom 'excelStyles' option to easily customize the Datatables Excel Stylesheet output
  * @file buttons.html5.styles.js
  * @copyright © 2020 Beyond the Box Creative
@@ -13,8 +13,7 @@
  * Create the required styles using the custom 'excelStyles' option in the button's 'exportOptions'
  * @see https://datatables.net/reference/button/excelHtml5 For exportOptions information
  *
- * Documentation on 'excelStyles' options
- * 'Coming soon...'
+ * @todo Documentation on 'excelStyles' options - 'Coming soon...'
  */
 
 (function (factory) {
@@ -65,6 +64,8 @@
 
     /**
      * Allow applyStyles to be triggered from a custom customize function
+     * If excelStyles is defined but customize isn't, then it will
+     * automatically be run so you don't need to do this.
      *
      * @example
      * buttons: {
@@ -80,8 +81,12 @@
      * }
      */
     DataTable.ext.buttons.excelHtml5.applyStyles = function (xlsx) {
-        if (this.exportOptions.excelStyles !== undefined) {
-            _applyStyles(xlsx, this.exportOptions.excelStyles);
+        var excelStyles = this.exportOptions.excelStyles;
+        if (excelStyles !== undefined) {
+            if (!Array.isArray(excelStyles)) {
+                excelStyles = [excelStyles];
+            }
+            this._applyExcelStyles(xlsx, excelStyles);
         }
     };
 
@@ -90,12 +95,12 @@
      *
      * @example
      * Cell reference examples
-     * 
+     *
      * Single Range References
      * ['A3']   = cell A3
      * ['4']    = row 4, all columns
      * ['D']    = column D, all rows
-     * 
+     *
      * Multiple Range References (seperated by :)
      * ['4:6']      = rows 4 to 6, all columns
      * ['B:F']      = column B to F, all rows
@@ -103,27 +108,27 @@
      * ['3:']       = from row 3 until the last row, all columns
      * ['A:']       = from column A until the last column, all rows
      * ['B3:']      = from column B until the last column, from row 3 until the last row
-     * [':B3']      = from column A until column B, from row 1 to row 3 
+     * [':B3']      = from column A until column B, from row 1 to row 3
      * ['B3:D']     = from column B until column D, from row 3 until the last row
-     * 
-     * References to the last column 
+     *
+     * References to the last column
      * ['>']        = all rows, the last column
      * ['>3:>20']   = the last column, row 3 to 20
-     * 
+     *
      * References counting back from the last column
      * ['-3>']      = three columns back from the last column
      * ['-2>5']     = two columns back from the last column, row 5
-     * 
+     *
      * References counting back from the last row
      * ['-0']       = all columns, the last row
      * ['B-3:B-0']  = column B from the third to last row until the last row
-     * 
+     *
      * Reference for everything
      * [':']        = all columns, all rows (also ['1:'], ['A:'], [''], ['A1:'], [':-0'], [':>'], [':>-0'])
-     * 
      *
-     * Column/Row skipping 
-     * 
+     *
+     * Column/Row skipping
+     *
      * Used to apply styles to every nth column or row (eg. every 2nd row, every 3rd column)
      *
      * Format: n[0-9],[0-9]
@@ -157,13 +162,12 @@
             nthCol: matches[10],
             nthRow: matches[11],
         };
-        
         // Refine column results
 
         results.toCol =
-            (results.toCol ?// if a to column has been specified
-                !results.toColEndSubtractAmount ? // if we are NOT subtracting from the last column
-                    results.toCol // return the selected column
+            (results.toCol // if a to column has been specified
+                ? !results.toColEndSubtractAmount // if we are NOT subtracting from the last column
+                    ? results.toCol // return the selected column
                     : _getMaxColumnIndex(sheet) - results.toColEndSubtractAmount // else return last column minus this column number
                 : null) || // else return null and continue
             (results.range || !results.fromCol // if there is a range selected, but no fromCol
@@ -173,10 +177,13 @@
                 : _getMaxColumnIndex(sheet) - results.fromColEndSubtractAmount); // else return the last column minus the from column number
 
         results.toCol = _parseColumnName(results.toCol, sheet);
-        results.fromCol = results.fromCol ? !results.fromColEndSubtractAmount ? results.fromCol : _getMaxColumnIndex(sheet) - results.fromColEndSubtractAmount : 1;
+        results.fromCol = results.fromCol
+            ? !results.fromColEndSubtractAmount
+                ? results.fromCol
+                : _getMaxColumnIndex(sheet) - results.fromColEndSubtractAmount
+            : 1;
         results.fromCol = _parseColumnName(results.fromCol, sheet);
         results.nthCol = results.nthCol ? parseInt(results.nthCol) : 1;
-        
 
         // Reverse the column results if from is higher than to
 
@@ -187,21 +194,26 @@
         }
 
         // Refine row results
-        results.toRow = (results.toRow ?                // if a to row has been specified
-            (!results.toRowEndSubtract ?                    // if we are NOT subtracting from the last row
-                results.toRow                                   // return the selected row
-                : _getMaxRow(sheet) - results.toRow)        // else return last row minus this row number
-            : null)                                     // else return null and continue
-            || 
-            (results.range || !results.fromRow ?        // if there is a range selected, but no fromRow
-                _getMaxRow(sheet)                           // return the maximum row
-                : (!results.fromRowEndSubtract) ?       // else if we are NOT subtracting from the last row for the from source
-                    results.fromRow                         // return the from row
-                    : _getMaxRow(sheet) - results.fromRow   // else return the last row minus the from row number
-            );
-        
+        results.toRow =
+            (results.toRow // if a to row has been specified
+                ? !results.toRowEndSubtract // if we are NOT subtracting from the last row
+                    ? results.toRow // return the selected row
+                    : _getMaxRow(sheet) - results.toRow // else return last row minus this row number
+                : null) || // else return null and continue
+            (results.range || !results.fromRow // if there is a range selected, but no fromRow
+                ? _getMaxRow(sheet) // return the maximum row
+                : !results.fromRowEndSubtract // else if we are NOT subtracting from the last row for the from source
+                ? results.fromRow // return the from row
+                : _getMaxRow(sheet) - results.fromRow); // else return the last row minus the from row number
+
         results.toRow = parseInt(results.toRow);
-        results.fromRow = results.fromRow ? parseInt(!results.fromRowEndSubtract ? results.fromRow : _getMaxRow(sheet) - results.fromRow) : 1;
+        results.fromRow = results.fromRow
+            ? parseInt(
+                  !results.fromRowEndSubtract
+                      ? results.fromRow
+                      : _getMaxRow(sheet) - results.fromRow
+              )
+            : 1;
         results.nthRow = results.nthRow ? parseInt(results.nthRow) : 1;
 
         // Reverse the row results if from is higher than to
@@ -217,7 +229,7 @@
 
     /**
      * Get the maximum row number in the worksheet
-     * 
+     *
      * @param {object} sheet Worksheet
      * @return {int} The maximum row number
      */
@@ -227,7 +239,7 @@
 
     /**
      * Get the maximum column index in the worksheet
-     * 
+     *
      * @param {object} sheet Worksheet
      * @return {int} The maximum column index
      */
@@ -248,8 +260,8 @@
      * @param {string} columnName Name of the excel column, eg. A, B, C, AB, etc.
      * @return {number} Index number of the column
      */
-    function _parseColumnName(columnName, sheet) {
-        if (typeof columnName == 'number' ) {
+    var _parseColumnName = function(columnName, sheet) {
+        if (typeof columnName == 'number') {
             return columnName;
         }
         // Match last column selector
@@ -275,11 +287,11 @@
 
     /**
      * Convert index number to Excel column name
-     * 
+     *
      * @param {int} index Index number of column
      * @return {string} Column name
      */
-    function _parseColumnIndex(index) {
+    var _parseColumnIndex = function(index) {
         index -= 1;
         var letter = String.fromCharCode(65 + (index % 26));
         var nextNumber = parseInt(index / 26);
@@ -293,17 +305,14 @@
      *
      * @param {object} xlsx
      */
-    var _applyStyles = function (xlsx, excelStyles) {
+    DataTable.ext.buttons.excelHtml5._applyExcelStyles = function (xlsx, excelStyles) {
         var sheet = xlsx.xl.worksheets['sheet1.xml'];
-        if (!Array.isArray(excelStyles)) {
-            excelStyles = [excelStyles];
-        }
 
         for (var i in excelStyles) {
             var style = excelStyles[i];
             /**
              * A lookup table of existing cell styles and what they should be turned into
-             * 
+             *
              * eg. if existing style is 0, and this style becomes number 54, then any cells with style 1 get turned into 54
              * if there isn't a match in the table, then create the new style.
              */
@@ -321,7 +330,6 @@
             if (style.index !== undefined && typeof style.index === 'number') {
                 styleId = style.index;
             }
-            
             var cells = style.cells !== undefined ? style.cells : ['1:'];
             if (!Array.isArray(cells)) {
                 cells = [cells];
@@ -330,29 +338,54 @@
             for (var i in cells) {
                 var selection = _parseExcellyReference(cells[i], sheet);
 
-                for(var col = selection.fromCol; col <= selection.toCol; col+= selection.nthCol) {
+                for (
+                    var col = selection.fromCol;
+                    col <= selection.toCol;
+                    col += selection.nthCol
+                ) {
                     var colLetter = _parseColumnIndex(col);
-                    for(var row = selection.fromRow; row <= selection.toRow; row += selection.nthRow) {
-                        var tag = 'row[r="' + row + '"] c[r="' + colLetter + row + '"]';
+                    for (
+                        var row = selection.fromRow;
+                        row <= selection.toRow;
+                        row += selection.nthRow
+                    ) {
+                        var tag =
+                            'row[r="' +
+                            row +
+                            '"] c[r="' +
+                            colLetter +
+                            row +
+                            '"]';
 
                         // Get current style from cell
                         var currentCellStyle = $(tag, sheet).attr('s') || 0;
 
                         // If a new style hasn't been created, based on this currentCellStyle, then...
-                        if(styleLookup[currentCellStyle] == undefined) {
-                            var newStyleId; 
-                            if(currentCellStyle === 0 && styleId) {
+                        if (styleLookup[currentCellStyle] == undefined) {
+                            var newStyleId;
+                            if (currentCellStyle === 0 && styleId) {
                                 newStyleId = styleId;
                             } else {
                                 // Add a new style based on this current style
-                                var merge = style.merge !== undefined ? style.merge : true;
-                                var mergeWithCellStyle = merge ? currentCellStyle : 0;
-                                console.log(style.merge);
-                                console.log(merge);
-                                if(!styleId) {
-                                    newStyleId = _addXMLStyle(xlsx, style, mergeWithCellStyle);
+                                var merge =
+                                    style.merge !== undefined
+                                        ? style.merge
+                                        : true;
+                                var mergeWithCellStyle = merge
+                                    ? currentCellStyle
+                                    : 0;
+                                if (!styleId) {
+                                    newStyleId = _addXMLStyle(
+                                        xlsx,
+                                        style,
+                                        mergeWithCellStyle
+                                    );
                                 } else {
-                                    newStyleId = _addXMLStyle(xlsx, styleId, mergeWithCellStyle);
+                                    newStyleId = _addXMLStyle(
+                                        xlsx,
+                                        styleId,
+                                        mergeWithCellStyle
+                                    );
                                 }
                             }
                             styleLookup[currentCellStyle] = newStyleId;
@@ -361,9 +394,9 @@
                         applyTable[styleLookup[currentCellStyle]].push(tag);
                     }
                     // Set column width
-                     $('col[min="' + col + '"]', sheet)
-                         .attr('width', style.width)
-                         .attr('customWidth', true);
+                    $('col[min="' + col + '"]', sheet)
+                        .attr('width', style.width)
+                        .attr('customWidth', true);
                 }
 
                 // Set row heights
@@ -379,8 +412,8 @@
                     }
                 }
             }
-            for(var i in applyTable) {
-                $(applyTable[i].join(),sheet).attr('s', i);
+            for (var i in applyTable) {
+                $(applyTable[i].join(), sheet).attr('s', i);
             }
         }
     };
@@ -389,6 +422,7 @@
      * Attributes to use when translating the simplified excelStyles object
      * to a format that Excel understands
      *
+     * @example
      * styleTag: { // Main style tag (font|fill|border)
      *    default: {
      *        tagName1: '', // Objects that are required by excel in a particular order
@@ -410,6 +444,7 @@
      *        attributeName: 'child', // Any attributes that should be create as a child of the parent tagName
      *    },
      * }
+     * @var {object} _translateAttribues
      */
     var _translateAttributes = {
         font: {
@@ -568,7 +603,7 @@
      * @param {string} attributeName
      * @param {string|object} value Attribute Value
      * @param {obj} parentNode
-     * 
+     *
      * @todo Replace jQuery function setting attributes when passed an object with plain javascript
      */
     var _addXMLAttribute = function (
@@ -606,20 +641,23 @@
     var _xmlStyleDoc;
 
     /**
+     * The xml Doc we're working on
+     */
+    var _xmlStyleDoc;
+
+    /**
      * Add an XML Node to the tree
      *
-     * @param {string} type
-     * @param {string} attr
+     * @param {string} tagName
+     * @param {string} attributeName
      * @param {string|object} value
      * @param {object} parentNode
      */
     var _addXMLNode = function (tagName, attributeName, value, parentNode) {
         var key = _getTranslatedKey(tagName, attributeName);
         var childNode;
-        if(parentNode.getElementsByTagName(key).length === 0)
-            childNode = parentNode.appendChild(
-                _xmlStyleDoc.createElement(key)
-            );
+        if (parentNode.getElementsByTagName(key).length === 0)
+            childNode = parentNode.appendChild(_xmlStyleDoc.createElement(key));
         else {
             childNode = parentNode.getElementsByTagName(key)[0];
         }
@@ -639,26 +677,101 @@
         _xmlStyleDoc = xlsx.xl['styles.xml'];
         if (typeof addStyle === 'object') {
             return _mergeWithStyle(addStyle, currentCellStyle);
-        }
-        else {
+        } else {
             return _mergeWithBuiltin(addStyle, currentCellStyle);
         }
-    }
+    };
 
     /**
      * Merge built-in style with new built-in style to be applied
-     * 
+     *
      * @param {int} builtInIndex Index of the built-in style to apply
      * @param {int} currentCellStyle Current index of the cell being updated
      * @return {int} Index of the newly created style
      */
-    var _mergeWithBuiltin = function(builtInIndex, currentCellStyle) {
+    var _mergeWithBuiltin = function (builtInIndex, currentCellStyle) {
         var cellXfs = _xmlStyleDoc.getElementsByTagName('cellXfs')[0];
 
-        var currentStyleXf = cellXfs.getElementsByTagName('xf')[currentCellStyle];
+        var currentStyleXf = cellXfs.getElementsByTagName('xf')[
+            currentCellStyle
+        ];
         var mergeStyleXf = cellXfs.getElementsByTagName('xf')[builtInIndex];
 
         var xf = cellXfs.appendChild(currentStyleXf.cloneNode(true));
+
+        // Go through all types if any of the type ids are different, clone the elements of those types and change as required
+        var types = ['font', 'fill', 'border', 'numFmt'];
+        for (var i = 0; i < types.length; i++) {
+            var id = types[i] + 'Id';
+
+            if (mergeStyleXf.hasAttribute(id)) {
+                if (xf.hasAttribute(id)) {
+                    var mergeId = mergeStyleXf.getAttribute(id);
+                    var typeId = xf.getAttribute(id);
+                    var parentNode = _xmlStyleDoc.getElementsByTagName(
+                        types[i] + 's'
+                    )[0];
+
+                    var mergeNode = parentNode.childNodes[mergeId];
+                    if (mergeId != typeId) {
+                        if (id == 'numFmtId') {
+                            if (mergeId > 0) {
+                                xf.setAttribute(id, mergeId);
+                            }
+                        } else {
+                            var childNode = parentNode.childNodes[
+                                typeId
+                            ].cloneNode(true);
+                            parentNode.appendChild(childNode);
+                            _updateContainerCount(parentNode);
+                            xf.setAttribute(
+                                id,
+                                parentNode.childNodes.length - 1
+                            );
+
+                            // Cycle through merge children and add/replace
+                            var mergeNodeChildren = mergeNode.childNodes;
+
+                            for (
+                                var key = 0;
+                                key < mergeNodeChildren.length;
+                                key++
+                            ) {
+                                var newAttr = mergeNodeChildren[key].cloneNode(
+                                    true
+                                );
+
+                                var attr = childNode.getElementsByTagName(
+                                    mergeNodeChildren[key].nodeName
+                                );
+                                if (attr[0]) {
+                                    childNode.replaceChild(newAttr, attr[0]);
+                                } else {
+                                    childNode.appendChild(newAttr);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return cellXfs.childNodes.length - 1;
+    };
+
+    /**
+     * Merge current cell style with new custom style to be applied
+     *
+     * @param {object} addStyle Excelstyles style object to be applied to cell
+     * @param {int} currentCellStyle Current index of the cell being updated
+     * @return {int} Index of the newly created style
+     */
+    var _mergeWithStyle = function (addStyle, currentCellStyle) {
+        var cellXfs = _xmlStyleDoc.getElementsByTagName('cellXfs')[0];
+        var style = addStyle.style;
+        var existingStyleXf = cellXfs.getElementsByTagName('xf')[
+            currentCellStyle
+        ];
+        var xf = cellXfs.appendChild(existingStyleXf.cloneNode(true));
 
         // Go through all types if any of the type ids are different, clone the elements of those types and change as required
         var types = ['font', 'fill', 'border', 'numFmt'];
@@ -717,32 +830,29 @@
             var typeNode = _xmlStyleDoc.getElementsByTagName(type + 's')[0];
             var node;
             var styleId = type + 'Id';
-            if(type == 'alignment') {
+            if (type == 'alignment') {
                 continue;
             } else if (type == 'numFmt') {
+                // Handle numFmt style seperately as they are a different format
                 if (typeof style[type] == 'number') {
                     xf.setAttribute(styleId, style[type]);
                 } else {
-                    // '<numFmt numFmtId="165" formatCode="&quot;£&quot;#,##0.00"/>'+
-                    // Create new numFmt node and set Attribute of newFmtId and formatCode
                     node = _xmlStyleDoc.createElement(type);
                     node.setAttribute('formatCode', style[type]);
 
-                    var numFmts = _xmlStyleDoc.getElementsByTagName('numFmts')[0];
-                    var lastNumFmtChild = numFmts.lastChild;
+                    //var numFmts = _xmlStyleDoc.getElementsByTagName('numFmts')[0];
+                    var lastNumFmtChild = typeNode.lastChild;
                     var lastId = lastNumFmtChild.getAttribute('numFmtId');
 
                     var numFmtId = Number(lastId) + 1;
                     node.setAttribute('numFmtId', numFmtId);
-                    
 
-                    numFmts.appendChild(node);
-                    _updateContainerCount(numFmts);
+                    typeNode.appendChild(node);
+                    _updateContainerCount(typeNode);
 
                     xf.setAttribute(styleId, numFmtId);
                 }
-            } 
-            else {
+            } else {
                 if (xf.hasAttribute(styleId)) {
                     var existingTypeId = xf.getAttribute(styleId);
                     node = typeNode.childNodes[existingTypeId].cloneNode(true);
@@ -762,7 +872,6 @@
 
                 _updateContainerCount(typeNode);
             }
-
         }
         // Add alignment seperately
         if (style.alignment !== undefined) {
