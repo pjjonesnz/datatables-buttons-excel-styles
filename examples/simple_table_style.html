@@ -57,7 +57,8 @@
         },
         striped2: {
             description: 'Striped rows using custom style: Pink striped',
-            help: '<p>Rows are selected using "cells": "4:n,2"</p><p>"4:" means from row 4 until the end, "n,2" means every two rows from the starting row.</p>',
+            help: '<p>Rows are selected using "cells": "4:n,2"</p><p>"4:" means from row 4 until the end, "n,2" means every two rows from the starting row.</p>' +
+                '<p>Custom styles can be applied to cells using the "style" option, the next few examples show how to use that. More info to come...</p>',
             excelStyles: {
                 cells: "4:n,2",
                 style: {
@@ -72,8 +73,9 @@
             }
         },
         striped3: {
-            description: 'Striped rows with Custom Header ',
+            description: 'Striped rows with Custom Header - Styles get merged',
             help: '<p>Multiple styles can be applied to one table by using an array</p>' +
+                '<p><strong>Note:</strong> Styles applied on top of each other get merged - eg. the style applying the red font is merged with the grey background</p>' +
                 '<p>Firstly, a thick border is applied to the bottom of the heading row "cells": "2"</p>' +
                 '<p>Next, a light grey solid fill is applied to every second row staring from row 3 using cells: "3:n,2"</p>' +
                 '<p>Last, a large red font is applied to column A from row 3 onwards</p>',
@@ -114,6 +116,47 @@
                 },
             ]
         },
+        striped4: {
+            description: 'Striped rows with Custom Header - Styles can replace',
+            help: '<p>If the "merge" attribute is added to a style and equal to false, the style will replace any existing styles in a cell instead of merging with it.</p>' +
+                '<p>This example is identical to the last except that the style in column A is replaced with the effect of there being no row sriping in column A.</p>',
+            excelStyles: [
+                {
+                    cells: "2",
+                    style: {
+                        font: {
+                            sz: 14,
+                            b: true,
+                        },
+                        border: {
+                            bottom: 'thick'
+                        }
+                    }
+                },
+                {
+                    cells: "3:n,2",
+                    style: {
+                        fill: {
+                            patternFill: {
+                                patternType: 'solid', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
+                                fgColor: 'EEEEEE',
+                                bgColor: 'EEEEEE',
+                            },
+                        },
+                    }
+                },
+                {
+                    cells: "A3:A",
+                    merge: false,
+                    style: {
+                        font: {
+                            sz: 14,
+                            color: 'FF0000',
+                        }
+                    },
+                }
+            ]
+        },
         multicells: {
             description: 'Multiple cells using arrays',
             help: '<p>You can apply a style to multiple cell selctions by specifying the cells as an array</p>' +
@@ -126,7 +169,7 @@
         },
         last3rows: {
             description: 'Selecting back from the last row and column',
-            help: '',
+            help: '<p>Scroll to the bottom of the Excel sheet to see the changes.</p>',
             excelStyles: [
                 {
                     cells: '-2>',
@@ -152,8 +195,51 @@
             help: '',
             excelStyles: [
                 {
-                    cells: ':>',
+                    cells: ':',
                     index: 45
+                }
+            ]
+        },
+        numFmt: {
+            description: 'Apply custom number formats to cells',
+            help: '<p>Numbers formatted to 4 decimal places, negatives in brackets, on Column ',
+            excelStyles: [
+                {
+                    cells: 'D',
+                    style: {
+                        "numFmt": "#,##0.0000;(#,##0.0000)"
+                    }
+                }
+            ]
+        },
+        widths: {
+            description: 'Set custom width, height and alignment',
+            help: '<p>Column width and row height can be defined</p>' +
+                '<p>Column F has the width adjusted to 30</p>' + 
+                '<p>Column C has width of 50 and with text aligned to the center</p>' +
+                '<p>Row 1 (the header) is 70 high and text aligned to the vertical center</p>',
+            excelStyles: [
+                {
+                    cells: 'F',
+                    width: 30,
+                },
+                {
+                    cells: '1',
+                    height: 70,
+                    style: {
+                        alignment: {
+                            vertical: "center"
+                        }
+                    }
+                },
+                {
+                    cells: 'C',
+                    width: 50,
+                    style: {
+                        alignment: {
+                            horizontal: "center"
+                        }
+                    }
                 }
             ]
         }
