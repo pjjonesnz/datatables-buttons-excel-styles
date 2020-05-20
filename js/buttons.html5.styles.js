@@ -61,8 +61,6 @@
      */
     DataTable.ext.buttons.excelHtml5.customize = function (xlsx) {
         this.applyStyles(xlsx);
-        var sheet = xlsx.xl.worksheets['sheet1.xml'];
-        console.log(sheet);
     };
 
     /**
@@ -159,7 +157,6 @@
             nthCol: matches[10],
             nthRow: matches[11],
         };
-        console.log(results);
         
         // Refine column results
 
@@ -257,7 +254,6 @@
         }
         // Match last column selector
         if (columnName == '>') {
-            console.log('here');
             return _getMaxColumnIndex(sheet);
         }
         var alpha = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -290,6 +286,8 @@
         return nextNumber > 0 ? _parseColumnIndex(nextNumber) + letter : letter;
     }
 
+    
+
     /**
      * Apply exportOptions.excelStyles to the OOXML stylesheet
      *
@@ -303,20 +301,31 @@
 
         for (var i in excelStyles) {
             var style = excelStyles[i];
-            var styleId;
+            /**
+             * A lookup table of existing cell styles and what they should be turned into
+             * 
+             * eg. if existing style is 0, and this style becomes number 54, then any cells with style 1 get turned into 54
+             * if there isn't a match in the table, then create the new style.
+             */
+            var styleLookup = {};
+
+            /**
+             * A list of styles created and the cell selectors to apply them to
+             */
+            var applyTable = {};
+
+            /**
+             * Are we using an existing style index rather than a style definition object
+             */
+            var styleId = false;
             if (style.index !== undefined && typeof style.index === 'number') {
                 styleId = style.index;
-            } else {
-                styleId = _addXMLStyle(xlsx, style);
             }
-
             
             var cells = style.cells !== undefined ? style.cells : ['1:'];
             if (!Array.isArray(cells)) {
                 cells = [cells];
             }
-
-            var selectors = [];
 
             for (var i in cells) {
                 var selection = _parseExcellyReference(cells[i], sheet);
@@ -325,7 +334,31 @@
                     var colLetter = _parseColumnIndex(col);
                     for(var row = selection.fromRow; row <= selection.toRow; row += selection.nthRow) {
                         var tag = 'row[r="' + row + '"] c[r="' + colLetter + row + '"]';
-                        selectors.push(tag);
+
+                        // Get current style from cell
+                        var currentCellStyle = $(tag, sheet).attr('s') || 0;
+
+                        // If a new style hasn't been created, based on this currentCellStyle, then...
+                        if(styleLookup[currentCellStyle] == undefined) {
+                            var newStyleId; 
+                            if(currentCellStyle === 0 && styleId) {
+                                newStyleId = styleId;
+                            } else {
+                                // Add a new style based on this current style
+                                var merge = style.merge !== undefined ? style.merge : true;
+                                var mergeWithCellStyle = merge ? currentCellStyle : 0;
+                                console.log(style.merge);
+                                console.log(merge);
+                                if(!styleId) {
+                                    newStyleId = _addXMLStyle(xlsx, style, mergeWithCellStyle);
+                                } else {
+                                    newStyleId = _addXMLStyle(xlsx, styleId, mergeWithCellStyle);
+                                }
+                            }
+                            styleLookup[currentCellStyle] = newStyleId;
+                            applyTable[styleLookup[currentCellStyle]] = [];
+                        }
+                        applyTable[styleLookup[currentCellStyle]].push(tag);
                     }
                     // Set column width
                      $('col[min="' + col + '"]', sheet)
@@ -346,8 +379,8 @@
                     }
                 }
             }
-            if (styleId >= 0) {
-                $(selectors.join(), sheet).attr('s', styleId);
+            for(var i in applyTable) {
+                $(applyTable[i].join(),sheet).attr('s', i);
             }
         }
     };
@@ -535,6 +568,8 @@
      * @param {string} attributeName
      * @param {string|object} value Attribute Value
      * @param {obj} parentNode
+     * 
+     * @todo Replace jQuery function setting attributes when passed an object with plain javascript
      */
     var _addXMLAttribute = function (
         tagName,
@@ -549,7 +584,7 @@
                 if (_isChildAttribute(tagName, attributeName, i)) {
                     _addXMLNode(tagName, i, value[i], parentNode);
                 } else {
-                    parentNode.attr(i, value[i]);
+                    $(parentNode).attr(i, value[i]);
                 }
             }
         } else if (value != '') {
@@ -559,9 +594,16 @@
                 'val',
                 value
             );
-            parentNode.attr(txAttr);
+            $(parentNode).attr(txAttr);
         }
     };
+
+    
+
+    /**
+     * The xml Doc we're working on
+     */
+    var _xmlStyleDoc;
 
     /**
      * Add an XML Node to the tree
@@ -573,12 +615,14 @@
      */
     var _addXMLNode = function (tagName, attributeName, value, parentNode) {
         var key = _getTranslatedKey(tagName, attributeName);
-
-        var childNode = parentNode
-            .append('<' + key + '/>')
-            .children()
-            .last();
-
+        var childNode;
+        if(parentNode.getElementsByTagName(key).length === 0)
+            childNode = parentNode.appendChild(
+                _xmlStyleDoc.createElement(key)
+            );
+        else {
+            childNode = parentNode.getElementsByTagName(key)[0];
+        }
         _addXMLAttribute(tagName, attributeName, value, childNode);
     };
 
@@ -586,51 +630,148 @@
      * Add Style to the stylesheet
      *
      * @param {object} xlsx
-     * @param {object} addStyle Definition of style to add
+     * @param {object|int} addStyle Definition of style to add as an object, or (int) styleID if using a built in style
      */
-    var _addXMLStyle = function (xlsx, addStyle) {
-        if (addStyle.style === undefined) {
-            return -1;
+    var _addXMLStyle = function (xlsx, addStyle, currentCellStyle) {
+        if (typeof addStyle === 'object' && addStyle.style === undefined) {
+            return currentCellStyle;
         }
-        var xml = xlsx.xl['styles.xml'];
-        var cellXfs = $('cellXfs', xml);
-        var style = addStyle.style;
-        var xf = cellXfs
-            .append(
-                '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" applyFont="1" applyFill="1" applyBorder="1" />'
-            )
-            .children()
-            .last();
+        _xmlStyleDoc = xlsx.xl['styles.xml'];
+        if (typeof addStyle === 'object') {
+            return _mergeWithStyle(addStyle, currentCellStyle);
+        }
+        else {
+            return _mergeWithBuiltin(addStyle, currentCellStyle);
+        }
+    }
 
+    /**
+     * Merge built-in style with new built-in style to be applied
+     * 
+     * @param {int} builtInIndex Index of the built-in style to apply
+     * @param {int} currentCellStyle Current index of the cell being updated
+     * @return {int} Index of the newly created style
+     */
+    var _mergeWithBuiltin = function(builtInIndex, currentCellStyle) {
+        var cellXfs = _xmlStyleDoc.getElementsByTagName('cellXfs')[0];
+
+        var currentStyleXf = cellXfs.getElementsByTagName('xf')[currentCellStyle];
+        var mergeStyleXf = cellXfs.getElementsByTagName('xf')[builtInIndex];
+
+        var xf = cellXfs.appendChild(currentStyleXf.cloneNode(true));
+
+        // Go through all types if any of the type ids are different, clone the elements of those types and change as required
+        var types = ['font', 'fill', 'border', 'numFmt'];
+        for(var i = 0; i<types.length; i++) {
+            var id = types[i] + 'Id';
+            
+            if (mergeStyleXf.hasAttribute(id)) {
+                if(xf.hasAttribute(id)) {
+                    var mergeId = mergeStyleXf.getAttribute(id);
+                    var typeId = xf.getAttribute(id);
+                    var parentNode = _xmlStyleDoc.getElementsByTagName(types[i] + 's')[0];
+                    
+                    var mergeNode = parentNode.childNodes[mergeId]
+                    if (mergeId != typeId) {
+                        if(id == 'numFmtId') {
+                            if (mergeId > 0) {
+                                xf.setAttribute(id, mergeId);
+                            }
+                        }
+                        else {
+                            
+                            var childNode = parentNode.childNodes[typeId].cloneNode( true );
+                            parentNode.appendChild(childNode);
+                            _updateContainerCount(parentNode);
+                            xf.setAttribute(id, parentNode.childNodes.length-1);
+
+                            // Cycle through merge children and add/replace
+                            var mergeNodeChildren = mergeNode.childNodes;
+                            
+                            for(var key = 0; key < mergeNodeChildren.length; key++) {
+                                var newAttr = mergeNodeChildren[key].cloneNode(true);
+                                
+                                var attr = childNode.getElementsByTagName(mergeNodeChildren[key].nodeName);
+                                if(attr[0]) {
+                                    childNode.replaceChild(newAttr, attr[0]);
+                                } else {
+                                    childNode.appendChild(newAttr);
+                                }
+                            }
+                        }
+
+                    }
+                }
+            } 
+        }
+        return cellXfs.childNodes.length - 1;
+    }
+
+    var _mergeWithStyle = function(addStyle, currentCellStyle) {
+        var cellXfs = _xmlStyleDoc.getElementsByTagName('cellXfs')[0];
+        var style = addStyle.style;
+        var existingStyleXf = cellXfs.getElementsByTagName('xf')[currentCellStyle];
+        var xf = cellXfs.appendChild(existingStyleXf.cloneNode(true));
+        
         for (var type in style) {
-            var node = $(xml)
-                .find(type + 's') // get fonts node
-                .append('<' + type + '/>') // append font
-                .children()
-                .last();
-            style[type] = _mergeDefault(type, null, style[type]);
-            for (var attr in style[type]) {
-                var value = style[type][attr];
-                _addXMLNode(type, attr, value, node); // fill, patternFill, object|string, parentNode
+            var typeNode = _xmlStyleDoc.getElementsByTagName(type + 's')[0];
+            var node;
+            var styleId = type + 'Id';
+            if(type == 'alignment') {
+                continue;
+            } else if (type == 'numFmt') {
+                if (typeof style[type] == 'number') {
+                    xf.setAttribute(styleId, style[type]);
+                } else {
+                    // '<numFmt numFmtId="165" formatCode="&quot;£&quot;#,##0.00"/>'+
+                    // Create new numFmt node and set Attribute of newFmtId and formatCode
+                    node = _xmlStyleDoc.createElement(type);
+                    node.setAttribute('formatCode', style[type]);
+
+                    var numFmts = _xmlStyleDoc.getElementsByTagName('numFmts')[0];
+                    var lastNumFmtChild = numFmts.lastChild;
+                    var lastId = lastNumFmtChild.getAttribute('numFmtId');
+
+                    var numFmtId = Number(lastId) + 1;
+                    node.setAttribute('numFmtId', numFmtId);
+                    
+
+                    numFmts.appendChild(node);
+                    _updateContainerCount(numFmts);
+
+                    xf.setAttribute(styleId, numFmtId);
+                }
+            } 
+            else {
+                if (xf.hasAttribute(styleId)) {
+                    var existingTypeId = xf.getAttribute(styleId);
+                    node = typeNode.childNodes[existingTypeId].cloneNode(true);
+                } else {
+                    node = _xmlStyleDoc.createElement(type);
+                }
+
+                typeNode.appendChild(node);
+
+                style[type] = _mergeDefault(type, null, style[type]);
+
+                for (var attr in style[type]) {
+                    var value = style[type][attr];
+                    _addXMLNode(type, attr, value, node); // fill, patternFill, object|string, parentNode
+                }
+                xf.setAttribute(styleId, typeNode.childNodes.length - 1);
+
+                _updateContainerCount(typeNode);
             }
 
-            xf.attr(
-                type + 'Id',
-                $(xml)
-                    .find(type + 's')
-                    .children().length - 1
-            );
-
-            var container = $(type + 's', xml);
-            _updateContainerCount(container);
         }
         // Add alignment seperately
-        if (addStyle.alignment !== undefined) {
-            _addXMLNode('xf', 'alignment', addStyle.alignment, xf);
-            xf.attr('applyAlignment', '1');
+        if (style.alignment !== undefined) {
+            _addXMLNode('xf', 'alignment', style.alignment, xf);
+            xf.setAttribute('applyAlignment', '1');
         }
+        console.log(xf);
         _updateContainerCount(cellXfs);
-        return cellXfs.children().length - 1;
+        return cellXfs.childNodes.length - 1;
     };
 
     /**
@@ -639,8 +780,8 @@
      * @param {object} Container node
      */
     var _updateContainerCount = function (container) {
-        container.attr('count', container.children().length);
+        container.setAttribute('count', container.childNodes.length);
     };
 
-    //return DataTable.Buttons;
+    return DataTable.Buttons;
 });
