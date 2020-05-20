@@ -1,351 +1,562 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, user-scalable=no">
-    <title>Styling for Datatables Buttons Excel XLSX (OOXML) creation</title>
-    
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, minimum-scale=1.0, user-scalable=no"
+        />
+        <title>
+            Styling for Datatables Buttons Excel XLSX (OOXML) creation
+        </title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css"
+        />
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.datatables.net/buttons/1.6.1/css/buttons.dataTables.min.css"
+        />
 
-    <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-	<script type="text/javascript" language="javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.html5.min.js"></script>
-    
-    <script type="text/javascript" language="javascript" src="../js/buttons.html5.styles.js"></script>
-    <script type="text/javascript" language="javascript" class="init">
+        <script
+            type="text/javascript"
+            language="javascript"
+            src="https://code.jquery.com/jquery-3.3.1.js"
+        ></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+        <script
+            type="text/javascript"
+            language="javascript"
+            src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"
+        ></script>
+        <script
+            type="text/javascript"
+            language="javascript"
+            src="https://cdn.datatables.net/buttons/1.6.1/js/dataTables.buttons.min.js"
+        ></script>
+        <script
+            type="text/javascript"
+            language="javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"
+        ></script>
+        <script
+            type="text/javascript"
+            language="javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"
+        ></script>
+        <script
+            type="text/javascript"
+            language="javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"
+        ></script>
+        <script
+            type="text/javascript"
+            language="javascript"
+            src="https://cdn.datatables.net/buttons/1.6.1/js/buttons.html5.min.js"
+        ></script>
 
-    var exampleStyles = {
-        excel: {
-            description: "Uses familiar 'Excel style' cell selection",
-            help: '<p>In its basic form you can use familiar Excel style cell references.</p>' +
-                '<p>"cells": "A3:A10" selects row 3 to 10 in column A</p>' +
-                '<p>"index": 40 applies the built in style #40 to these cells</p>' +
-                '<p>See <a href="https://datatables.net/reference/button/excelHtml5#Built-in-styles" target="_blank">this page</a> for built in styles</p>',
-            excelStyles: {
-                cells: 'A3:A10',
-                index: 40
-            }
-        },
-        heading: {
-            description: 'Customize table heading row - red background',
-            help: '<p>You can select a single row by just using a row number</p>' +
-                '<p>The heading row (the second row in the Excel sheet) is selected using "cells": "2"</p>' + 
-                '<p>The built in style #12 is applied to it using "index": 12</p>' + 
-                '<p>See <a href="https://datatables.net/reference/button/excelHtml5#Built-in-styles" target="_blank">this page</a> for built in styles</p>',
-            excelStyles: {
-                cells: '2',
-                index: 12
-            }
-        },
-        striped: {
-            description: 'Striped rows using inbuilt styles',
-            help: '<p>You can skip columns and/or rows by using the "n[0-9],[0-9]" suffix on your cell reference to define the increment count when applying the style to the columns/rows.</p>' +
-                '<p>"n" stands for nth, with the column increment followed by the row increment</p>' + 
-                '<p>Every second row from row 4 onwards is selected using "cells":"4:n1,2"</p>' +
-                '<p>"4:" means from row 4 until the last row. Since no columns are defined, all columns are affected.</p>' + 
-                '"n1,2" means every column (1) and every 2nd row (2). Note: "n1,2" can also be written "n,2" - if a column or row is not defined it defaults to 1 (ie. every)</p>' +
-                '<p>The built in style #5 is applied to every second row using "index": 5</p>',
-            excelStyles: {
-                cells:'4:n1,2',
-                index: 5
-            }
-        },
-        striped2: {
-            description: 'Striped rows using custom style: Pink striped',
-            help: '<p>Rows are selected using "cells": "4:n,2"</p><p>"4:" means from row 4 until the end, "n,2" means every two rows from the starting row.</p>' +
-                '<p>Custom styles can be applied to cells using the "style" option, the next few examples show how to use that. More info to come...</p>',
-            excelStyles: {
-                cells: "4:n,2",
-                style: {
-                    fill: {
-                        patternFill: {
-                            patternType: 'lightUp', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
-                            fgColor: 'FFC6CF',
-                            bgColor: 'FFFFFF',
-                        },
-                    },
-                }
-            }
-        },
-        striped3: {
-            description: 'Striped rows with Custom Header - Styles get merged',
-            help: '<p>Multiple styles can be applied to one table by using an array</p>' +
-                '<p><strong>Note:</strong> Styles applied on top of each other get merged - eg. the style applying the red font is merged with the grey background</p>' +
-                '<p>Firstly, a thick border is applied to the bottom of the heading row "cells": "2"</p>' +
-                '<p>Next, a light grey solid fill is applied to every second row staring from row 3 using cells: "3:n,2"</p>' +
-                '<p>Last, a large red font is applied to column A from row 3 onwards</p>',
-            excelStyles: [
-                {
-                    cells: "2",
-                    style: {
-                        font: {
-                            sz: 14,
-                            b: true,
-                        },
-                        border: {
-                            bottom: 'thick'
-                        }
+        <script
+            type="text/javascript"
+            language="javascript"
+            src="../js/buttons.html5.styles.js"
+        ></script>
+        <script
+            type="text/javascript"
+            language="javascript"
+            src="../js/buttons.html5.styles.templates.js"
+        ></script>
+        <script type="text/javascript" language="javascript" class="init">
+            var exampleStyles = {
+                excelblue_template: {
+                    description: 'Your first example',
+                    help:
+                        "<p>This is the first simple example showing how easy it is to style an excel spreadsheet.</p>" +
+                        '<p>This one uses the addon styles templates, which is the simplest way to make a great looking spreadsheet</p>' +
+                        '<p>The other examples will show you how incredibly flexible this plugin is.</p>',
+                    excelStyles: {
+                        template: 'blue_medium',
                     },
                 },
-                
-                {
-                cells: "3:n,2",
-                style: {
-                    fill: {
-                        patternFill: {
-                            patternType: 'solid', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
-                            fgColor: 'EEEEEE',
-                            bgColor: 'EEEEEE',
-                        },
+                excel: {
+                    description: "Cell references: Uses familiar Excel style cell references",
+                    help:
+                        '<p>In its basic form you can use familiar Excel style cell references.</p>' +
+                        '<p>"cells": "A3:A10" selects row 3 to 10 in column A</p>' +
+                        '<p>"index": 40 applies the built in style #40 to these cells</p>' +
+                        '<p>See <a href="https://datatables.net/reference/button/excelHtml5#Built-in-styles" target="_blank">this page</a> for built in styles</p>',
+                    excelStyles: {
+                        cells: 'A3:A10',
+                        index: 40,
                     },
-                }
-                
-            },{
-                    cells: "A3:A",
-                    style: {
-                        font: {
-                            sz: 14,
-                            color: 'FF0000',
-                        }
-                    }
                 },
-            ]
-        },
-        striped4: {
-            description: 'Striped rows with Custom Header - Styles can replace',
-            help: '<p>If the "merge" attribute is added to a style and equal to false, the style will replace any existing styles in a cell instead of merging with it.</p>' +
-                '<p>This example is identical to the last except that the style in column A is replaced with the effect of there being no row sriping in column A.</p>',
-            excelStyles: [
-                {
-                    cells: "2",
-                    style: {
-                        font: {
-                            sz: 14,
-                            b: true,
-                        },
-                        border: {
-                            bottom: 'thick'
-                        }
-                    }
+                heading: {
+                    description: 'Cell references: Customize table heading row',
+                    help:
+                        '<p>You can select a single row by just using a row number</p>' +
+                        '<p>The heading row (the second row in the Excel sheet) is selected using "cells": "2"</p>' +
+                        '<p>The built in style #12 is applied to it using "index": 12</p>' +
+                        '<p>See <a href="https://datatables.net/reference/button/excelHtml5#Built-in-styles" target="_blank">this page</a> for built in styles</p>',
+                    excelStyles: {
+                        cells: '2',
+                        index: 12,
+                    },
                 },
-                {
-                    cells: "3:n,2",
-                    style: {
-                        fill: {
-                            patternFill: {
-                                patternType: 'solid', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
-                                fgColor: 'EEEEEE',
-                                bgColor: 'EEEEEE',
+                striped: {
+                    description: 'Cell references: Striped rows using inbuilt styles',
+                    help:
+                        '<p>You can skip columns and/or rows by using the "n[0-9],[0-9]" suffix on your cell reference to define the increment count when applying the style to the columns/rows.</p>' +
+                        '<p>"n" stands for nth, with the column increment followed by the row increment</p>' +
+                        '<p>Every second row from row 4 onwards is selected using "cells":"4:n1,2"</p>' +
+                        '<p>"4:" means from row 4 until the last row. Since no columns are defined, all columns are affected.</p>' +
+                        '"n1,2" means every column (1) and every 2nd row (2). Note: "n1,2" can also be written "n,2" - if a column or row is not defined it defaults to 1 (ie. every)</p>' +
+                        '<p>The built in style #5 is applied to every second row using "index": 5</p>',
+                    excelStyles: {
+                        cells: '4:n1,2',
+                        index: 5,
+                    },
+                },
+                striped2: {
+                    description:
+                        'Cell references: Striped rows using custom style',
+                    help:
+                        '<p>Rows are selected using "cells": "4:n,2"</p><p>"4:" means from row 4 until the end, "n,2" means every two rows from the starting row.</p>' +
+                        '<p>Custom styles can be applied to cells using the "style" option, the next few examples show how to use that. More info to come...</p>',
+                    excelStyles: {
+                        cells: '4:n,2',
+                        style: {
+                            fill: {
+                                patternFill: {
+                                    patternType: 'lightUp', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
+                                    fgColor: 'FFC6CF',
+                                    bgColor: 'FFFFFF',
+                                },
                             },
                         },
-                    }
-                },
-                {
-                    cells: "A3:A",
-                    merge: false,
-                    style: {
-                        font: {
-                            sz: 14,
-                            color: 'FF0000',
-                        }
                     },
-                }
-            ]
-        },
-        multicells: {
-            description: 'Multiple cells using arrays',
-            help: '<p>You can apply a style to multiple cell selctions by specifying the cells as an array</p>' +
-                '<p>Apply the indexed style #5 to column A, row 5, cell B8, and from row 10 to 12 in columns C and D and the last column from row 15 to 20</p>' +
-                '<p>Note: yes the from and to cells are back to front in the "D12:C10" selection, but this works fine as well</p>',
-            excelStyles: {
-                cells: ["A", "5", "B8", "D12:C10", ">15:>20"],
-                index: 5
-            }
-        },
-        last3rows: {
-            description: 'Selecting back from the last row and column',
-            help: '<p>Scroll to the bottom of the Excel sheet to see the changes.</p>',
-            excelStyles: [
-                {
-                    cells: '-2>',
-                    index: 40,
                 },
-                {
-                    cells: '-0',
-                    index: 12,
+                excelblue: {
+                    description: 'Cell references: Excel blue table example',
+                    help:
+                        '<p>Styles can be applied to create a beautiful looking table without any extra styling needed by the user after downloading.</p>',
+                    excelStyles: [
+                        {
+                            cells: '2',
+                            style: {
+                                font: {
+                                    color: 'FFFFFF',
+                                },
+                                fill: {
+                                    patternFill: {
+                                        patternType: 'solid',
+                                        fgColor: '4472C4',
+                                        bgColor: '4472C4',
+                                    },
+                                },
+                            },
+                        },
+                        {
+                            cells: '3:n,2',
+                            style: {
+                                fill: {
+                                    patternFill: {
+                                        patternType: 'solid',
+                                        fgColor: 'D9E1F2',
+                                        bgColor: 'D9E1F2',
+                                    },
+                                },
+                            },
+                        },
+                        {
+                            cells: '2:',
+                            style: {
+                                border: {
+                                    top: {
+                                        style: 'thin',
+                                        color: '8EA9DB',
+                                    },
+                                    bottom: {
+                                        style: 'thin',
+                                        color: '8EA9DB',
+                                    },
+                                },
+                            },
+                        },
+                        {
+                            cells: 'F',
+                            width: 16,
+                        },
+                    ],
                 },
-                {
-                    cells: '-5:-7',
-                    index: 40
+                excelgreen: {
+                    description: 'Templates: Excel green table example using templates',
+                    help:
+                        "<p>If you include the 'buttons.html5.styles.templates.js' library, you'll have access to a bunch of predefined styles which make it even easier!</p>" +
+                        '<p><strong>Note:</strong> If the template library is not included, this will just be ignored</p>',
+                    excelStyles: {
+                        template: 'green_medium',
+                    },
                 },
-                {
-                    cells: 'B-12:D-10',
-                    index: 45
+                excelgreen2: {
+                    description: 'Templates: Excel Green Template with custom heading',
+                    help:
+                        '<p>You can mix templates with your own style definitions. This one uses the same green template with a special orange heading!</p>',
+                    excelStyles: [
+                        {
+                            template: 'green_medium',
+                        },
+                        {
+                            cells: '2',
+                            style: {
+                                fill: {
+                                    patternFill: {
+                                        patternType: 'solid',
+                                        fgColor: 'ED7D31',
+                                        bgColor: 'ED7D31',
+                                    },
+                                },
+                            },
+                        },
+                    ],
                 },
-                
-            ]
-        },
-        everything: {
-            description: 'Select everything',
-            help: '',
-            excelStyles: [
-                {
-                    cells: ':',
-                    index: 45
-                }
-            ]
-        },
-        numFmt: {
-            description: 'Apply custom number formats to cells',
-            help: '<p>Numbers formatted to 4 decimal places, negatives in brackets, on Column ',
-            excelStyles: [
-                {
-                    cells: 'D',
-                    style: {
-                        "numFmt": "#,##0.0000;(#,##0.0000)"
-                    }
-                }
-            ]
-        },
-        widths: {
-            description: 'Set custom width, height and alignment',
-            help: '<p>Column width and row height can be defined</p>' +
-                '<p>Column F has the width adjusted to 30</p>' + 
-                '<p>Column C has width of 50 and with text aligned to the center</p>' +
-                '<p>Row 1 (the header) is 70 high and text aligned to the vertical center</p>',
-            excelStyles: [
-                {
-                    cells: 'F',
-                    width: 30,
-                },
-                {
-                    cells: '1',
-                    height: 70,
-                    style: {
-                        alignment: {
-                            vertical: "center"
-                        }
-                    }
-                },
-                {
-                    cells: 'C',
-                    width: 50,
-                    style: {
-                        alignment: {
-                            horizontal: "center"
-                        }
-                    }
-                }
-            ]
-        }
-    };
+                striped3: {
+                    description:
+                        'Merging: Styles get merged',
+                    help:
+                        '<p>Multiple styles can be applied to one table by using an array</p>' +
+                        '<p><strong>Note:</strong> Styles applied on top of each other get merged - eg. the style applying the red font in this example is merged with the grey background</p>' +
+                        '<p>Firstly, a thick border is applied to the bottom of the heading row "cells": "2"</p>' +
+                        '<p>Next, a light grey solid fill is applied to every second row staring from row 3 using cells: "3:n,2"</p>' +
+                        '<p>Last, a large red font is applied to column A from row 3 onwards</p>',
+                    excelStyles: [
+                        {
+                            cells: '2',
+                            style: {
+                                font: {
+                                    sz: 14,
+                                    b: true,
+                                },
+                                border: {
+                                    bottom: 'thick',
+                                },
+                            },
+                        },
 
-    $(document).ready(function() {
-        $('#included_content').load('data1.html', function() {
-            for(var i in exampleStyles) {
-                $('#selected_style').append('<option value="' + i + '">' + exampleStyles[i].description + '</option>');
-            }
-            $('#selected_style').change(function() {
-                console.log($(this).val());
-                var style = exampleStyles[$(this).val()];
-                $('#excel_styles').val('"excelStyles": ' + JSON.stringify(style.excelStyles, null, 2));
-                $('#help').html(style.help);
-            });
-            $('#selected_style').change();
-            $('#example').DataTable( {
-                dom: 'Bfrtip',
-                buttons: [{
-                    extend: 'excelHtml5',
-                    action: function ( e, dt, node, config ) {
-                        // We're only using this action to add the styles for this website example so we can have mulitple examples on one page
-                        var excelStyleString = '{' + $('#excel_styles').val() + '}';
-                        var test = '0123456789';
-                        console.log(test.substr(2,4));
-                        console.log(test.substring(4,2));
-                        console.log(test.slice(4,2));
-                        try {
-                            var json = JSON.parse(excelStyleString);
-                            
-                        }  catch(e) {
-                            var pattern = /Unexpected (token|string).*in JSON at position (\d+)/;
-                            var matches = pattern.exec(e);
-                            var message = e;
-                            if(matches) {
-                                message += "\n\n" + excelStyleString.slice(0,matches[2]).trim() + "\n<< POSITION " + matches[2] + " >>\n" + excelStyleString.slice(matches[2]).trim() + "\n\n";
-                            }
-                            if(matches[1] == 'token') {
-                                message += "Help: Possibly a missing speechmark";
-                            }
-                            else if(matches[1] == 'string') {
-                                message += "Help: Possibly a missing : or ,";
-                            }
-                            alert(message);
-                            return;
-                        }
-                        
-                        
-                        config.exportOptions.excelStyles = json.excelStyles;
-                        $.fn.dataTable.ext.buttons.excelHtml5.action.call(this, e, dt, node, config);
+                        {
+                            cells: '3:n,2',
+                            style: {
+                                fill: {
+                                    patternFill: {
+                                        patternType: 'solid', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
+                                        fgColor: 'EEEEEE',
+                                        bgColor: 'EEEEEE',
+                                    },
+                                },
+                            },
+                        },
+                        {
+                            cells: 'A3:A',
+                            style: {
+                                font: {
+                                    sz: 14,
+                                    color: 'FF0000',
+                                },
+                            },
+                        },
+                    ],
+                },
+                striped4: {
+                    description:
+                        'Merging: Styles can replace',
+                    help:
+                        '<p>If the "merge" attribute is added to a style and equal to false, the style will <strong>replace</strong> any existing styles in a cell instead of merging with it.</p>' +
+                        '<p>This example is identical to the last except that the style in column A is replaced with the effect of there being no row sriping in column A.</p>',
+                    excelStyles: [
+                        {
+                            cells: '2',
+                            style: {
+                                font: {
+                                    sz: 14,
+                                    b: true,
+                                },
+                                border: {
+                                    bottom: 'thick',
+                                },
+                            },
+                        },
+                        {
+                            cells: '3:n,2',
+                            style: {
+                                fill: {
+                                    patternFill: {
+                                        patternType: 'solid', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
+                                        fgColor: 'EEEEEE',
+                                        bgColor: 'EEEEEE',
+                                    },
+                                },
+                            },
+                        },
+                        {
+                            cells: 'A3:A',
+                            merge: false,
+                            style: {
+                                font: {
+                                    sz: 14,
+                                    color: 'FF0000',
+                                },
+                            },
+                        },
+                    ],
+                },
+                multicells: {
+                    description: 'Cell references: Multiple cells referenced using arrays',
+                    help:
+                        '<p>You can apply a style to multiple cell selctions by specifying the cells as an array</p>' +
+                        '<p>Apply the indexed style #5 to column A, row 5, cell B8, and from row 10 to 12 in columns C and D and the last column from row 15 to 20</p>' +
+                        '<p>Note: yes the from and to cells are back to front in the "D12:C10" selection, but this works fine as well</p>',
+                    excelStyles: {
+                        cells: ['A', '5', 'B8', 'D12:C10', '>15:>20'],
+                        index: 5,
                     },
-                }]
-            } );
-        });
-    } );
-    </script>
-    <style>
-        body {
-            background-color: #eee;
-        }
-        #body_content {
-            margin: 0px auto;
-            background-color: #fff;
-            max-width:1280px;
-            padding: 20px;
-        }
-        #included_content {
-            border: 1px solid #ccc;
-            margin: 20px auto 40px;
-            padding: 20px;
-        }
-        #excel_styles, #help {
-            width: 100%;
-            display: inline-block;
-            vertical-align:top;
-            padding: 10px 20px;
-            box-sizing: border-box;
-            max-height: 250px;
-            overflow: auto;
-        }
-        #help p:first-child {
-            margin-top:0;
-        }
-        #excel_styles {
-            border: 1px solid #ccc;
-            height: 250px;
-        }
-        td {
-            vertical-align: top;
-        }
-    </style>
-</head>
-<body>
-    <div id="body_content">
-        <div id="header">
-        <h2>Datatables Excel Styling Examples</h2>
-        <p>Select a format you would like for the Excel export, then click on the 'Excel' button to download the spreadsheet with the selected styling</p>
-        <p><strong>Note:</strong> The style box below is a textbox. Edit the style json to try your own!</p>
-        <select id="selected_style"></select>
-        <table style="width: 100%;" cellpadding="0" cellspacing="0">
-        <tr><td style="width:30%"><h3>Style</h3><textarea spellcheck="false" id="excel_styles"></textarea></td><td style="width:70%"><h3>Help</h3><div id="help"></div></td></tr>
-        </table>
+                },
+                last3rows: {
+                    description: 'Cell references: Selecting back from the last row and column',
+                    help:
+                        '<p>Scroll to the bottom of the Excel sheet to see the changes.</p>',
+                    excelStyles: [
+                        {
+                            cells: '-2>',
+                            index: 40,
+                        },
+                        {
+                            cells: '-0',
+                            index: 12,
+                        },
+                        {
+                            cells: '-5:-7',
+                            index: 40,
+                        },
+                        {
+                            cells: 'B-12:D-10',
+                            index: 45,
+                        },
+                    ],
+                },
+                everything: {
+                    description: 'Cell references: Select everything',
+                    help: '',
+                    excelStyles: [
+                        {
+                            cells: ':',
+                            index: 45,
+                        },
+                    ],
+                },
+                numFmt: {
+                    description: 'Number formats: Apply custom number formats to cells',
+                    help:
+                        '<p>Numbers formatted to 4 decimal places, negatives in brackets, on Column ',
+                    excelStyles: [
+                        {
+                            cells: 'D',
+                            style: {
+                                numFmt: '#,##0.0000;(#,##0.0000)',
+                            },
+                        },
+                    ],
+                },
+                widths: {
+                    description: 'Cell size and alignment: Set custom width, height and alignment',
+                    help:
+                        '<p>Column width and row height can be defined</p>' +
+                        '<p>Column F has the width adjusted to 30</p>' +
+                        '<p>Column C has width of 50 and with text aligned to the center</p>' +
+                        '<p>Row 1 (the header) is 70 high and text aligned to the vertical center</p>',
+                    excelStyles: [
+                        {
+                            cells: 'F',
+                            width: 30,
+                        },
+                        {
+                            cells: '1',
+                            height: 70,
+                            style: {
+                                alignment: {
+                                    vertical: 'center',
+                                },
+                            },
+                        },
+                        {
+                            cells: 'C',
+                            width: 50,
+                            style: {
+                                alignment: {
+                                    horizontal: 'center',
+                                },
+                            },
+                        },
+                    ],
+                },
+            };
+
+            $(document).ready(function () {
+                $('#included_content').load('data1.html', function () {
+                    for (var i in exampleStyles) {
+                        $('#selected_style').append(
+                            '<option value="' +
+                                i +
+                                '">' +
+                                exampleStyles[i].description +
+                                '</option>'
+                        );
+                    }
+                    $('#selected_style').change(function () {
+                        var style = exampleStyles[$(this).val()];
+                        $('#excel_styles').val(
+                            '"excelStyles": ' +
+                                JSON.stringify(style.excelStyles, null, 2)
+                        );
+                        $('#help').html(style.help);
+                    });
+                    $('#selected_style').change();
+                    $('#example').DataTable({
+                        dom: 'Bfrtip',
+                        buttons: [
+                            {
+                                extend: 'excelHtml5',
+                                action: function (e, dt, node, config) {
+                                    // We're only using this action to add the styles for this website example so we can have mulitple examples on one page
+                                    var excelStyleString =
+                                        '{' + $('#excel_styles').val() + '}';
+                                    var test = '0123456789';
+                                    try {
+                                        var json = JSON.parse(excelStyleString);
+                                    } catch (e) {
+                                        var pattern = /Unexpected (token|string).*in JSON at position (\d+)/;
+                                        var matches = pattern.exec(e);
+                                        var message = e;
+                                        if (matches) {
+                                            message +=
+                                                '\n\n' +
+                                                excelStyleString
+                                                    .slice(0, matches[2])
+                                                    .trim() +
+                                                '\n<< POSITION ' +
+                                                matches[2] +
+                                                ' >>\n' +
+                                                excelStyleString
+                                                    .slice(matches[2])
+                                                    .trim() +
+                                                '\n\n';
+                                        }
+                                        if (matches[1] == 'token') {
+                                            message +=
+                                                'Help: Possibly a missing speechmark';
+                                        } else if (matches[1] == 'string') {
+                                            message +=
+                                                'Help: Possibly a missing : or ,';
+                                        }
+                                        alert(message);
+                                        return;
+                                    }
+
+                                    config.exportOptions.excelStyles =
+                                        json.excelStyles;
+                                    $.fn.dataTable.ext.buttons.excelHtml5.action.call(
+                                        this,
+                                        e,
+                                        dt,
+                                        node,
+                                        config
+                                    );
+                                },
+                            },
+                        ],
+                    });
+                });
+            });
+        </script>
+        <style>
+            body {
+                background-color: #eee;
+            }
+            #body_content {
+                margin: 0px auto;
+                background-color: #fff;
+                max-width: 1280px;
+                padding: 20px;
+            }
+            #included_content {
+                border: 1px solid #ccc;
+                margin: 20px auto 40px;
+                padding: 20px;
+            }
+            #excel_styles,
+            #help {
+                height: 250px;
+                overflow: auto;
+            }
+            #help p:first-child {
+                margin-top: 0;
+            }
+            #excel_styles {
+                border: 1px solid #ccc;
+                height: 250px;
+            }
+            td {
+                vertical-align: top;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="body_content">
+            <div id="header">
+                <div class="container-fluid">
+                <h3>Datatables Excel Styling Examples</h3>
+                <p>
+                    <ol>
+                    <li>Select a style you would like to apply to the Excel spreadsheet</li>
+                    <li>Click on the 'Excel' button to download the spreadsheet with the style applied</li>
+                    <li>Try another example</li>
+                    <li>Edit the style code yourself to make your own style!</li>
+                    <li>Download it from Github and use it on your site: <a href="https://github.com/pjjonesnz/buttons-html5-styles" target="_blank">https://github.com/pjjonesnz/buttons-html5-styles</a>
+                    </ol>
+                </p>
+                
+                <form>
+                <div class="form-group">
+                    <label for="selected_style">Select a style: </label><select class="form-control" id="selected_style"></select>
+                </div>
+                <div class="form-group">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <h3>Style code</h3>
+                            <textarea
+                            class="form-control"
+                                spellcheck="false"
+                                id="excel_styles"
+                            ></textarea>
+                        </div>
+                        <div class="col-sm-7">
+                            <h3>Help</h3>
+                            <div id="help"></div>
+                        </div>
+                </div>
+                </div>
+                </form>
+                
+                <p class="mt-3 ml-4">
+                    <strong>Note:</strong> The style box above is a textbox.
+                    Edit the style json to try your own!
+                </p>
+                </div>
+            </div>
+            <div id="included_content"></div>
+            <div style="clear: both;"></div>
         </div>
-        <div id="included_content"></div>
-        <div style="clear: both;"></div>
-    </div>
-</body>
+    </body>
 </html>
