@@ -81,8 +81,12 @@
      * }
      */
     DataTable.ext.buttons.excelHtml5.applyStyles = function (xlsx) {
-        if (this.exportOptions.excelStyles !== undefined) {
-            _applyStyles(xlsx, this.exportOptions.excelStyles);
+        var excelStyles = this.exportOptions.excelStyles;
+        if (excelStyles !== undefined) {
+            if (!Array.isArray(excelStyles)) {
+                excelStyles = [excelStyles];
+            }
+            this._applyExcelStyles(xlsx, excelStyles);
         }
     };
 
@@ -257,7 +261,7 @@
      * @param {string} columnName Name of the excel column, eg. A, B, C, AB, etc.
      * @return {number} Index number of the column
      */
-    function _parseColumnName(columnName, sheet) {
+    var _parseColumnName = function(columnName, sheet) {
         if (typeof columnName == 'number') {
             return columnName;
         }
@@ -288,23 +292,22 @@
      * @param {int} index Index number of column
      * @return {string} Column name
      */
-    function _parseColumnIndex(index) {
+    var _parseColumnIndex = function(index) {
         index -= 1;
         var letter = String.fromCharCode(65 + (index % 26));
         var nextNumber = parseInt(index / 26);
         return nextNumber > 0 ? _parseColumnIndex(nextNumber) + letter : letter;
     }
 
+    
+
     /**
      * Apply exportOptions.excelStyles to the OOXML stylesheet
      *
      * @param {object} xlsx
      */
-    var _applyStyles = function (xlsx, excelStyles) {
+    DataTable.ext.buttons.excelHtml5._applyExcelStyles = function (xlsx, excelStyles) {
         var sheet = xlsx.xl.worksheets['sheet1.xml'];
-        if (!Array.isArray(excelStyles)) {
-            excelStyles = [excelStyles];
-        }
 
         for (var i in excelStyles) {
             var style = excelStyles[i];
@@ -373,8 +376,6 @@
                                 var mergeWithCellStyle = merge
                                     ? currentCellStyle
                                     : 0;
-                                console.log(style.merge);
-                                console.log(merge);
                                 if (!styleId) {
                                     newStyleId = _addXMLStyle(
                                         xlsx,
