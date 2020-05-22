@@ -1,7 +1,7 @@
 /**
  * Styling for Datatables Buttons Excel XLSX (OOXML) creation
  *
- * @version: 0.6
+ * @version: 0.6.1
  * @description Add and process a custom 'excelStyles' option to easily customize the Datatables Excel Stylesheet output
  * @file buttons.html5.styles.js
  * @copyright © 2020 Beyond the Box Creative
@@ -10,8 +10,8 @@
  *
  * Include this file after including the javascript for the Datatables, Buttons, HTML5 and JSZip extensions
  *
- * Create the required styles using the custom 'excelStyles' option in the button's 'exportOptions'
- * @see https://datatables.net/reference/button/excelHtml5 For exportOptions information
+ * Create the required styles using the custom 'excelStyles' option in the button's config
+ * @see https://datatables.net/reference/button/excel
  *
  * @todo Documentation on 'excelStyles' options - 'Coming soon...'
  */
@@ -69,15 +69,14 @@
      *
      * @example
      * buttons: {
-     *      exportOptions: {
-     *          excelStyles: {
-     *              ... custom styles defined ...
-     *          },
-     *          customize: function(xlsx) {
-     *              this.applyStyles(xlsx);
-     *              ... custom code here ...
-     *          }
-     *      }
+     *       excelStyles: {
+     *          ... custom styles defined ...
+     *       },
+     *       customize: function(xlsx) {
+     *           this.applyStyles(xlsx);
+     *           ... custom code here ...
+     *       }
+     *    }
      * }
      */
 
@@ -459,7 +458,7 @@
     }
 
     /**
-     * Apply exportOptions.excelStyles to the OOXML stylesheet
+     * Apply excelStyles to the OOXML stylesheet
      *
      * @param {object} xlsx
      */
