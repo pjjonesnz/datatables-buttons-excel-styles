@@ -18,16 +18,8 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-html5-1.6.2/datatables.min.css"/>
         <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-html5-1.6.2/datatables.min.js"></script>
 
-        <script
-            type="text/javascript"
-            language="javascript"
-            src="../js/buttons.html5.styles.js?version=0.6"
-        ></script>
-        <script
-            type="text/javascript"
-            language="javascript"
-            src="../js/buttons.html5.styles.templates.js?version=0.2"
-        ></script>
+        <script type="text/javascript" src="../js/buttons.html5.styles.js?version=0.6"></script>
+        <script type="text/javascript" src="../js/buttons.html5.styles.templates.js?version=0.2"></script>
         <script type="text/javascript" language="javascript" class="init">
             var exampleStyles = {
                 excelblue_template: {
@@ -35,7 +27,8 @@
                     help:
                         "<p>This is the first simple example showing how easy it is to style an excel spreadsheet.</p>" +
                         '<p>This one uses the addon styles templates, which is the simplest way to make a great looking spreadsheet</p>' +
-                        '<p>The other examples will show you how incredibly flexible this plugin is.</p>',
+                        '<p>The other examples will show you how incredibly flexible this plugin is.</p>' +
+                        '<p><strong>Click on the Excel button</strong> to download the spreadsheet with the style dynamically applied.</p>',
                     excelStyles: {
                         template: 'blue_medium',
                     },
@@ -353,7 +346,8 @@
                     help:
                         '<p>Number formats defined in a template can be applied to specific cells.</p><p>If no cell references are given then' +
                         ' the cell reference is taken from the template, but if you provide a cell reference this is used instead.</p>' +
-                        '<p>Note: this could give weird results for some of the templates, but using the individual template parts like this works great!</p>',
+                        '<p>Note: this could give weird results for some of the templates, but using the individual template parts like this works great!</p>' +
+                        '<p>Also try the following: currency_us, currency_gb</p>',
                     excelStyles: [
                         {
                             cells: 'D',
@@ -361,7 +355,7 @@
                         },
                         {
                             cells: 'F',
-                            template: 'currency_us',
+                            template: 'currency_eu',
                         },
                     ],
                 },
