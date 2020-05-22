@@ -80,14 +80,9 @@
      *      }
      * }
      */
+
     DataTable.ext.buttons.excelHtml5.applyStyles = function (xlsx) {
-        var excelStyles = this.exportOptions.excelStyles;
-        if (excelStyles !== undefined) {
-            if (!Array.isArray(excelStyles)) {
-                excelStyles = [excelStyles];
-            }
-            this._applyExcelStyles(xlsx, excelStyles);
-        }
+        this._applyExcelStyles(xlsx);
     };
 
     /**
@@ -97,35 +92,34 @@
      * Cell reference examples
      *
      * Single Range References
-     * ['A3']   = cell A3
-     * ['4']    = row 4, all columns
-     * ['D']    = column D, all rows
+     *  'A3'   = cell A3
+     *  '4'    = row 4, all columns
+     *  'D'    = column D, all rows
      *
      * Multiple Range References (seperated by :)
-     * ['4:6']      = rows 4 to 6, all columns
-     * ['B:F']      = column B to F, all rows
-     * ['D4:D20']   = column D from row 4 to 20
-     * ['3:']       = from row 3 until the last row, all columns
-     * ['A:']       = from column A until the last column, all rows
-     * ['B3:']      = from column B until the last column, from row 3 until the last row
-     * [':B3']      = from column A until column B, from row 1 to row 3
-     * ['B3:D']     = from column B until column D, from row 3 until the last row
+     *  '4:6'       = rows 4 to 6, all columns
+     *  'B:F'       = column B to F, all rows
+     *  'D4:D20'    = column D from row 4 to 20
+     *  '3:'        = from row 3 until the last row, all columns
+     *  'A:'        = from column A until the last column, all rows
+     *  'B3:'       = from column B until the last column, from row 3 until the last row
+     *  ':B3'       = from column A until column B, from row 1 to row 3
+     *  'B3:D'      = from column B until column D, from row 3 until the last row
      *
      * References to the last column
-     * ['>']        = all rows, the last column
-     * ['>3:>20']   = the last column, row 3 to 20
+     *  '>'         = all rows, the last column
+     *  '>3:>20'    = the last column, row 3 to 20
      *
      * References counting back from the last column
-     * ['-3>']      = three columns back from the last column
-     * ['-2>5']     = two columns back from the last column, row 5
+     *  '-3>'       = three columns back from the last column
+     *  '-2>5'      = two columns back from the last column, row 5
      *
      * References counting back from the last row
-     * ['-0']       = all columns, the last row
-     * ['B-3:B-0']  = column B from the third to last row until the last row
+     *  '-0'        = all columns, the last row
+     *  'B-3:B-0'   = column B from the third to last row until the last row
      *
      * Reference for everything
-     * [':']        = all columns, all rows (also ['1:'], ['A:'], [''], ['A1:'], [':-0'], [':>'], [':>-0'])
-     *
+     *  ':'         = all columns, all rows (also '1:', 'A:', '', 'A1:', ':-0', ':>', ':>-0')
      *
      * Column/Row skipping
      *
@@ -135,33 +129,120 @@
      * n (stands for every nth column/row), then the column increment followed by the row increment
      *
      * Column/Row skipping examples
-     * ['A3:D10n1,2']   = from Column A row 3, to Column D row 10, target every column, target every second row
-     * ['3:n1,2']       = every column from row 3 until the last row, target every second row (use this for row striping)
-     * [':n1,2']        = every column, every second row (also [':n,2'])
-     * [':n2,1']        = every second column, every row (also [':n2'])
+     *  'A3:D10n1,2'    = from Column A row 3, to Column D row 10, target every column, target every second row
+     *  '3:n1,2'        = every column from row 3 until the last row, target every second row (use this for row striping)
+     *  ':n1,2'         = every column, every second row (also ':n,2')
+     *  ':n2,1'         = every second column, every row (also ':n2')
      *
+     * Smart row references
+     *
+     * With the default settings row references refer to the actual Excel spreadsheet rows (ie. 1 = row 1, 12 = row 12). This works well, but
+     * can be hard to work with if your spreadsheet has (or doesn't have) the extra title and/or message above the data. Also, if you
+     * include a footer this can be hard to define a template that works for custom excel configurations.
+     *
+     * Smart row references adds specific code to refer to these special rows, and redfines row 1 to be the first row of the data
+     *
+     * You can enable smart references by adding the following to your style definition, or by prefixing your cell reference with a lower case s
+     * excelstyles: [
+     *      {
+     *          rowref: "smart",
+     *          cells: "...cell reference..."
+     *          style: { ...style definition... }
+     *      }
+     * ]
+     *
+     * Once enabled, the following row references are available, along with the row option that they refer to:
+     *
+     *  't'     = title: the title row (usually this is excel row 1)
+     *  'm'     = messageTop: the message row (if enabled)
+     *  'h'     = header: the row with the cell titles
+     *  '1:-0'  = the data rows (also '1:' or ':-0' or ':') - note that will now ONLY refer to the data
+     *  'f'     = footer: row with the cell titles (same content as the header row but at the bottom of the table)
+     *  'b'     = messageBottom: the message row at the bottom of the table. The row below the footer row (it it is enabled)
      *
      * @param {string} cells Cell names in an Excel-like structure
      * @param {object} sheet The worksheet to enable finding of the last column/row
      * @return {object} Parsed rows and columns, in number format (ie. columns refernced by number, not letter)
      */
-    var _parseExcellyReference = function (cells, sheet) {
+    var _parseExcellyReference = function (cells, sheet, smartRowOption) {
         //var pattern = /^(-\d+(?=\>))*([A-Z]*|[>])*(-)*([0-9]*)(\:)*(-\d+(?=\>))*([A-Z]*|[>])*(-)*([0-9]*)(?:n([0-9]*)(?:,)*([0-9]*))*$/;
-        var pattern = /^(?:-(\d*)(?=\>))*([A-Z]*|[>])*(-(?=[0-9]+))*([0-9]*)(?:(\:)(?:-(\d*)(?=\>))*([A-Z]*|[>])*(-(?=[0-9]+))*([0-9]*)(?:n([0-9]*)(?:,)*([0-9]*))*)*$/;
+        var pattern = /^(s)*(?:-(\d*)(?=\>))*([A-Z]*|[>])*([tmhfb]{1})*(-(?=[0-9]+))*([0-9]*)(?:(\:)(?:-(\d*)(?=\>))*([A-Z]*|[>])*([tmhfb]{1})*(-(?=[0-9]+))*([0-9]*)(?:n([0-9]*)(?:,)*([0-9]*))*)*$/;
         var matches = pattern.exec(cells);
+        if (matches === null) {
+            return false;
+        }
+
         var results = {
-            fromColEndSubtractAmount: matches[1],
-            fromCol: matches[2],
-            fromRowEndSubtract: matches[3],
-            fromRow: matches[4],
-            range: matches[5],
-            toColEndSubtractAmount: matches[6],
-            toCol: matches[7],
-            toRowEndSubtract: matches[8],
-            toRow: matches[9],
-            nthCol: matches[10],
-            nthRow: matches[11],
+            smartRow: matches[1],
+            fromColEndSubtractAmount: matches[2],
+            fromCol: matches[3],
+            fromSmartRow: matches[4],
+            fromRowEndSubtract: matches[5],
+            fromRow: matches[6],
+            range: matches[7],
+            toColEndSubtractAmount: matches[8],
+            toCol: matches[9],
+            toSmartRow: matches[10],
+            toRowEndSubtract: matches[11],
+            toRow: matches[12],
+            nthCol: matches[13],
+            nthRow: matches[14],
+            pattern: cells,
         };
+
+        var _smartRow = function (index) {
+            return parseInt(index) + _rowRefs.dt - 1;
+        };
+
+        /**
+         * Modify the parsed cell results to account for smart row references
+         * 
+         * @param {object} results The parsed cells
+         * @param {boolean} smartRowOption Has the smart row option been set in excelStyles
+         * @returns {boolean} True if a positive match has been made and resolved, or if this is not a smart row. False otherwise
+         */
+        function _patternMatchSmartRow(results, smartRowOption) {
+            if (
+                !smartRowOption &&
+                (!results.smartRow || results.smartRow != 's')
+            ) {
+                results.smartRow = false;
+                return true;
+            }
+            results.smartRow = true;
+
+            if (results.fromRow && !results.fromRowEndSubtract) {
+                results.fromRow = _smartRow(results.fromRow);
+            }
+
+            if (results.toRow && !results.toRowEndSubtract) {
+                results.toRow = _smartRow(results.toRow);
+            }
+
+            var pattern = /['tmhfb']{1}/;
+            if (results.fromSmartRow !== undefined) {
+                var match = pattern.exec(results.fromSmartRow);
+                if (match && _rowRefs[match[0]] !== false) {
+                    results.fromRow = _rowRefs[match[0]];
+                } else {
+                    return false;
+                }
+            }
+            if (results.toSmartRow !== undefined) {
+                var match = pattern.exec(results.toSmartRow);
+                if (match && _rowRefs[match[0]] !== false) {
+                    results.toRow = _rowRefs[match[0]];
+                } else {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        if(!_patternMatchSmartRow(results, smartRowOption)) {
+            return false;
+        }
+        
         // Refine column results
 
         results.toCol =
@@ -198,23 +279,26 @@
             (results.toRow // if a to row has been specified
                 ? !results.toRowEndSubtract // if we are NOT subtracting from the last row
                     ? results.toRow // return the selected row
-                    : _getMaxRow(sheet) - results.toRow // else return last row minus this row number
+                    : _getMaxRow(sheet, results) - results.toRow // else return last row minus this row number
                 : null) || // else return null and continue
             (results.range || !results.fromRow // if there is a range selected, but no fromRow
-                ? _getMaxRow(sheet) // return the maximum row
+                ? _getMaxRow(sheet, results) // return the maximum row
                 : !results.fromRowEndSubtract // else if we are NOT subtracting from the last row for the from source
                 ? results.fromRow // return the from row
-                : _getMaxRow(sheet) - results.fromRow); // else return the last row minus the from row number
+                : _getMaxRow(sheet, results) - results.fromRow); // else return the last row minus the from row number
 
         results.toRow = parseInt(results.toRow);
+
         results.fromRow = results.fromRow
             ? parseInt(
                   !results.fromRowEndSubtract
                       ? results.fromRow
-                      : _getMaxRow(sheet) - results.fromRow
+                      : _getMaxRow(sheet, results) - results.fromRow
               )
+            : _getMinRow(results);
+        results.nthRow = results.nthRow
+            ? parseInt(results.nthRow)
             : 1;
-        results.nthRow = results.nthRow ? parseInt(results.nthRow) : 1;
 
         // Reverse the row results if from is higher than to
 
@@ -227,13 +311,35 @@
         return results;
     };
 
+    
+
     /**
-     * Get the maximum row number in the worksheet
+     * Get the maximum row index - adjusts for smart row references
      *
      * @param {object} sheet Worksheet
+     * @param {object} results Cell parsing results to check for smart row refs
      * @return {int} The maximum row number
      */
-    var _getMaxRow = function (sheet) {
+    var _getMaxRow = function (sheet, results) {
+        if (results.smartRow) {
+            return _rowRefs.db;
+        }
+        return _getMaxSheetRow(sheet);
+    };
+
+    /**
+     * Get the minimum row index - adjusts for smart row references
+     *
+     * @param {object} results Cell parsing results to check for smart row refs
+     */
+    var _getMinRow = function (results) {
+        if (results.smartRow) {
+            return _rowRefs.dt;
+        }
+        return 1;
+    };
+
+    var _getMaxSheetRow = function (sheet) {
         return Number($('sheetData row', sheet).last().attr('r'));
     };
 
@@ -260,7 +366,7 @@
      * @param {string} columnName Name of the excel column, eg. A, B, C, AB, etc.
      * @return {number} Index number of the column
      */
-    var _parseColumnName = function(columnName, sheet) {
+    var _parseColumnName = function (columnName, sheet) {
         if (typeof columnName == 'number') {
             return columnName;
         }
@@ -283,7 +389,7 @@
         }
 
         return Number(result);
-    }
+    };
 
     /**
      * Convert index number to Excel column name
@@ -291,22 +397,89 @@
      * @param {int} index Index number of column
      * @return {string} Column name
      */
-    var _parseColumnIndex = function(index) {
+    var _parseColumnIndex = function (index) {
         index -= 1;
         var letter = String.fromCharCode(65 + (index % 26));
         var nextNumber = parseInt(index / 26);
         return nextNumber > 0 ? _parseColumnIndex(nextNumber) + letter : letter;
-    }
+    };
 
-    
+    /**
+     * Datatables config settings, used to calculate smart row references
+     */
+    //var _tableConfig = {};
+
+    /**
+     * Row references for smart row references
+     */
+    var _rowRefs = {
+        t: false, // title
+        m: false, // messageTop
+        h: false, // header
+        dt: false, // Data top row
+        db: false, // Data bottom row
+        f: false, // footer
+        b: false, // messageBottom
+    };
+
+    /**
+     * Load the row references for smart rows into an object
+     *
+     * @param {object} config Config options that affect the index of the rows
+     * @param {object} sheet Spreadsheet - to calculate length
+     */
+    function _loadRowRefs(config, sheet) {
+        var currentRow = 1;
+        // title: Row 1 if it exists
+        if (typeof config.title === 'string' && config.title !== '') {
+            _rowRefs.t = currentRow;
+            currentRow++;
+        }
+        if (config.messageTop !== null && config.messageTop !== '') {
+            _rowRefs.m = currentRow;
+            currentRow++;
+        }
+        if (config.header !== false) {
+            _rowRefs.h = currentRow;
+            currentRow++;
+        }
+        _rowRefs.dt = currentRow;
+
+        // Get last row in sheet
+        var currentRow = _getMaxSheetRow(sheet);
+        if (config.messageBottom !== null && config.messageBottom !== '') {
+            _rowRefs.b = currentRow;
+            currentRow--;
+        }
+        if (config.footer !== false) {
+            _rowRefs.f = currentRow;
+            currentRow--;
+        }
+        _rowRefs.db = currentRow;
+    }
 
     /**
      * Apply exportOptions.excelStyles to the OOXML stylesheet
      *
      * @param {object} xlsx
      */
-    DataTable.ext.buttons.excelHtml5._applyExcelStyles = function (xlsx, excelStyles) {
+    DataTable.ext.buttons.excelHtml5._applyExcelStyles = function (xlsx) {
+        // Load excelStyles from exportOptions
+        var excelStyles = this.exportOptions.excelStyles;
+        if (excelStyles === undefined) {
+            return;
+        }
+        if (!Array.isArray(excelStyles)) {
+            excelStyles = [excelStyles];
+        }
+
         var sheet = xlsx.xl.worksheets['sheet1.xml'];
+
+        // load config settings for smart row references
+        var config = DataTable.Api().buttons.exportInfo(this);
+        config.header = this.header;
+        config.footer = this.footer;
+        _loadRowRefs(config, sheet);
 
         for (var i in excelStyles) {
             var style = excelStyles[i];
@@ -334,9 +507,21 @@
             if (!Array.isArray(cells)) {
                 cells = [cells];
             }
-
+            var smartRowRef = false;
+            if (style.rowref && style.rowref == 'smart') {
+                smartRowRef = true;
+            }
             for (var i in cells) {
-                var selection = _parseExcellyReference(cells[i], sheet);
+                var selection = _parseExcellyReference(
+                    cells[i],
+                    sheet,
+                    smartRowRef
+                );
+
+                // If a valid cell selection is not found, skip this style
+                if (selection === false) {
+                    continue;
+                }
 
                 for (
                     var col = selection.fromCol;
@@ -633,8 +818,6 @@
         }
     };
 
-    
-
     /**
      * The xml Doc we're working on
      */
@@ -775,57 +958,71 @@
 
         // Go through all types if any of the type ids are different, clone the elements of those types and change as required
         var types = ['font', 'fill', 'border', 'numFmt'];
-        for(var i = 0; i<types.length; i++) {
+        for (var i = 0; i < types.length; i++) {
             var id = types[i] + 'Id';
-            
+
             if (mergeStyleXf.hasAttribute(id)) {
-                if(xf.hasAttribute(id)) {
+                if (xf.hasAttribute(id)) {
                     var mergeId = mergeStyleXf.getAttribute(id);
                     var typeId = xf.getAttribute(id);
-                    var parentNode = _xmlStyleDoc.getElementsByTagName(types[i] + 's')[0];
-                    
-                    var mergeNode = parentNode.childNodes[mergeId]
+                    var parentNode = _xmlStyleDoc.getElementsByTagName(
+                        types[i] + 's'
+                    )[0];
+
+                    var mergeNode = parentNode.childNodes[mergeId];
                     if (mergeId != typeId) {
-                        if(id == 'numFmtId') {
+                        if (id == 'numFmtId') {
                             if (mergeId > 0) {
                                 xf.setAttribute(id, mergeId);
                             }
-                        }
-                        else {
-                            
-                            var childNode = parentNode.childNodes[typeId].cloneNode( true );
+                        } else {
+                            var childNode = parentNode.childNodes[
+                                typeId
+                            ].cloneNode(true);
                             parentNode.appendChild(childNode);
                             _updateContainerCount(parentNode);
-                            xf.setAttribute(id, parentNode.childNodes.length-1);
+                            xf.setAttribute(
+                                id,
+                                parentNode.childNodes.length - 1
+                            );
 
                             // Cycle through merge children and add/replace
                             var mergeNodeChildren = mergeNode.childNodes;
-                            
-                            for(var key = 0; key < mergeNodeChildren.length; key++) {
-                                var newAttr = mergeNodeChildren[key].cloneNode(true);
-                                
-                                var attr = childNode.getElementsByTagName(mergeNodeChildren[key].nodeName);
-                                if(attr[0]) {
+
+                            for (
+                                var key = 0;
+                                key < mergeNodeChildren.length;
+                                key++
+                            ) {
+                                var newAttr = mergeNodeChildren[key].cloneNode(
+                                    true
+                                );
+
+                                var attr = childNode.getElementsByTagName(
+                                    mergeNodeChildren[key].nodeName
+                                );
+                                if (attr[0]) {
                                     childNode.replaceChild(newAttr, attr[0]);
                                 } else {
                                     childNode.appendChild(newAttr);
                                 }
                             }
                         }
-
                     }
                 }
-            } 
+            }
         }
         return cellXfs.childNodes.length - 1;
-    }
+    };
 
-    var _mergeWithStyle = function(addStyle, currentCellStyle) {
+    var _mergeWithStyle = function (addStyle, currentCellStyle) {
         var cellXfs = _xmlStyleDoc.getElementsByTagName('cellXfs')[0];
         var style = addStyle.style;
-        var existingStyleXf = cellXfs.getElementsByTagName('xf')[currentCellStyle];
+        var existingStyleXf = cellXfs.getElementsByTagName('xf')[
+            currentCellStyle
+        ];
         var xf = cellXfs.appendChild(existingStyleXf.cloneNode(true));
-        
+
         for (var type in style) {
             var typeNode = _xmlStyleDoc.getElementsByTagName(type + 's')[0];
             var node;
@@ -878,7 +1075,6 @@
             _addXMLNode('xf', 'alignment', style.alignment, xf);
             xf.setAttribute('applyAlignment', '1');
         }
-        console.log(xf);
         _updateContainerCount(cellXfs);
         return cellXfs.childNodes.length - 1;
     };
