@@ -1,23 +1,27 @@
-# Datatables Buttons Html5 Excel Styling
+# DataTables Buttons Html5 Excel Styling
+
+**Add beautifully styled Excel output to your DataTables.**
+
+DataTables is an amazing tool to display your tables in a user friendly way, and the buttons extension makes downloading those tables a breeze. Now you can simply style your downloaded tables without having to learn the intricacies of Open Office XML Styling.
 
 ## Demo
 
-[View the Excel style demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html)
+[View the Excel styling demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html)
 
 ## Usage
 
-Include jQuery
+1. Include jQuery
 
-Include Datatables css and js (https://www.datatables.net/download/)
+2. Include Datatables css and js (https://www.datatables.net/download/)
 
-Include the plugins' style and optional template javascript files
+3. Include the plugins' style and optional template javascript files
 
 ```html
 <script src="js/buttons.html5.styles.js"></script>
 <script src="js/buttons.html5.styles.templates.js"></script>
 ```
 
-Add an excelStyles config option to apply a style or template when you download your DataTable with the Excel button. [View this example](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_template_style.html)
+4. Add an excelStyles config option to apply a style or template to the Excel file. [View demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_template_style.html)
 
 ```js
 $('#myTable').DataTable({
