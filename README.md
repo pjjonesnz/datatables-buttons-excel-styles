@@ -17,4 +17,21 @@ Include the plugins' style and optional template javascript files
 <script src="js/buttons.html5.styles.templates.js"></script>
 ```
 
-** Docs coming soon... **
+Add a excelStyles [export option]() to apply a style or template when you download your DataTable with the Excel button.
+
+``` html
+
+$('#myTable').DataTable( {
+    dom: 'Bfrtip',
+    buttons: [
+      {
+        extend: 'excel',
+        excelStyles: {
+          template: 'blue_medium'
+        }
+      }
+    ]
+} );
+```
+
+** More docs underway - due end of May 2020  **

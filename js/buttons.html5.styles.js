@@ -464,8 +464,8 @@
      * @param {object} xlsx
      */
     DataTable.ext.buttons.excelHtml5._applyExcelStyles = function (xlsx) {
-        // Load excelStyles from exportOptions
-        var excelStyles = this.exportOptions.excelStyles;
+        // Load excelStyles and also check exportOptions for backwards compatibility 
+        var excelStyles = this.excelStyles || this.exportOptions.excelStyles;
         if (excelStyles === undefined) {
             return;
         }

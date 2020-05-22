@@ -54,12 +54,12 @@
      * Override the html5.styles.js applyStyles function to initialize the templates
      */
     DataTable.ext.buttons.excelHtml5.applyStyles = function (xlsx) {
-        var excelStyles = this.exportOptions.excelStyles;
+        var excelStyles = this.excelStyles || this.exportOptions.excelStyles;
         if (excelStyles !== undefined) {
             if (!Array.isArray(excelStyles)) {
                 excelStyles = [excelStyles];
             }
-            this.exportOptions.excelStyles = _replaceTemplatesWithStyles(
+            this.excelStyles = _replaceTemplatesWithStyles(
                 excelStyles
             );
             this._applyExcelStyles(xlsx);
