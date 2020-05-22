@@ -1,19 +1,16 @@
 /**
  * Style templates for html5.styles
  *
- * @version: 0.1
+ * @version: 0.2
  * @description Easy templats for 'excelStyles'
  * @file buttons.html5.styles.templates.js
  * @copyright © 2020 Beyond the Box Creative
  * @author Paul Jones <info@pauljones.co.nz>
  * @license MIT
  *
- * Include this file after including the javascript for the Datatables, Buttons, HTML5 and JSZip extensions
+ * Include this file after including the buttons.html5.styles.js (along with the required DataTables dependencies)
  *
- * Create the required styles using the custom 'excelStyles' option in the button's 'exportOptions'
- * @see https://datatables.net/reference/button/excelHtml5 For exportOptions information
- *
- * @todo Documentation on 'excelStyles' options - 'Coming soon...'
+ * @todo Add extra templates really soon
  */
 
 (function (factory) {
@@ -62,45 +59,44 @@
             if (!Array.isArray(excelStyles)) {
                 excelStyles = [excelStyles];
             }
-            excelStyles = _replaceTemplatesWithStyles(excelStyles);
-            this._applyExcelStyles(xlsx, excelStyles);
+            this.exportOptions.excelStyles = _replaceTemplatesWithStyles(
+                excelStyles
+            );
+            this._applyExcelStyles(xlsx);
         }
     };
 
     /**
      * Replace any template names found in the styles with the template style content
-     * 
+     *
      * @param {array} excelStyles The excel styles to apply
      */
     var _replaceTemplatesWithStyles = function (excelStyles) {
-        var templatesLoaded = false;
-        if (DataTable.ext.buttons.excelHtml5.getTemplate !== undefined) {
-            templatesLoaded = true;
-        }
         var newStyles = [];
         for (var i in excelStyles) {
             if (excelStyles[i].template !== undefined) {
                 var templateName = excelStyles[i].template;
-                if (templatesLoaded) {
-                    var template = DataTable.ext.buttons.excelHtml5.getTemplate(
-                        templateName
-                    );
-                    if (template !== false) {
-                        for (var j in template.excelStyles) {
-                            newStyles.push(template.excelStyles[j]);
+                var template = _getTemplate(templateName);
+                if (template !== false) {
+                    if (Array.isArray(template.es)) {
+                        for (var j in template.es) {
+                            if (excelStyles[i].cells !== undefined) {
+                                template.es[j].cells = excelStyles[i].cells;
+                            }
+                            newStyles.push(template.es[j]);
                         }
-                    } else {
-                        console.log(
-                            "Error: Template '" +
-                                templateName +
-                                "' not found. Ignoring template."
-                        );
+                    }
+                    else {
+                        if (excelStyles[i].cells !== undefined) {
+                            template.es.cells = excelStyles[i].cells;
+                        }
+                        newStyles.push(template.es);
                     }
                 } else {
                     console.log(
-                        "Error: the style.templates.js library has not been included - template '" +
+                        "Error: Template '" +
                             templateName +
-                            "' ignored"
+                            "' not found. Ignoring template."
                     );
                 }
             } else {
@@ -110,108 +106,178 @@
         return newStyles;
     };
 
-    DataTable.ext.buttons.excelHtml5.getTemplate = function(templateName) {
+    var _getTemplate = function (templateName) {
         return _templates[templateName] || false;
-    }
+    };
 
+    /**
+     * Template parts to be used to create excelStyles, and also be available as styles in themselves
+     * Note: excelStyles key shortened to es for brevity
+     */
+    var _tp = {
+        header_blue: {
+            es: {
+                cells: ['sh', 'sf'],
+                style: {
+                    font: {
+                        color: 'FFFFFF',
+                    },
+                    fill: {
+                        patternFill: {
+                            patternType: 'solid',
+                            fgColor: '4472C4',
+                            bgColor: '4472C4',
+                        },
+                    },
+                },
+            },
+        },
+        header_green: {
+            es: {
+                cells: ['sh', 'sf'],
+                style: {
+                    font: {
+                        color: 'FFFFFF',
+                    },
+                    fill: {
+                        patternFill: {
+                            patternType: 'solid',
+                            fgColor: '70AD47',
+                            bgColor: '70AD47',
+                        },
+                    },
+                },
+            },
+        },
+        stripes_blue: {
+            es: {
+                cells: 's1:n,2',
+                style: {
+                    fill: {
+                        patternFill: {
+                            patternType: 'solid',
+                            fgColor: 'D9E1F2',
+                            bgColor: 'D9E1F2',
+                        },
+                    },
+                },
+            },
+        },
+        stripes_green: {
+            es: {
+                cells: 's1:n,2',
+                style: {
+                    fill: {
+                        patternFill: {
+                            patternType: 'solid',
+                            fgColor: 'E2EFDA',
+                            bgColor: 'E2EFDA',
+                        },
+                    },
+                },
+            },
+        },
+        rowlines_blue: {
+            es: {
+                cells: 'sh:f',
+                style: {
+                    border: {
+                        top: {
+                            style: 'thin',
+                            color: '8EA9DB',
+                        },
+                        bottom: {
+                            style: 'thin',
+                            color: '8EA9DB',
+                        },
+                    },
+                },
+            },
+        },
+        rowlines_green: {
+            es: {
+                cells: 'sh:f',
+                style: {
+                    border: {
+                        top: {
+                            style: 'thin',
+                            color: 'A9D08E',
+                        },
+                        bottom: {
+                            style: 'thin',
+                            color: 'A9D08E',
+                        },
+                    },
+                },
+            },
+        },
+        currency_us: {
+            es: {
+                style: {
+                    numFmt: '[$$-en-US] #,##0.00',
+                },
+            },
+        },
+        int: {
+            es: {
+                style: {
+                    numFmt: '#,##0;(#,##0)',
+                },
+            },
+        },
+        decimal_1: {
+            es: {
+                style: {
+                    numFmt: '#,##0.0;(#,##0.0)',
+                },
+            },
+        },
+        decimal_2: {
+            es: {
+                style: {
+                    numFmt: '#,##0.00;(#,##0.00)',
+                },
+            },
+        },
+        decimal_3: {
+            es: {
+                style: {
+                    numFmt: '#,##0.000;(#,##0.000)',
+                },
+            },
+        },
+        decimal_4: {
+            es: {
+                style: {
+                    numFmt: '#,##0.0000;(#,##0.0000)',
+                },
+            },
+        },
+    };
+
+    /**
+     * Templates available for styles
+     */
     var _templates = {
         blue_medium: {
-            description: 'Blue Medium Weight',
-            excelStyles: [
-                {
-                    cells: '2',
-                    style: {
-                        font: {
-                            color: 'FFFFFF',
-                        },
-                        fill: {
-                            patternFill: {
-                                patternType: 'solid',
-                                fgColor: '4472C4',
-                                bgColor: '4472C4',
-                            },
-                        },
-                    },
-                },
-                {
-                    cells: '3:n,2',
-                    style: {
-                        fill: {
-                            patternFill: {
-                                patternType: 'solid',
-                                fgColor: 'D9E1F2',
-                                bgColor: 'D9E1F2',
-                            },
-                        },
-                    },
-                },
-                {
-                    cells: '2:',
-                    style: {
-                        border: {
-                            top: {
-                                style: 'thin',
-                                color: '8EA9DB',
-                            },
-                            bottom: {
-                                style: 'thin',
-                                color: '8EA9DB',
-                            },
-                        },
-                    },
-                },
+            desc: 'Blue Medium Weight',
+            es: [
+                _tp.header_blue.es,
+                _tp.stripes_blue.es,
+                _tp.rowlines_blue.es,
             ],
         },
         green_medium: {
-            description: 'Green Medium Weight',
-            excelStyles: [
-                {
-                    cells: '2',
-                    style: {
-                        font: {
-                            color: 'FFFFFF',
-                        },
-                        fill: {
-                            patternFill: {
-                                patternType: 'solid',
-                                fgColor: '70AD47',
-                                bgColor: '70AD47',
-                            },
-                        },
-                    },
-                },
-                {
-                    cells: '3:n,2',
-                    style: {
-                        fill: {
-                            patternFill: {
-                                patternType: 'solid',
-                                fgColor: 'E2EFDA',
-                                bgColor: 'E2EFDA',
-                            },
-                        },
-                    },
-                },
-                {
-                    cells: '2:',
-                    style: {
-                        border: {
-                            top: {
-                                style: 'thin',
-                                color: 'A9D08E',
-                            },
-                            bottom: {
-                                style: 'thin',
-                                color: 'A9D08E',
-                            },
-                        },
-                    },
-                },
+            desc: 'Green Medium Weight',
+            es: [
+                _tp.header_green.es,
+                _tp.stripes_green.es,
+                _tp.rowlines_green.es,
             ],
         },
     };
 
+    $.extend(_templates, _tp);
+
     return DataTable.Buttons;
 });
-
-
