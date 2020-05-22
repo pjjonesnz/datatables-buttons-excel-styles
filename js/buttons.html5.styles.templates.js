@@ -218,6 +218,20 @@
                 },
             },
         },
+        currency_eu: {
+            es: {
+                style: {
+                    numFmt: '[$€-x-euro2] #,##0.00',
+                },
+            },
+        },
+        currency_gb: {
+            es: {
+                style: {
+                    numFmt: '[$£-en-GB]#,##0.00',
+                },
+            },
+        },
         int: {
             es: {
                 style: {
