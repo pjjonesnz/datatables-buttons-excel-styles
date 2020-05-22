@@ -69,6 +69,6 @@ Smart References can select the various parts of the table (title, header, data,
 * `sB3` - Column B, row 3 of the data rows
 * and more...
 
-For exmplaes of using these cell selections, while the docs are being written, please [view the demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html), or have a look at the source of buttons.html5.styles.templates.js
+For exmplaes of using these cell selections, while the docs are being written, please [view the demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html), or have a look at the source of [buttons.html5.styles.templates.js](https://github.com/pjjonesnz/buttons-html5-styles/blob/master/js/buttons.html5.styles.templates.js)
 
 ** More docs underway - due end of May 2020 **
