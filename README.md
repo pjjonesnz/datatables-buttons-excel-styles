@@ -1,8 +1,8 @@
 # DataTables Buttons Html5 Excel Styling
 
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/pjjonesnz/buttons-html5-styles)](https://github.com/pjjonesnz/buttons-html5-styles/releases)
-[![GitHub license](https://img.shields.io/github/license/pjjonesnz/buttons-html5-styles)](https://github.com/pjjonesnz/buttons-html5-styles/blob/master/LICENSE.md)
-[![npm](https://img.shields.io/npm/v/buttons-html5-styles)](https://www.npmjs.com/package/buttons-html5-styles)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/pjjonesnz/datatables-buttons-excel-styles)](https://github.com/pjjonesnz/datatables-buttons-excel-styles/releases)
+[![GitHub license](https://img.shields.io/github/license/pjjonesnz/datatables-buttons-excel-styles)](https://github.com/pjjonesnz/datatables-buttons-excel-styles/blob/master/LICENSE.md)
+[![npm](https://img.shields.io/npm/v/datatables-buttons-excel-styles)](https://www.npmjs.com/package/datatables-buttons-excel-styles)
 
 **Add beautifully styled Excel output to your DataTables.**
 
@@ -70,6 +70,6 @@ Smart References can select the various parts of the table (title, header, data,
 * `sB3` - Column B, row 3 of the data rows
 * and more...
 
-For exmplaes of using these cell selections, while the docs are being written, please [view the demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html), or have a look at the source of [buttons.html5.styles.templates.js](https://github.com/pjjonesnz/buttons-html5-styles/blob/master/js/buttons.html5.styles.templates.js)
+For exmplaes of using these cell selections, while the docs are being written, please [view the demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html), or have a look at the source of [buttons.html5.styles.templates.js](https://github.com/pjjonesnz/datatables-buttons-excel-styles/blob/master/js/buttons.html5.styles.templates.js)
 
 ** More docs underway - due end of May 2020 **

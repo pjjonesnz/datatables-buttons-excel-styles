@@ -1,5 +1,5 @@
 {
-  "name": "buttons-html5-styles",
+  "name": "datatables-buttons-excel-styles",
   "version": "0.6.2",
   "description": "Easy custom styling of the Excel export from DataTables jQuery plug-in.",
   "main": "js/buttons.html5.styles.js",
@@ -14,13 +14,12 @@
     "update_example_version": "rexreplace \"\\.min\\.js\\?version=[^\\\"]*\" \".min.js?version=%npm_package_version%\" examples/*.html",
     "build": "npm run update_version && npm run uglify",
     "git_push": "git push && git push --tags",
-    "publish": "npm publish",
     "push_and_publish": "npm run git_push && npm publish",
     "version": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/pjjonesnz/buttons-html5-styles.git"
+    "url": "https://github.com/pjjonesnz/datatables-buttons-excel-styles.git"
   },
   "keywords": [
     "DataTables",
@@ -34,9 +33,9 @@
   "author": "Paul Jones",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/pjjonesnz/buttons-html5-styles/issues"
+    "url": "https://github.com/pjjonesnz/datatables-buttons-excel-styles/issues"
   },
-  "homepage": "https://github.com/pjjonesnz/buttons-html5-styles#readme",
+  "homepage": "https://github.com/pjjonesnz/datatables-buttons-excel-styles#readme",
   "dependencies": {
     "datatables.net": "^1.10.15",
     "datatables.net-buttons": "^1.6.1",
