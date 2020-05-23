@@ -1,10 +1,22 @@
 {
   "name": "buttons-html5-styles",
-  "version": "0.5.0",
+  "version": "0.6.1",
   "description": "Easy custom styling of the Excel export from DataTables jQuery plug-in.",
   "main": "js/buttons.html5.styles.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "uglify": "npm run uglify_styles && npm run uglify_templates",
+    "uglify_styles": "uglifyjs js/buttons.html5.styles.js -c -o js/buttons.html5.styles.min.js",
+    "uglify_templates": "uglifyjs js/buttons.html5.styles.templates.js -c -o js/buttons.html5.styles.templates.min.js",
+    "update_version": "npm run update_script_version && npm run update_template_version",
+    "update_script_version": "rexreplace \"\\* version: .*\" \"* version: %npm_package_version%\" js/buttons.html5.styles.js -G",
+    "update_template_version": "rexreplace \"\\* version: .*\" \"* version: %npm_package_version%\" js/buttons.html5.styles.templates.js -G",
+    "build": "npm run update_version && npm run uglify",
+    "push_tags": "git push --follow-tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pjjonesnz/buttons-html5-styles.git"
   },
   "keywords": [
     "DataTables",
@@ -12,10 +24,15 @@
     "excel",
     "export",
     "style",
-    "styling"
+    "styling",
+    "themes"
   ],
   "author": "Paul Jones",
   "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pjjonesnz/buttons-html5-styles/issues"
+  },
+  "homepage": "https://github.com/pjjonesnz/buttons-html5-styles#readme",
   "dependencies": {
     "datatables.net": "^1.10.15",
     "datatables.net-buttons": "^1.6.1",
@@ -23,6 +40,8 @@
   },
   "devDependencies": {
     "datatables.net-buttons-dt": "^1.6.1",
-    "datatables.net-dt": "^1.10.20"
+    "datatables.net-dt": "^1.10.20",
+    "rexreplace": "^5.3.0",
+    "uglify-js": "^3.9.3"
   }
 }
