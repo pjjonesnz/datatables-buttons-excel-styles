@@ -1,4 +1,4 @@
-# DataTables Buttons Html5 Excel Styling
+# DataTables Buttons Excel Styling
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/pjjonesnz/datatables-buttons-excel-styles)](https://github.com/pjjonesnz/datatables-buttons-excel-styles/releases)
 [![GitHub license](https://img.shields.io/github/license/pjjonesnz/datatables-buttons-excel-styles)](https://github.com/pjjonesnz/datatables-buttons-excel-styles/blob/master/LICENSE.md)
