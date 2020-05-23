@@ -2,7 +2,7 @@
  * Style templates for html5.styles
  *
  * @version: 0.7.0
- * @description Easy templats for 'excelStyles'
+ * @description Easy templates for 'excelStyles'
  * @file buttons.html5.styles.templates.js
  * @copyright © 2020 Beyond the Box Creative
  * @author Paul Jones <info@pauljones.co.nz>

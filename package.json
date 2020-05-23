@@ -19,15 +19,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/pjjonesnz/datatables-buttons-excel-styles.git"
+    "url": "git+https://github.com/pjjonesnz/datatables-buttons-excel-styles.git"
   },
   "keywords": [
     "DataTables",
     "buttons",
     "excel",
+    "html5",
     "export",
     "style",
     "styling",
+    "styles",
+    "theme",
     "themes"
   ],
   "author": "Paul Jones",
