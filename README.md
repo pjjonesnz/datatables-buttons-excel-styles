@@ -22,11 +22,11 @@ Now you can simply style your downloaded tables without having to learn the intr
 
 2. Include Datatables css and js (https://www.datatables.net/download/)
 
-3. Include the plugins' style and optional template javascript files
+3. Include the plugins' style and optional template javascript files from the following cdn or download from this repository and add the scripts in the js folder to your page.
 
 ```html
-<script src="js/buttons.html5.styles.min.js"></script>
-<script src="js/buttons.html5.styles.templates.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.1/js/buttons.html5.styles.min.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.1/js/buttons.html5.styles.templates.min.js"></script>
 ```
 
 4. Add an excelStyles config option to apply a style or template to the Excel file. [View demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_template_style.html)
