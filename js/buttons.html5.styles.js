@@ -23,6 +23,7 @@
             'jquery',
             'datatables.net',
             'datatables.net-buttons',
+            'datatables.net-buttons/js/buttons.html5.js',
         ], function ($) {
             return factory($, window, document);
         });
@@ -39,6 +40,10 @@
 
             if (!$.fn.dataTable.Buttons) {
                 require('datatables.net-buttons')(root, $);
+            }
+            
+            if (!$.fn.dataTable.Buttons.excelHtml5) {
+                require('datatables.net-buttons/js/buttons.html5.js')(root, $);
             }
 
             return factory($, root, root.document);

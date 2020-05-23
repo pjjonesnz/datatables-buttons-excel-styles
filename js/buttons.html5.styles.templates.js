@@ -20,6 +20,8 @@
             'jquery',
             'datatables.net',
             'datatables.net-buttons',
+            'datatables.net-buttons/js/buttons.html5.js',
+            'datatables-buttons-excel-styles/js/buttons.html5.styles.js',
         ], function ($) {
             return factory($, window, document);
         });
@@ -36,6 +38,17 @@
 
             if (!$.fn.dataTable.Buttons) {
                 require('datatables.net-buttons')(root, $);
+            }
+
+            if (!$.fn.dataTable.Buttons.excelHtml5) {
+                require('datatables.net-buttons/js/buttons.html5.js')(root, $);
+            }
+
+            if (!$.fn.dataTable.Buttons._applyExcelStyles) {
+                require('datatables-buttons-excel-styles/js/buttons.html5.styles.js')(
+                    root,
+                    $
+                );
             }
 
             return factory($, root, root.document);
