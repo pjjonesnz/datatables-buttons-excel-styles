@@ -25,8 +25,8 @@ Now you can simply style your downloaded tables without having to learn the intr
 3. Include the plugins' style and optional template javascript files
 
 ```html
-<script src="js/buttons.html5.styles.js"></script>
-<script src="js/buttons.html5.styles.templates.js"></script>
+<script src="js/buttons.html5.styles.min.js"></script>
+<script src="js/buttons.html5.styles.templates.min.js"></script>
 ```
 
 4. Add an excelStyles config option to apply a style or template to the Excel file. [View demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_template_style.html)
