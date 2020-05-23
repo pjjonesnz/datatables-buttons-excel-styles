@@ -13,7 +13,10 @@
     "update_template_version": "rexreplace \"\\* @version: .*\" \"* @version: %npm_package_version%\" js/buttons.html5.styles.templates.js -G",
     "update_example_version": "rexreplace \"\\.min\\.js\\?version=[^\\\"]*\" \".min.js?version=%npm_package_version%\" examples/*.html",
     "build": "npm run update_version && npm run uglify",
-    "push_tags": "git push --follow-tags"
+    "git_push": "git push && git push --tags",
+    "publish": "npm publish",
+    "push_and_publish": "npm run git_push && npm publish",
+    "version": "npm run build"
   },
   "repository": {
     "type": "git",
