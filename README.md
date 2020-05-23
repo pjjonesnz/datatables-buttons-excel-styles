@@ -2,6 +2,7 @@
 
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/pjjonesnz/buttons-html5-styles)](https://github.com/pjjonesnz/buttons-html5-styles/releases)
 [![GitHub license](https://img.shields.io/github/license/pjjonesnz/buttons-html5-styles)](https://github.com/pjjonesnz/buttons-html5-styles/blob/master/LICENSE.md)
+[![npm](https://img.shields.io/npm/v/buttons-html5-styles)](https://www.npmjs.com/package/buttons-html5-styles)
 
 **Add beautifully styled Excel output to your DataTables.**
 
