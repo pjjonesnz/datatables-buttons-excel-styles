@@ -15,7 +15,7 @@
     "build": "npm run update_version && npm run uglify",
     "git_push": "git push && git push --tags",
     "push_and_publish": "npm run git_push && npm publish",
-    "version": "npm run build"
+    "version": "npm run build && git add -A"
   },
   "repository": {
     "type": "git",
