@@ -128,6 +128,36 @@
      * Note: excelStyles key shortened to es for brevity
      */
     var _tp = {
+        b: {
+            es: {
+                cells: 's1:-0',
+                style: {
+                    font: {
+                      b: true
+                    },
+                }
+            }
+        },
+        u: {
+            es: {
+                cells: 's1:-0',
+                style: {
+                    font: {
+                    u: true
+                    },
+                }
+            }
+        },
+        i: {
+            es: {
+                cells: 's1:-0',
+                style: {
+                    font: {
+                    i: true
+                    },
+                }
+            }
+        },
         header_blue: {
             es: {
                 cells: ['sh', 'sf'],
