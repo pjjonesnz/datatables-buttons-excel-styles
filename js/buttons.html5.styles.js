@@ -651,6 +651,11 @@
             },
         },
         fill: {
+            translate: {
+                pattern: 'patternFill',
+                type: 'patternType',
+                color: 'fgColor',
+            },
             fgColor: {
                 val: 'rgb',
             },
@@ -804,11 +809,12 @@
         if (typeof value === 'object') {
             value = _mergeDefault(tagName, attributeName, value);
             for (var i in value) {
+                var key = _getTranslatedKey(tagName, i);
                 // if the type is child, create a child node
-                if (_isChildAttribute(tagName, attributeName, i)) {
-                    _addXMLNode(tagName, i, value[i], parentNode);
+                if (_isChildAttribute(tagName, attributeName, key)) {
+                    _addXMLNode(tagName, key, value[i], parentNode);
                 } else {
-                    $(parentNode).attr(i, value[i]);
+                    $(parentNode).attr(key, value[i]);
                 }
             }
         } else if (value != '') {
@@ -841,12 +847,12 @@
      * @param {object} parentNode
      */
     var _addXMLNode = function (tagName, attributeName, value, parentNode) {
-        var key = _getTranslatedKey(tagName, attributeName);
+        var attributeName = _getTranslatedKey(tagName, attributeName);
         var childNode;
-        if (parentNode.getElementsByTagName(key).length === 0)
-            childNode = parentNode.appendChild(_xmlStyleDoc.createElement(key));
+        if (parentNode.getElementsByTagName(attributeName).length === 0)
+            childNode = parentNode.appendChild(_xmlStyleDoc.createElement(attributeName));
         else {
-            childNode = parentNode.getElementsByTagName(key)[0];
+            childNode = parentNode.getElementsByTagName(attributeName)[0];
         }
         _addXMLAttribute(tagName, attributeName, value, childNode);
     };
@@ -885,80 +891,6 @@
         var mergeStyleXf = cellXfs.getElementsByTagName('xf')[builtInIndex];
 
         var xf = cellXfs.appendChild(currentStyleXf.cloneNode(true));
-
-        // Go through all types if any of the type ids are different, clone the elements of those types and change as required
-        var types = ['font', 'fill', 'border', 'numFmt'];
-        for (var i = 0; i < types.length; i++) {
-            var id = types[i] + 'Id';
-
-            if (mergeStyleXf.hasAttribute(id)) {
-                if (xf.hasAttribute(id)) {
-                    var mergeId = mergeStyleXf.getAttribute(id);
-                    var typeId = xf.getAttribute(id);
-                    var parentNode = _xmlStyleDoc.getElementsByTagName(
-                        types[i] + 's'
-                    )[0];
-
-                    var mergeNode = parentNode.childNodes[mergeId];
-                    if (mergeId != typeId) {
-                        if (id == 'numFmtId') {
-                            if (mergeId > 0) {
-                                xf.setAttribute(id, mergeId);
-                            }
-                        } else {
-                            var childNode = parentNode.childNodes[
-                                typeId
-                            ].cloneNode(true);
-                            parentNode.appendChild(childNode);
-                            _updateContainerCount(parentNode);
-                            xf.setAttribute(
-                                id,
-                                parentNode.childNodes.length - 1
-                            );
-
-                            // Cycle through merge children and add/replace
-                            var mergeNodeChildren = mergeNode.childNodes;
-
-                            for (
-                                var key = 0;
-                                key < mergeNodeChildren.length;
-                                key++
-                            ) {
-                                var newAttr = mergeNodeChildren[key].cloneNode(
-                                    true
-                                );
-
-                                var attr = childNode.getElementsByTagName(
-                                    mergeNodeChildren[key].nodeName
-                                );
-                                if (attr[0]) {
-                                    childNode.replaceChild(newAttr, attr[0]);
-                                } else {
-                                    childNode.appendChild(newAttr);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return cellXfs.childNodes.length - 1;
-    };
-
-    /**
-     * Merge current cell style with new custom style to be applied
-     *
-     * @param {object} addStyle Excelstyles style object to be applied to cell
-     * @param {int} currentCellStyle Current index of the cell being updated
-     * @return {int} Index of the newly created style
-     */
-    var _mergeWithStyle = function (addStyle, currentCellStyle) {
-        var cellXfs = _xmlStyleDoc.getElementsByTagName('cellXfs')[0];
-        var style = addStyle.style;
-        var existingStyleXf = cellXfs.getElementsByTagName('xf')[
-            currentCellStyle
-        ];
-        var xf = cellXfs.appendChild(existingStyleXf.cloneNode(true));
 
         // Go through all types if any of the type ids are different, clone the elements of those types and change as required
         var types = ['font', 'fill', 'border', 'numFmt'];
