@@ -18,16 +18,8 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-html5-1.6.2/datatables.min.css"/>
         <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.21/b-1.6.2/b-html5-1.6.2/datatables.min.js"></script>
 
-        <script
-            type="text/javascript"
-            language="javascript"
-            src="../js/buttons.html5.styles.js"
-        ></script>
-        <script
-            type="text/javascript"
-            language="javascript"
-            src="../js/buttons.html5.styles.templates.js"
-        ></script>
+        <script type="text/javascript" src="../js/buttons.html5.styles.js?version=0.7.2"></script>
+        <script type="text/javascript" src="../js/buttons.html5.styles.templates.js?version=0.7.2"></script>
         <script type="text/javascript" language="javascript" class="init">
             var exampleStyles = {
                 excelblue_template: {
@@ -35,7 +27,8 @@
                     help:
                         "<p>This is the first simple example showing how easy it is to style an excel spreadsheet.</p>" +
                         '<p>This one uses the addon styles templates, which is the simplest way to make a great looking spreadsheet</p>' +
-                        '<p>The other examples will show you how incredibly flexible this plugin is.</p>',
+                        '<p>The other examples will show you how incredibly flexible this plugin is.</p>' +
+                        '<p><strong>Click on the Excel button</strong> to download the spreadsheet with the style dynamically applied.</p>',
                     excelStyles: {
                         template: 'blue_medium',
                     },
@@ -88,10 +81,9 @@
                         cells: '4:n,2',
                         style: {
                             fill: {
-                                patternFill: {
-                                    patternType: 'lightUp', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
-                                    fgColor: 'FFC6CF',
-                                    bgColor: 'FFFFFF',
+                                pattern: {
+                                    type: 'solid', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
+                                    color: 'FFC6CF',
                                 },
                             },
                         },
@@ -109,10 +101,9 @@
                                     color: 'FFFFFF',
                                 },
                                 fill: {
-                                    patternFill: {
-                                        patternType: 'solid',
-                                        fgColor: '4472C4',
-                                        bgColor: '4472C4',
+                                    pattern: {
+                                        type: 'solid',
+                                        color: '4472C4',
                                     },
                                 },
                             },
@@ -121,10 +112,9 @@
                             cells: '3:n,2',
                             style: {
                                 fill: {
-                                    patternFill: {
-                                        patternType: 'solid',
-                                        fgColor: 'D9E1F2',
-                                        bgColor: 'D9E1F2',
+                                    pattern: {
+                                        type: 'solid',
+                                        color: 'D9E1F2',
                                     },
                                 },
                             },
@@ -171,10 +161,9 @@
                             cells: '2',
                             style: {
                                 fill: {
-                                    patternFill: {
-                                        patternType: 'solid',
-                                        fgColor: 'ED7D31',
-                                        bgColor: 'ED7D31',
+                                    pattern: {
+                                        type: 'solid',
+                                        color: 'ED7D31',
                                     },
                                 },
                             },
@@ -221,10 +210,9 @@
                             cells: '3:n,2',
                             style: {
                                 fill: {
-                                    patternFill: {
-                                        patternType: 'solid', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
-                                        fgColor: 'EEEEEE',
-                                        bgColor: 'EEEEEE',
+                                    pattern: {
+                                        type: 'solid', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
+                                        color: 'EEEEEE',
                                     },
                                 },
                             },
@@ -263,10 +251,9 @@
                             cells: '3:n,2',
                             style: {
                                 fill: {
-                                    patternFill: {
-                                        patternType: 'solid', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
-                                        fgColor: 'EEEEEE',
-                                        bgColor: 'EEEEEE',
+                                    pattern: {
+                                        type: 'solid', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
+                                        color: 'EEEEEE',
                                     },
                                 },
                             },
@@ -353,7 +340,8 @@
                     help:
                         '<p>Number formats defined in a template can be applied to specific cells.</p><p>If no cell references are given then' +
                         ' the cell reference is taken from the template, but if you provide a cell reference this is used instead.</p>' +
-                        '<p>Note: this could give weird results for some of the templates, but using the individual template parts like this works great!</p>',
+                        '<p>Note: this could give weird results for some of the templates, but using the individual template parts like this works great!</p>' +
+                        '<p>Also try the following: currency_us, currency_gb</p>',
                     excelStyles: [
                         {
                             cells: 'D',
@@ -361,7 +349,7 @@
                         },
                         {
                             cells: 'F',
-                            template: 'currency_us',
+                            template: 'currency_eu',
                         },
                     ],
                 },
@@ -556,7 +544,7 @@
                                         config.footer = false;
                                     }
                                     
-                                    config.exportOptions.excelStyles =
+                                    config.excelStyles =
                                         json.excelStyles;
                                     $.fn.dataTable.ext.buttons.excelHtml5.action.call(
                                         this,
@@ -615,7 +603,7 @@
                     <li>Click on the 'Excel' button to download the spreadsheet with the style applied</li>
                     <li>Try another example</li>
                     <li>Edit the style code yourself to make your own style!</li>
-                    <li>Download it from Github and use it on your site: <a href="https://github.com/pjjonesnz/buttons-html5-styles" target="_blank">https://github.com/pjjonesnz/buttons-html5-styles</a>
+                    <li>Download it from Github and use it on your site: <a href="https://github.com/pjjonesnz/datatables-buttons-excel-styles" target="_blank">https://github.com/pjjonesnz/datatables-buttons-excel-styles</a></li>
                     </ol>
                 </p>
                 

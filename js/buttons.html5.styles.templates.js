@@ -1,8 +1,8 @@
 /**
  * Style templates for html5.styles
  *
- * @version: 0.2
- * @description Easy templats for 'excelStyles'
+ * @version: 0.7.3
+ * @description Easy templates for 'excelStyles'
  * @file buttons.html5.styles.templates.js
  * @copyright © 2020 Beyond the Box Creative
  * @author Paul Jones <info@pauljones.co.nz>
@@ -20,6 +20,8 @@
             'jquery',
             'datatables.net',
             'datatables.net-buttons',
+            'datatables.net-buttons/js/buttons.html5.js',
+            'datatables-buttons-excel-styles/js/buttons.html5.styles.js',
         ], function ($) {
             return factory($, window, document);
         });
@@ -38,6 +40,17 @@
                 require('datatables.net-buttons')(root, $);
             }
 
+            if (!$.fn.dataTable.Buttons.excelHtml5) {
+                require('datatables.net-buttons/js/buttons.html5.js')(root, $);
+            }
+
+            if (!$.fn.dataTable.Buttons._applyExcelStyles) {
+                require('datatables-buttons-excel-styles/js/buttons.html5.styles.js')(
+                    root,
+                    $
+                );
+            }
+
             return factory($, root, root.document);
         };
     } else {
@@ -54,12 +67,12 @@
      * Override the html5.styles.js applyStyles function to initialize the templates
      */
     DataTable.ext.buttons.excelHtml5.applyStyles = function (xlsx) {
-        var excelStyles = this.exportOptions.excelStyles;
+        var excelStyles = this.excelStyles || this.exportOptions.excelStyles;
         if (excelStyles !== undefined) {
             if (!Array.isArray(excelStyles)) {
                 excelStyles = [excelStyles];
             }
-            this.exportOptions.excelStyles = _replaceTemplatesWithStyles(
+            this.excelStyles = _replaceTemplatesWithStyles(
                 excelStyles
             );
             this._applyExcelStyles(xlsx);
@@ -115,6 +128,36 @@
      * Note: excelStyles key shortened to es for brevity
      */
     var _tp = {
+        b: {
+            es: {
+                cells: 's1:-0',
+                style: {
+                    font: {
+                      b: true
+                    },
+                }
+            }
+        },
+        u: {
+            es: {
+                cells: 's1:-0',
+                style: {
+                    font: {
+                    u: true
+                    },
+                }
+            }
+        },
+        i: {
+            es: {
+                cells: 's1:-0',
+                style: {
+                    font: {
+                    i: true
+                    },
+                }
+            }
+        },
         header_blue: {
             es: {
                 cells: ['sh', 'sf'],
@@ -215,6 +258,20 @@
             es: {
                 style: {
                     numFmt: '[$$-en-US] #,##0.00',
+                },
+            },
+        },
+        currency_eu: {
+            es: {
+                style: {
+                    numFmt: '[$€-x-euro2] #,##0.00',
+                },
+            },
+        },
+        currency_gb: {
+            es: {
+                style: {
+                    numFmt: '[$£-en-GB]#,##0.00',
                 },
             },
         },
