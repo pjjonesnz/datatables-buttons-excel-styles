@@ -16,20 +16,20 @@ Now you can simply style your downloaded tables without having to learn the intr
 
 [View the Excel styling demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html)
 
-## Usage
+## Installing
 
-1. Include jQuery
+1. Add jQuery, DataTables, Buttons Extension and JSZip to your page. [Download from DataTables.net](https://www.datatables.net/download/)
 
-2. Include Datatables css and js (https://www.datatables.net/download/)
-
-3. Include the plugins' style and optional template javascript files from the following cdn or download from this repository and add the scripts in the js folder to your page.
+2. Include the javascript files for this plugin from the following cdn, or download from this repository and add the scripts in the js/ folder to your page.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.1/js/buttons.html5.styles.min.js"></script>
- <script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.1/js/buttons.html5.styles.templates.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.3/js/buttons.html5.styles.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.3/js/buttons.html5.styles.templates.min.js"></script>
 ```
 
-4. Add an excelStyles config option to apply a style or template to the Excel file. [View demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_template_style.html)
+## Usage
+
+Add an excelStyles config option to apply a style or template to the Excel file. [View demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_template_style.html)
 
 ```js
 $('#myTable').DataTable({
@@ -72,6 +72,6 @@ Smart References can select the various parts of the table (title, header, data,
 * `sB3` - Column B, row 3 of the data rows
 * and more...
 
-For exmplaes of using these cell selections, while the docs are being written, please [view the demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html), or have a look at the source of [buttons.html5.styles.templates.js](https://github.com/pjjonesnz/datatables-buttons-excel-styles/blob/master/js/buttons.html5.styles.templates.js)
+For examples of using these cell selections, while the docs are being written, please [view the demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html), or have a look at the source of [buttons.html5.styles.templates.js](https://github.com/pjjonesnz/datatables-buttons-excel-styles/blob/master/js/buttons.html5.styles.templates.js)
 
 ** More docs underway - due end of May 2020 **

@@ -90,16 +90,18 @@ With the default settings, row references refer to the actual spreadsheet rows (
 can be hard to work with if your spreadsheet has (or doesn't have) the extra title and/or message above the data. Also, if you
 include a footer this can be hard to define a template that works for custom excel configurations.
 
-Smart row references adds specific code to refer to these special rows, and redfines row 1 to be the first row of the data
+Smart row references adds specific code to refer to these special rows, and redefines row 1 to be the first row of the data
 
 You can enable smart references by adding the `rowref:"smart"` option to your style definition
 
 ```js
-excelstyles: [
+excelStyles: [
     {
         rowref: "smart",
-        cells: "...cell reference..."
-        style: { ...style definition... }
+        cells: "...cell reference...",
+        style: { 
+            // ...style definition... 
+        }
     }
 ]
 ```
