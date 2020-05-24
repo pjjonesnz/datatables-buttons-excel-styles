@@ -108,7 +108,7 @@ excelStyles: [
 
 An alternative way to enable smart row references is by adding a `s` to the beginning of the cell reference, although this may be harder to remember when you come back to it in the future. eg. `sD4` Now refers to column D, row 4 of the data (which in a standard table with a title row and column headers would be found in row 6 of the exported table).
 
-### Smart row references
+### Available Smart Row References
 
 | Ref | Buttons option | Meaning |
 |---|---|---|

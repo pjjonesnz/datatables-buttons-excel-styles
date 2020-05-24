@@ -62,15 +62,15 @@ Extended references are also available to select individual rows and columns, or
 * `>` - The last column in the table
 * `-0` - The last row in the table
 * `-2` - The third to last row in the table
-* and more...
+* [and more...](./docs/cell_references.md)
 
-Smart References can select the various parts of the table (title, header, data, footer, etc.). These are enabled with a `s` prefix in the cell reference:
+Smart References can select the various parts of the table (title, header, data, footer, etc.). These are enabled with a `s` prefix in the cell reference, or with the `rowref: "smart"` config option:
 * `sh` - The header
 * `sf` - The footer
 * `s1` - Becomes the first data row
 * `s-0` - Becomes the last data row
 * `sB3` - Column B, row 3 of the data rows
-* and more...
+* [and more...](./docs/cell_references.md)
 
 For examples of using these cell selections, while the docs are being written, please [view the demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html), or have a look at the source of [buttons.html5.styles.templates.js](https://github.com/pjjonesnz/datatables-buttons-excel-styles/blob/master/js/buttons.html5.styles.templates.js)
 
