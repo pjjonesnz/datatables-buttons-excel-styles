@@ -47,6 +47,8 @@ $('#myTable').DataTable({
 
 ## Cell References
 
+[View this page for a complete list of all cell reference options](./docs/cell_references.md)
+
 Use familiar Excel cell references to select a specific cell or cell range:
 * `A2` - Select cell A2
 * `C17` - Select cell C17
