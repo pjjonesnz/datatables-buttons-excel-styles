@@ -166,10 +166,9 @@
                         color: 'FFFFFF',
                     },
                     fill: {
-                        patternFill: {
-                            patternType: 'solid',
-                            fgColor: '4472C4',
-                            bgColor: '4472C4',
+                        pattern: {
+                            type: 'solid',
+                            color: '4472C4',
                         },
                     },
                 },
@@ -183,10 +182,9 @@
                         color: 'FFFFFF',
                     },
                     fill: {
-                        patternFill: {
-                            patternType: 'solid',
-                            fgColor: '70AD47',
-                            bgColor: '70AD47',
+                        pattern: {
+                            type: 'solid',
+                            color: '70AD47',
                         },
                     },
                 },
@@ -197,10 +195,9 @@
                 cells: 's1:n,2',
                 style: {
                     fill: {
-                        patternFill: {
-                            patternType: 'solid',
-                            fgColor: 'D9E1F2',
-                            bgColor: 'D9E1F2',
+                        pattern: {
+                            type: 'solid',
+                            color: 'D9E1F2',
                         },
                     },
                 },
@@ -211,10 +208,9 @@
                 cells: 's1:n,2',
                 style: {
                     fill: {
-                        patternFill: {
-                            patternType: 'solid',
-                            fgColor: 'E2EFDA',
-                            bgColor: 'E2EFDA',
+                        pattern: {
+                            type: 'solid',
+                            color: 'E2EFDA',
                         },
                     },
                 },

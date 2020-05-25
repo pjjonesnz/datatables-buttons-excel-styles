@@ -642,11 +642,6 @@
             },
             color: {
                 val: 'rgb',
-                rgb: {
-                    tidy: function (val) {
-                        return /([A-F0-9]{3,6})/.exec(val)[1].toUpperCase();
-                    },
-                },
             },
         },
         fill: {
@@ -676,9 +671,14 @@
             },
             gradientFill: {
                 replace: 'patternFill',
+                merge: false,
                 stop: {
+                    merge: false,
                     child: true,
-                    val: 'rgb',
+                    color: {
+                        child: true,
+                        val: 'rgb',
+                    },
                 },
             },
         },
@@ -689,6 +689,8 @@
                 top: '',
                 bottom: '',
                 diagonal: '',
+                vertical: '',
+                horizontal: '',
             },
             top: {
                 val: 'style',
@@ -712,6 +714,27 @@
                 },
             },
             right: {
+                val: 'style',
+                color: {
+                    child: true,
+                    val: 'rgb',
+                },
+            },
+            diagonal: {
+                val: 'style',
+                color: {
+                    child: true,
+                    val: 'rgb',
+                },
+            },
+            horizontal: {
+                val: 'style',
+                color: {
+                    child: true,
+                    val: 'rgb',
+                },
+            },
+            vertical: {
                 val: 'style',
                 color: {
                     child: true,
@@ -765,7 +788,11 @@
      */
     var _isChildAttribute = function (nodeHierarchy, attributeName) {
         var value = _findNodeValue(nodeHierarchy.concat([attributeName]));
-        return value !== undefined && value.child !== undefined && value.child === true;
+        return (
+            value !== undefined &&
+            value.child !== undefined &&
+            value.child === true
+        );
     };
 
     /**
@@ -776,7 +803,9 @@
      * @return {string} Translated tagName if found, otherwise tagName
      */
     var _getTranslatedKey = function (nodeHierarchy, tagName) {
-        var newKey = _findNodeValue(nodeHierarchy.concat(['translate', tagName]));
+        var newKey = _findNodeValue(
+            nodeHierarchy.concat(['translate', tagName])
+        );
         return newKey !== undefined ? newKey : tagName;
     };
 
@@ -789,10 +818,7 @@
      * @param {string} value
      * @param {array}  nodeHierarchy   Array of node names in this tree
      */
-    var _getStringAttribute = function (
-        attributeValue,
-        nodeHierarchy
-    ) {
+    var _getStringAttribute = function (attributeValue, nodeHierarchy) {
         var attributeName = 'val';
         var tKey = _findNodeValue(nodeHierarchy.concat([attributeName]));
         if (tKey !== undefined) {
@@ -832,13 +858,19 @@
                 var key = _getTranslatedKey(nodeHierarchy, attributeKey);
                 // if the type is child, create a child node
                 if (_isChildAttribute(nodeHierarchy, key)) {
-                    _addXMLNode(styleType, key, value, parentNode, nodeHierarchy);
+                    _addXMLNode(
+                        styleType,
+                        key,
+                        value,
+                        parentNode,
+                        nodeHierarchy
+                    );
                 } else {
                     $(parentNode).attr(key, value);
                 }
             }
         } else if (attributeValues != '') {
-            var txAttr = _getStringAttribute( attributeValues, nodeHierarchy );
+            var txAttr = _getStringAttribute(attributeValues, nodeHierarchy);
             $(parentNode).attr(txAttr);
         }
     };
@@ -862,17 +894,65 @@
      * @param {object}          parentNode      The parent xml node
      * @param {array}           nodeHierarchy   Array of node names in this tree
      */
-    var _addXMLNode = function (styleType, attributeName, attributeValue, parentNode, nodeHierarchy) {
+    var _addXMLNode = function (
+        styleType,
+        attributeName,
+        attributeValue,
+        parentNode,
+        nodeHierarchy
+    ) {
         var attributeName = _getTranslatedKey(nodeHierarchy, attributeName);
-        var childNode;
-        if (parentNode.getElementsByTagName(attributeName).length === 0)
-            childNode = parentNode.appendChild(
-                _xmlStyleDoc.createElement(attributeName)
-            );
-        else {
-            childNode = parentNode.getElementsByTagName(attributeName)[0];
+        _purgeUnwantedSiblings(attributeName, parentNode, nodeHierarchy);
+        if (!Array.isArray(attributeValue)) {
+            attributeValue = [attributeValue];
         }
-        _addXMLAttribute(styleType, attributeName, attributeValue, childNode, nodeHierarchy.concat(attributeName));
+
+        var mergeWith = _doWeMerge(attributeName, nodeHierarchy);
+
+        for (var i in attributeValue) {
+            var childNode;
+            if ( !mergeWith || parentNode.getElementsByTagName(attributeName).length === 0)
+                childNode = parentNode.appendChild(
+                    _xmlStyleDoc.createElement(attributeName)
+                );
+            else {
+                childNode = parentNode.getElementsByTagName(attributeName)[0];
+            }
+
+            _addXMLAttribute(
+                styleType,
+                attributeName,
+                attributeValue[i],
+                childNode,
+                nodeHierarchy.concat(attributeName)
+            );
+        }
+    };
+
+    var _doWeMerge = function (attributeName, nodeHierarchy) {
+        var merge = _findNodeValue(
+            nodeHierarchy.concat([attributeName, 'merge'])
+        );
+        if( merge !== undefined && merge === false) {
+            return false;
+        }
+        return true;
+    };
+
+    var _purgeUnwantedSiblings = function (
+        attributeName,
+        parentNode,
+        nodeHierarchy
+    ) {
+        var replace = _findNodeValue(
+            nodeHierarchy.concat([attributeName, 'replace'])
+        );
+        if (replace !== undefined) {
+            var match = parentNode.getElementsByTagName(replace);
+            if (match.length > 0) {
+                parentNode.removeChild(match[0]);
+            }
+        }
     };
 
     /**
@@ -1005,21 +1085,27 @@
             } else {
                 if (xf.hasAttribute(styleId)) {
                     var existingTypeId = xf.getAttribute(styleId);
-                    parentNode = typeNode.childNodes[existingTypeId].cloneNode(true);
+                    parentNode = typeNode.childNodes[existingTypeId].cloneNode(
+                        true
+                    );
                 } else {
                     parentNode = _xmlStyleDoc.createElement(type);
                 }
 
                 typeNode.appendChild(parentNode);
-
                 style[type] = _mergeDefault([type], style[type]);
 
                 for (var attributeName in style[type]) {
                     var attributeValue = style[type][attributeName];
-                    _addXMLNode(type, attributeName, attributeValue, parentNode, [type]); // fill, patternFill, object|string, parentNode
+                    _addXMLNode(
+                        type,
+                        attributeName,
+                        attributeValue,
+                        parentNode,
+                        [type]
+                    ); // fill, patternFill, object|string, parentNode
                 }
                 xf.setAttribute(styleId, typeNode.childNodes.length - 1);
-
                 _updateContainerCount(typeNode);
             }
         }
@@ -1029,7 +1115,6 @@
             xf.setAttribute('applyAlignment', '1');
         }
         _updateContainerCount(cellXfs);
-        console.log(_xmlStyleDoc);
         return cellXfs.childNodes.length - 1;
     };
 
