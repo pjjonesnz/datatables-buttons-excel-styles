@@ -41,7 +41,7 @@
             if (!$.fn.dataTable.Buttons) {
                 require('datatables.net-buttons')(root, $);
             }
-            
+
             if (!$.fn.dataTable.Buttons.excelHtml5) {
                 require('datatables.net-buttons/js/buttons.html5.js')(root, $);
             }
@@ -200,7 +200,7 @@
 
         /**
          * Modify the parsed cell results to account for smart row references
-         * 
+         *
          * @param {object} results The parsed cells
          * @param {boolean} smartRowOption Has the smart row option been set in excelStyles
          * @returns {boolean} True if a positive match has been made and resolved, or if this is not a smart row. False otherwise
@@ -243,10 +243,10 @@
             return true;
         }
 
-        if(!_patternMatchSmartRow(results, smartRowOption)) {
+        if (!_patternMatchSmartRow(results, smartRowOption)) {
             return false;
         }
-        
+
         // Refine column results
 
         results.toCol =
@@ -300,9 +300,7 @@
                       : _getMaxRow(sheet, results) - results.fromRow
               )
             : _getMinRow(results);
-        results.nthRow = results.nthRow
-            ? parseInt(results.nthRow)
-            : 1;
+        results.nthRow = results.nthRow ? parseInt(results.nthRow) : 1;
 
         // Reverse the row results if from is higher than to
 
@@ -314,8 +312,6 @@
 
         return results;
     };
-
-    
 
     /**
      * Get the maximum row index - adjusts for smart row references
@@ -468,7 +464,7 @@
      * @param {object} xlsx
      */
     DataTable.ext.buttons.excelHtml5._applyExcelStyles = function (xlsx) {
-        // Load excelStyles and also check exportOptions for backwards compatibility 
+        // Load excelStyles and also check exportOptions for backwards compatibility
         var excelStyles = this.excelStyles || this.exportOptions.excelStyles;
         if (excelStyles === undefined) {
             return;
@@ -612,7 +608,7 @@
      * to a format that Excel understands
      *
      * @example
-     * styleTag: { // Main style tag (font|fill|border)
+     * [rootStyleTag]: { // Main style tag (font|fill|border)
      *    default: {
      *        tagName1: '', // Objects that are required by excel in a particular order
      *        tagName2: '',
@@ -620,13 +616,16 @@
      *    translate: { // Used to translate commonly used tag names to XML spec name
      *        tagName: 'translatedTagName',
      *    },
-     *    tagName: { // eg. color, bottom, top, left, right (children of the main style tag)
+     *    [tagName]: { // eg. color, bottom, top, left, right (children of the main style tag)
      *        default: {
      *            tagName1: '', // Child objects required by excel in a particular order
      *            tagName2: '',
      *        },
+     *        translate: { // Used to translate commonly used tag names to XML spec name
+     *            tagName: 'translatedTagName',
+     *        },
      *        val: 'defaultAttributeName', // The attribute name to use in the XML output if value passed as a non-object
-     *        attributeName: {
+     *        [attributeName]: {
      *            tidy: function(val) { // The tidy function to run on attributeName value
      *            },
      *        },
@@ -653,14 +652,7 @@
         fill: {
             translate: {
                 pattern: 'patternFill',
-                type: 'patternType',
-                color: 'fgColor',
-            },
-            fgColor: {
-                val: 'rgb',
-            },
-            bgColor: {
-                val: 'rgb',
+                gradient: 'gradientFill',
             },
             patternFill: {
                 default: {
@@ -668,8 +660,26 @@
                     fgColor: '',
                     bgColor: '',
                 },
-                fgColor: 'child',
-                bgColor: 'child',
+                translate: {
+                    type: 'patternType',
+                    color: 'fgColor',
+                },
+                replace: 'gradientFill',
+                fgColor: {
+                    child: true,
+                    val: 'rgb',
+                },
+                bgColor: {
+                    child: true,
+                    val: 'rgb',
+                },
+            },
+            gradientFill: {
+                replace: 'patternFill',
+                stop: {
+                    child: true,
+                    val: 'rgb',
+                },
             },
         },
         border: {
@@ -680,24 +690,33 @@
                 bottom: '',
                 diagonal: '',
             },
-            color: {
-                val: 'rgb',
-            },
             top: {
                 val: 'style',
-                color: 'child',
+                color: {
+                    child: true,
+                    val: 'rgb',
+                },
             },
             bottom: {
                 val: 'style',
-                color: 'child',
+                color: {
+                    child: true,
+                    val: 'rgb',
+                },
             },
             left: {
                 val: 'style',
-                color: 'child',
+                color: {
+                    child: true,
+                    val: 'rgb',
+                },
             },
             right: {
                 val: 'style',
-                color: 'child',
+                color: {
+                    child: true,
+                    val: 'rgb',
+                },
             },
         },
     };
@@ -724,13 +743,12 @@
     /**
      * Merge object with defaults to fix Excel needing certain fields in a particular order
      *
-     * @param {string} parentTagName
-     * @param {string} tagName
+     * @param {array} nodeHierarchy
      * @param {object} obj Attribute object
      * @return {object} Attribute object merged with object defaults if they exist
      */
-    var _mergeDefault = function (parentTagName, tagName, obj) {
-        var mergeObj = _findNodeValue([parentTagName, tagName, 'default']);
+    var _mergeDefault = function (nodeHierarchy, obj) {
+        var mergeObj = _findNodeValue(nodeHierarchy.concat(['default']));
         if (mergeObj !== undefined) {
             return $.extend({}, mergeObj, obj);
         }
@@ -740,90 +758,87 @@
     /**
      * Should this attribute be created as a child node?
      *
-     * @param {string} parentTagName
+     * @param {array} nodeHierarchy
      * @param {string} tagName
      * @param {string} attributeName
      * @return {boolean}
      */
-    var _isChildAttribute = function (parentTagName, tagName, attributeName) {
-        return (
-            _findNodeValue([parentTagName, tagName, attributeName]) == 'child'
-        );
+    var _isChildAttribute = function (nodeHierarchy, attributeName) {
+        var value = _findNodeValue(nodeHierarchy.concat([attributeName]));
+        return value !== undefined && value.child !== undefined && value.child === true;
     };
 
     /**
      * Get translated tagName to translate commonly used html names to XML name (eg size: 'sz')
      *
-     * @param {string} parentTagName
+     * @param {array} nodeHierarchy
      * @param {string} tagName
      * @return {string} Translated tagName if found, otherwise tagName
      */
-    var _getTranslatedKey = function (parentTagName, tagName) {
-        var newKey = _findNodeValue([parentTagName, 'translate', tagName]);
+    var _getTranslatedKey = function (nodeHierarchy, tagName) {
+        var newKey = _findNodeValue(nodeHierarchy.concat(['translate', tagName]));
         return newKey !== undefined ? newKey : tagName;
     };
 
     /**
      * Get the attributes to add to the node
      *
-     * @param {string} parentTagName
+     * @param {string} styleType
      * @param {string} tagName
      * @param {string} attributeName
      * @param {string} value
+     * @param {array}  nodeHierarchy   Array of node names in this tree
      */
-    var _getTagAttributes = function (
-        parentTagName,
-        tagName,
-        attributeName,
-        value
+    var _getStringAttribute = function (
+        attributeValue,
+        nodeHierarchy
     ) {
-        var tKey = _findNodeValue([parentTagName, tagName, attributeName]);
-        if (tKey !== undefined && attributeName == 'val') {
+        var attributeName = 'val';
+        var tKey = _findNodeValue(nodeHierarchy.concat([attributeName]));
+        if (tKey !== undefined) {
             attributeName = tKey;
-            tKey = _findNodeValue([parentTagName, tagName, attributeName]);
+            tKey = _findNodeValue(nodeHierarchy.concat([attributeName]));
         }
         if (tKey !== undefined && tKey.tidy !== undefined) {
-            value = tKey.tidy(value);
+            attributeValue = tKey.tidy(attributeValue);
         }
         var obj = {};
-        obj[attributeName] = value;
+        obj[attributeName] = attributeValue;
         return obj;
     };
 
     /**
      * Add attributes to a node
      *
-     * @param {string} tagName
-     * @param {string} attributeName
-     * @param {string|object} value Attribute Value
-     * @param {obj} parentNode
+     * @param {string}          styleType       The type being added (ie. font, fill, border)
+     * @param {string}          attributeName   The name of the attribute to add
+     * @param {string|object}   attributeValue  The value of the attribute to add
+     * @param {object}          parentNode      The parent xml node
+     * @param {array}           nodeHierarchy   Array of node names in this tree
      *
      * @todo Replace jQuery function setting attributes when passed an object with plain javascript
      */
     var _addXMLAttribute = function (
-        tagName,
+        styleType,
         attributeName,
-        value,
-        parentNode
+        attributeValues,
+        parentNode,
+        nodeHierarchy
     ) {
-        if (typeof value === 'object') {
-            value = _mergeDefault(tagName, attributeName, value);
-            for (var i in value) {
-                var key = _getTranslatedKey(tagName, i);
+        if (typeof attributeValues === 'object') {
+            attributeValues = _mergeDefault(nodeHierarchy, attributeValues);
+            for (var attributeKey in attributeValues) {
+                var value = attributeValues[attributeKey];
+                var key = _getTranslatedKey(nodeHierarchy, attributeKey);
                 // if the type is child, create a child node
-                if (_isChildAttribute(tagName, attributeName, key)) {
-                    _addXMLNode(tagName, key, value[i], parentNode);
+                if (_isChildAttribute(nodeHierarchy, key)) {
+                    _addXMLNode(styleType, key, value, parentNode, nodeHierarchy);
                 } else {
-                    $(parentNode).attr(key, value[i]);
+                    $(parentNode).attr(key, value);
                 }
             }
-        } else if (value != '') {
-            var txAttr = _getTagAttributes(
-                tagName,
-                attributeName,
-                'val',
-                value
-            );
+        } else if (attributeValues != '') {
+            var txAttr = _getStringAttribute( attributeValues, nodeHierarchy );
             $(parentNode).attr(txAttr);
         }
     };
@@ -841,20 +856,23 @@
     /**
      * Add an XML Node to the tree
      *
-     * @param {string} tagName
-     * @param {string} attributeName
-     * @param {string|object} value
-     * @param {object} parentNode
+     * @param {string}          styleType       The type being added (ie. font, fill, border)
+     * @param {string}          attributeName   The name of the attribute to add
+     * @param {string|object}   attributeValue  The value of the attribute to add
+     * @param {object}          parentNode      The parent xml node
+     * @param {array}           nodeHierarchy   Array of node names in this tree
      */
-    var _addXMLNode = function (tagName, attributeName, value, parentNode) {
-        var attributeName = _getTranslatedKey(tagName, attributeName);
+    var _addXMLNode = function (styleType, attributeName, attributeValue, parentNode, nodeHierarchy) {
+        var attributeName = _getTranslatedKey(nodeHierarchy, attributeName);
         var childNode;
         if (parentNode.getElementsByTagName(attributeName).length === 0)
-            childNode = parentNode.appendChild(_xmlStyleDoc.createElement(attributeName));
+            childNode = parentNode.appendChild(
+                _xmlStyleDoc.createElement(attributeName)
+            );
         else {
             childNode = parentNode.getElementsByTagName(attributeName)[0];
         }
-        _addXMLAttribute(tagName, attributeName, value, childNode);
+        _addXMLAttribute(styleType, attributeName, attributeValue, childNode, nodeHierarchy.concat(attributeName));
     };
 
     /**
@@ -961,7 +979,7 @@
 
         for (var type in style) {
             var typeNode = _xmlStyleDoc.getElementsByTagName(type + 's')[0];
-            var node;
+            var parentNode;
             var styleId = type + 'Id';
             if (type == 'alignment') {
                 continue;
@@ -970,16 +988,16 @@
                 if (typeof style[type] == 'number') {
                     xf.setAttribute(styleId, style[type]);
                 } else {
-                    node = _xmlStyleDoc.createElement(type);
-                    node.setAttribute('formatCode', style[type]);
+                    parentNode = _xmlStyleDoc.createElement(type);
+                    parentNode.setAttribute('formatCode', style[type]);
 
                     var lastNumFmtChild = typeNode.lastChild;
                     var lastId = lastNumFmtChild.getAttribute('numFmtId');
 
                     var numFmtId = Number(lastId) + 1;
-                    node.setAttribute('numFmtId', numFmtId);
+                    parentNode.setAttribute('numFmtId', numFmtId);
 
-                    typeNode.appendChild(node);
+                    typeNode.appendChild(parentNode);
                     _updateContainerCount(typeNode);
 
                     xf.setAttribute(styleId, numFmtId);
@@ -987,18 +1005,18 @@
             } else {
                 if (xf.hasAttribute(styleId)) {
                     var existingTypeId = xf.getAttribute(styleId);
-                    node = typeNode.childNodes[existingTypeId].cloneNode(true);
+                    parentNode = typeNode.childNodes[existingTypeId].cloneNode(true);
                 } else {
-                    node = _xmlStyleDoc.createElement(type);
+                    parentNode = _xmlStyleDoc.createElement(type);
                 }
 
-                typeNode.appendChild(node);
+                typeNode.appendChild(parentNode);
 
-                style[type] = _mergeDefault(type, null, style[type]);
+                style[type] = _mergeDefault([type], style[type]);
 
-                for (var attr in style[type]) {
-                    var value = style[type][attr];
-                    _addXMLNode(type, attr, value, node); // fill, patternFill, object|string, parentNode
+                for (var attributeName in style[type]) {
+                    var attributeValue = style[type][attributeName];
+                    _addXMLNode(type, attributeName, attributeValue, parentNode, [type]); // fill, patternFill, object|string, parentNode
                 }
                 xf.setAttribute(styleId, typeNode.childNodes.length - 1);
 
@@ -1007,10 +1025,11 @@
         }
         // Add alignment separately
         if (style.alignment !== undefined) {
-            _addXMLNode('xf', 'alignment', style.alignment, xf);
+            _addXMLNode('xf', 'alignment', style.alignment, xf, 'xf');
             xf.setAttribute('applyAlignment', '1');
         }
         _updateContainerCount(cellXfs);
+        console.log(_xmlStyleDoc);
         return cellXfs.childNodes.length - 1;
     };
 
