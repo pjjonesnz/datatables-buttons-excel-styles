@@ -869,7 +869,7 @@
                     $(parentNode).attr(key, value);
                 }
             }
-        } else if (attributeValues != '') {
+        } else if (attributeValues !== '') {
             var txAttr = _getStringAttribute(attributeValues, nodeHierarchy);
             $(parentNode).attr(txAttr);
         }
