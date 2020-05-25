@@ -1,14 +1,14 @@
 /**
- * Styling for Datatables Buttons Excel XLSX (OOXML) creation
+ * Styling for DataTables Buttons Excel XLSX (Open Office XML) creation
  *
  * @version: 0.7.4
- * @description Add and process a custom 'excelStyles' option to easily customize the Datatables Excel Stylesheet output
+ * @description Add and process a custom 'excelStyles' option to easily customize the DataTables Excel Stylesheet output
  * @file buttons.html5.styles.js
  * @copyright © 2020 Beyond the Box Creative
  * @author Paul Jones <info@pauljones.co.nz>
  * @license MIT
  *
- * Include this file after including the javascript for the Datatables, Buttons, HTML5 and JSZip extensions
+ * Include this file after including the javascript for the DataTables, Buttons, HTML5 and JSZip extensions
  *
  * Create the required styles using the custom 'excelStyles' option in the button's config
  * @see https://datatables.net/reference/button/excel
@@ -100,7 +100,7 @@
      *  '4'    = row 4, all columns
      *  'D'    = column D, all rows
      *
-     * Multiple Range References (seperated by :)
+     * Multiple Range References (separated by :)
      *  '4:6'       = rows 4 to 6, all columns
      *  'B:F'       = column B to F, all rows
      *  'D4:D20'    = column D from row 4 to 20
@@ -144,10 +144,10 @@
      * can be hard to work with if your spreadsheet has (or doesn't have) the extra title and/or message above the data. Also, if you
      * include a footer this can be hard to define a template that works for custom excel configurations.
      *
-     * Smart row references adds specific code to refer to these special rows, and redfines row 1 to be the first row of the data
+     * Smart row references adds specific code to refer to these special rows, and redefines row 1 to be the first row of the data
      *
      * You can enable smart references by adding the following to your style definition, or by prefixing your cell reference with a lower case s
-     * excelstyles: [
+     * excelStyles: [
      *      {
      *          rowref: "smart",
      *          cells: "...cell reference..."
@@ -166,7 +166,7 @@
      *
      * @param {string} cells Cell names in an Excel-like structure
      * @param {object} sheet The worksheet to enable finding of the last column/row
-     * @return {object} Parsed rows and columns, in number format (ie. columns refernced by number, not letter)
+     * @return {object} Parsed rows and columns, in number format (ie. columns referenced by number, not letter)
      */
     var _parseExcellyReference = function (cells, sheet, smartRowOption) {
         //var pattern = /^(-\d+(?=\>))*([A-Z]*|[>])*(-)*([0-9]*)(\:)*(-\d+(?=\>))*([A-Z]*|[>])*(-)*([0-9]*)(?:n([0-9]*)(?:,)*([0-9]*))*$/;
@@ -463,7 +463,7 @@
     }
 
     /**
-     * Apply excelStyles to the OOXML stylesheet
+     * Apply excelStyles to the XML stylesheet
      *
      * @param {object} xlsx
      */
@@ -617,7 +617,7 @@
      *        tagName1: '', // Objects that are required by excel in a particular order
      *        tagName2: '',
      *    },
-     *    translate: { // Used to translate commonly used tag names to OOXML name
+     *    translate: { // Used to translate commonly used tag names to XML spec name
      *        tagName: 'translatedTagName',
      *    },
      *    tagName: { // eg. color, bottom, top, left, right (children of the main style tag)
@@ -625,7 +625,7 @@
      *            tagName1: '', // Child objects required by excel in a particular order
      *            tagName2: '',
      *        },
-     *        val: 'defaultAttributeName', // The attribute name to use in the OOXML if value passed as a non-object
+     *        val: 'defaultAttributeName', // The attribute name to use in the XML output if value passed as a non-object
      *        attributeName: {
      *            tidy: function(val) { // The tidy function to run on attributeName value
      *            },
@@ -633,7 +633,7 @@
      *        attributeName: 'child', // Any attributes that should be create as a child of the parent tagName
      *    },
      * }
-     * @var {object} _translateAttribues
+     * @var {object} _translateAttributes
      */
     var _translateAttributes = {
         font: {
@@ -703,7 +703,7 @@
     };
 
     /**
-     * Find the node value in the _translateAttribues object
+     * Find the node value in the _translateAttributes object
      *
      * @param {array} keyArray Hierarchy of nodes to search
      * @return {any|undefined} Value of the node
@@ -752,7 +752,7 @@
     };
 
     /**
-     * Get translated tagName to translate commonly used html names to OOXML name (eg size: 'sz')
+     * Get translated tagName to translate commonly used html names to XML name (eg size: 'sz')
      *
      * @param {string} parentTagName
      * @param {string} tagName
@@ -966,14 +966,13 @@
             if (type == 'alignment') {
                 continue;
             } else if (type == 'numFmt') {
-                // Handle numFmt style seperately as they are a different format
+                // Handle numFmt style separately as they are a different format
                 if (typeof style[type] == 'number') {
                     xf.setAttribute(styleId, style[type]);
                 } else {
                     node = _xmlStyleDoc.createElement(type);
                     node.setAttribute('formatCode', style[type]);
 
-                    //var numFmts = _xmlStyleDoc.getElementsByTagName('numFmts')[0];
                     var lastNumFmtChild = typeNode.lastChild;
                     var lastId = lastNumFmtChild.getAttribute('numFmtId');
 
@@ -1006,7 +1005,7 @@
                 _updateContainerCount(typeNode);
             }
         }
-        // Add alignment seperately
+        // Add alignment separately
         if (style.alignment !== undefined) {
             _addXMLNode('xf', 'alignment', style.alignment, xf);
             xf.setAttribute('applyAlignment', '1');
