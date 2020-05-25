@@ -651,7 +651,7 @@
             },
             patternFill: {
                 default: {
-                    patternType: '',
+                    patternType: 'solid',
                     fgColor: '',
                     bgColor: '',
                 },
