@@ -13,7 +13,7 @@ Now you can simply style your downloaded tables without having to learn the intr
 * Styles: Your own custom defined font, border, background and number format style, and/or
 * Pre-defined Templates: A selection of templates to apply to your table or selected cells
 
-[Table of Contents](#Table-of-Contents)
+[Table of Contents](#table-of-contents)
 
 ## Demo
 
@@ -34,11 +34,11 @@ Now you can simply style your downloaded tables without having to learn the intr
 
 This plugin adds a new option `excelStyles` to the [DataTables Buttons configuration array](https://datatables.net/reference/option/buttons.buttons).
 
-Add an `excelStyles` option to your button, containing either a single [Excel Style Object](#Excel-Style-Object) or an array of Excel Style Objects to be applied to your table.
+Add an `excelStyles` option to your button, containing either a single [Excel Style Object](#excel-style-object) or an array of Excel Style Objects to be applied to your table.
 
 ### Style Example
 
-With a custom [Style Object](#Style-Object) you can customize your spreadsheet to look exactly as you'd like it to. Either use familiar Excel cell references or take advantage of the [Cell Reference](#Cell-Reference) definitions available, to target specific parts of your worksheet. [See this example live](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_style.html)
+With a custom [Style Object](#style-object) you can customize your spreadsheet to look exactly as you'd like it to. Either use familiar Excel cell references or take advantage of the [Cell Reference](#cell-reference) definitions available, to target specific parts of your worksheet. [See this example live](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_style.html)
 
 ```js
 $("#myTable").DataTable({
@@ -69,7 +69,7 @@ $("#myTable").DataTable({
 
 ### Template Example
 
-[Pre-defined templates](#Pre-defined-templates) are a quick option for a nice output. [See this example live](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_template_style.html)
+[Pre-defined templates](#pre-defined-templates) are a quick option for a nice output. [See this example live](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_template_style.html)
 
 ```js
 $("#myTable").DataTable({
@@ -143,9 +143,9 @@ The `excelStyles` DataTables Buttons option is added as a configuration item for
 
 | Attribute | Description | Type | Default |
 |---|---|---|---|
-| cells | The cell or cell range that the style is being applied to. | String or Array of<br />([Cell References](#Cell-Reference)) |
+| cells | The cell or cell range that the style is being applied to. | String or Array of<br />([Cell References](#cell-reference)) |
 | rowref    | Enables smart row references if set to "smart" | Enum<br />( false \| "smart" ) | false |
-| style     | The style definition          | [Style Object](#Style-Object) |
+| style     | The style definition          | [Style Object](#style-object) |
 | template  | A template name               | String |
 | index     | Built-in style index number   | Integer |
 | merge     | Merge this style with the existing cell style | Boolean | true |
@@ -192,11 +192,11 @@ There are five main properties available within a Style Object.
 
 | Attribute | Description | Type |
 |---|---|---|
-| font      | To style the font used in a cell | [Font Object](#Font-Object) |
-| border    | The border of the cell | [Border Object](#Border-Object) |
-| fill      | To style the cell fill (ie. the cell background color and pattern) | [Fill Object](#Fill-Object) |
-| numFmt    | Apply a number format (eg. define currency display, decimal places, etc.) | [NumFmt String](#NumFmt-String) |
-| alignment | Horizontal and vertical alignment of the cell content | [Alignment Object](#Alignment-Object) |
+| font      | To style the font used in a cell | [Font Object](#font-object) |
+| border    | The border of the cell | [Border Object](#border-object) |
+| fill      | To style the cell fill (ie. the cell background color and pattern) | [Fill Object](#fill-object) |
+| numFmt    | Apply a number format (eg. define currency display, decimal places, etc.) | [NumFmt String](#numfmt-string) |
+| alignment | Horizontal and vertical alignment of the cell content | [Alignment Object](#alignment-object) |
 
 ## Font Object
 
@@ -218,7 +218,7 @@ The commonly used font attributes are listed below. A full list can be found in 
 | Attribute | Meaning | Type | Example | Aliases |
 |---|---|---|---|---|
 | b         | Bold          | Boolean               | `bold: true`              | strong<br />bold  |
-| color     | Color         | String (RGB or ARGB) or<br />[Color Object](#Color-Object)    | `color: "FF0000"`<br />`color: { rgb: "FF0000", tint: 0.54 }`   |
+| color     | Color         | String (RGB or ARGB) or<br />[Color Object](#color-object)    | `color: "FF0000"`<br />`color: { rgb: "FF0000", tint: 0.54 }`   |
 | family    | Font family   | Integer               | `family: 1`               | 
 | i         | Italic        | Boolean               | `i: true`                 | italic |
 | name      | Font name     | String                | `name: "Arial"`           |                   
@@ -252,13 +252,13 @@ border: {
 
 | Attribute | Meaning | Type | Example | 
 |---|---|---|---|
-| top<br />bottom<br />left<br />right<br />diagonal | Border position | String (Border Style)<br />[Border Style Object](#Border-Style-Object) | `top: "thin"`<br />`bottom: { style: "dashed", color: "A9D08E" }` |
+| top<br />bottom<br />left<br />right<br />diagonal | Border position | String (Border Style)<br />[Border Style Object](#border-style-object) | `top: "thin"`<br />`bottom: { style: "dashed", color: "A9D08E" }` |
 
 #### Border Style Object
 | Attribute | Meaning | Type | Example | 
 |---|---|---|---|
-| style | The style of the border   | Enum ([Border Styles String](#Border-Styles-String))      | `style: "medium"` |
-| color | The border color          | String or<br />[Color Object](#Color-Object)  | `color: "FF0000"`<br />`color: { rgb: "FF0000", tint: 0.54 }` |
+| style | The style of the border   | Enum ([Border Styles String](#border-styles-string))      | `style: "medium"` |
+| color | The border color          | String or<br />[Color Object](#color-object)  | `color: "FF0000"`<br />`color: { rgb: "FF0000", tint: 0.54 }` |
 
 #### Border Styles String
 | Value | Meaning | 
@@ -325,16 +325,16 @@ fill: {
 
 | Attribute | Meaning | Type | Aliases |
 |---|---|---|---|
-| pattern   | Pattern Fill  | [Pattern Object](#Pattern-Object)   | patternFill |
-| gradient  | Gradient Fill | [Gradient Object](#Gradient-Object)    | gradientFill |
+| pattern   | Pattern Fill  | [Pattern Object](#pattern-object)   | patternFill |
+| gradient  | Gradient Fill | [Gradient Object](#gradient-object)    | gradientFill |
 
 #### Pattern Object
 
 | Attribute | Meaning | Type | Example | Aliases |
 |---|---|---|---|---|
 | type      | Type of pattern       | String | `type: "lightUp"`<br />Default: `"solid"` | |
-| fgColor   | Foreground color      | String or<br />[Color Object](#Color-Object)    | `fgColor: "FF0000"`<br />`fgColor: { rgb: "FF0000", tint: 0.54 }`   | color |
-| bgColor   | Background color      | String or<br />[Color Object](#Color-Object)    | `bgColor: "FF0000"`<br />`bgColor: { rgb: "FF0000", tint: 0.54 }`   | |
+| fgColor   | Foreground color      | String or<br />[Color Object](#color-object)    | `fgColor: "FF0000"`<br />`fgColor: { rgb: "FF0000", tint: 0.54 }`   | color |
+| bgColor   | Background color      | String or<br />[Color Object](#color-object)    | `bgColor: "FF0000"`<br />`bgColor: { rgb: "FF0000", tint: 0.54 }`   | |
 
 #### Gradient Object
 
@@ -343,14 +343,14 @@ fill: {
 | type   | Gradient fill type           | Enum<br />( `linear` \| `path` )    | `type: "linear"`<br />`type: "path"` |
 | degree | Angle of the gradient<br />for linear gradients | Integer | `degree: "270"` |
 | left<br />right<br />top<br />bottom | Edge position percentage of the inner rectangle<br />for path gradients | Double<br />(0.0 - 1.0) | `left: "0.3"` |
-| stop   | Array of two or more gradient stops  | Array of [Stop Objects](#Stop-Object) | `stop: [{ position: "0", color: "#FF0000"}, ..., ...]` |
+| stop   | Array of two or more gradient stops  | Array of [Stop Objects](#stop-object) | `stop: [{ position: "0", color: "#FF0000"}, ..., ...]` |
 
 #### Stop Object
 
 | Attribute | Meaning | Type | Example | 
 |---|---|---|---|
 | position  | Position percentage | Double<br />(0.0 to 1.0)    | `position: "0"`<br />`position: "1"` |
-| color     | Color               | String or<br />[Color Object](#Color-Object)          | `fgColor: "FF0000"`<br />`fgColor: { rgb: "FF0000", tint: 0.54 }`   |
+| color     | Color               | String or<br />[Color Object](#color-object)          | `fgColor: "FF0000"`<br />`fgColor: { rgb: "FF0000", tint: 0.54 }`   |
 
 ## NumFmt String
 
@@ -387,12 +387,12 @@ alignment: {
 
 | Attribute | Meaning | Type | Info |
 |---|---|---|---|
-| horizontal    | Horizontal Alignment  | [Horizontal Alignment Enum](#Horizontal-Alignment-Enum) |
+| horizontal    | Horizontal Alignment  | [Horizontal Alignment Enum](#horizontal-alignment-enum) |
 | indent        | Indent                | Integer                   | value is multipled by 3 text spaces |
 | readingOrder  | Reading Order         | Integer                   | 0 - Context Dependent<br />1 - Left-to-Right<br />2 - Right-to-Left |
 | shrinkToFit   | Shrink To Fit         | Boolean                   | Should text be shrunk to fit cell width |
 | textRotation  | Text Rotation         | Unsigned Integer (0 - 180)  | Degrees to rotate text
-| vertical      | Vertical Alignment    | [Vertical Alignment Enum](#Vertical-Alignment-Enum) |
+| vertical      | Vertical Alignment    | [Vertical Alignment Enum](#vertical-alignment-enum) |
 | wrapText      | Word Wrapping         | Boolean |
 
 #### Horizontal Alignment Enum
