@@ -24,9 +24,11 @@
             var exampleStyles = {
                 excelblue_template: {
                     description: 'Your first example',
+                    group: "",
                     help:
                         "<p>This is the first simple example showing how easy it is to style an excel spreadsheet.</p>" +
                         '<p>This one uses the addon styles templates, which is the simplest way to make a great looking spreadsheet</p>' +
+                        '<p>Styles are written using JSON objects providing a simple and flexible way to target cells and apply your styles.</p>' +
                         '<p>The other examples will show you how incredibly flexible this plugin is.</p>' +
                         '<p><strong>Click on the Excel button</strong> to download the spreadsheet with the style dynamically applied.</p>',
                     excelStyles: {
@@ -34,7 +36,8 @@
                     },
                 },
                 excel: {
-                    description: "Cell references: Uses familiar Excel style cell references",
+                    description: "Uses familiar Excel style cell references",
+                    group: "Cell references",
                     help:
                         '<p>In its basic form you can use familiar Excel style cell references.</p>' +
                         '<p>"cells": "A3:A10" selects row 3 to 10 in column A</p>' +
@@ -46,53 +49,67 @@
                     },
                 },
                 heading: {
-                    description: 'Cell references: Customize table heading row',
+                    description: 'Customize table heading row',
+                    group: "Cell references",
                     help:
                         '<p>You can select a single row by just using a row number</p>' +
                         '<p>The heading row (the second row in the Excel sheet) is selected using "cells": "2"</p>' +
-                        '<p>The built in style #12 is applied to it using "index": 12</p>' +
-                        '<p>See <a href="https://datatables.net/reference/button/excelHtml5#Built-in-styles" target="_blank">this page</a> for built in styles</p>',
+                        '<p>A custom Style Object is added to change the font and apply a background color to the heading</p>' +
+                        '<p>Formats follow the general pattern in ' +
+                        '<a href="https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_Styles_topic_ID0EFT25.html" target="_blank">Office Open XML Styles</a> ' +
+                        'with some logical aliases and abbreviations to make it easy to use.</p>',
                     excelStyles: {
                         cells: '2',
-                        index: 12,
-                    },
-                },
-                striped: {
-                    description: 'Cell references: Striped rows using inbuilt styles',
-                    help:
-                        '<p>You can skip columns and/or rows by using the "n[0-9],[0-9]" suffix on your cell reference to define the increment count when applying the style to the columns/rows.</p>' +
-                        '<p>"n" stands for nth, with the column increment followed by the row increment</p>' +
-                        '<p>Every second row from row 4 onwards is selected using "cells":"4:n1,2"</p>' +
-                        '<p>"4:" means from row 4 until the last row. Since no columns are defined, all columns are affected.</p>' +
-                        '"n1,2" means every column (1) and every 2nd row (2). Note: "n1,2" can also be written "n,2" - if a column or row is not defined it defaults to 1 (ie. every)</p>' +
-                        '<p>The built in style #5 is applied to every second row using "index": 5</p>',
-                    excelStyles: {
-                        cells: '4:n1,2',
-                        index: 5,
+                        style: {                        // The style block
+                            font: {                     // Style the font
+                                size: '14',             // Font size
+                                color: 'FFFFFF',        // Font Color
+                            },
+                            fill: {                     // Style the cell fill (background)
+                                pattern: {              // Type of fill (pattern or gradient)
+                                    color: '457B9D',    // Fill color
+                                }
+                            }
+                        }
                     },
                 },
                 striped2: {
-                    description:
-                        'Cell references: Striped rows using custom style',
+                    description: 'Striped rows using custom style',
+                    group: "Cell references",
                     help:
-                        '<p>Rows are selected using "cells": "4:n,2"</p><p>"4:" means from row 4 until the end, "n,2" means every two rows from the starting row.</p>' +
-                        '<p>Custom styles can be applied to cells using the "style" option, the next few examples show how to use that. More info to come...</p>',
+                    '<p>You can skip rows and/or columns by using the "n[0-9],[0-9]" suffix in your "cells" definition</p>' +
+                        '<p>"n" stands for nth, with the column increment followed by the row increment</p>' +
+                        '<p>Every second row from row 4 onwards is selected using "cells":"4:n1,2"</p>' +
+                        '<p>"4:" means from row 4 until the last row. Since no columns are defined, all columns are selected.</p>' +
+                        '"n1,2" means every column (1) and every 2nd row (2). Note: "n1,2" can also be written "n,2" - if a column or row is not defined it defaults to 1 (ie. every)</p>',
                     excelStyles: {
-                        cells: '4:n,2',
+                        cells: '4:n1,2',
                         style: {
                             fill: {
                                 pattern: {
-                                    type: 'solid', // https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html#topic_ID0EBYQFB
                                     color: 'FFC6CF',
                                 },
                             },
                         },
                     },
                 },
-                excelblue: {
-                    description: 'Cell references: Excel blue table example',
+                striped: {
+                    description: 'Striped rows using inbuilt styles',
+                    group: "Cell references",
                     help:
-                        '<p>Styles can be applied to create a beautiful looking table without any extra styling needed by the user after downloading.</p>',
+                        '<p>Rows are selected using "cells": "4:n,2"</p><p>"4:" means from row 4 until the end, "n1,2" means every two rows from the starting row (row 4).</p>' +
+                        '<p>In this example the built in style #5 is applied to every second row using "index": 5</p>',
+                    excelStyles: {
+                        cells: '4:n1,2',
+                        index: 5,
+                    },
+                },
+                excelblue: {
+                    description: 'Excel blue table example',
+                    group: "Cell references",
+                    help:
+                        '<p>Advanced styles can be applied to create a beautiful looking table without any extra styling needed by the user after downloading.</p>' +
+                        '<p>Multiple styles are defined for one table by creating an array of <a href="https://github.com/pjjonesnz/datatables-buttons-excel-styles#excel-style-object" target="_blank">Excel Style Objects</a></p>',
                     excelStyles: [
                         {
                             cells: '2',
@@ -102,7 +119,6 @@
                                 },
                                 fill: {
                                     pattern: {
-                                        type: 'solid',
                                         color: '4472C4',
                                     },
                                 },
@@ -113,7 +129,6 @@
                             style: {
                                 fill: {
                                     pattern: {
-                                        type: 'solid',
                                         color: 'D9E1F2',
                                     },
                                 },
@@ -141,7 +156,8 @@
                     ],
                 },
                 excelgreen: {
-                    description: 'Templates: Excel green table example using templates',
+                    description: 'Excel green table example using templates',
+                    group: "Templates",
                     help:
                         "<p>If you include the 'buttons.html5.styles.templates.js' library, you'll have access to a bunch of predefined styles which make it even easier!</p>" +
                         '<p><strong>Note:</strong> If the template library is not included, this will just be ignored</p>',
@@ -150,7 +166,8 @@
                     },
                 },
                 excelgreen2: {
-                    description: 'Templates: Excel Green Template with custom heading',
+                    description: 'Excel Green Template with custom heading',
+                    group: "Templates",
                     help:
                         '<p>You can mix templates with your own style definitions. This one uses the same green template with a special orange heading!</p>',
                     excelStyles: [
@@ -171,7 +188,8 @@
                     ],
                 },
                 excelgreen3: {
-                    description: 'Templates: Excel Blue Template with Heading Template',
+                    description: 'Excel Blue Template with Heading Template',
+                    group: "Templates",
                     help:
                         '<p>You can even mix templates. The templates are built with parts that can be referenced separately. Lots of templates are under construction right now - May 2020.</p>',
                     excelStyles: [
@@ -185,7 +203,8 @@
                 },
                 striped3: {
                     description:
-                        'Merging: Styles get merged',
+                        'Styles get merged by default',
+                    group: "Merging Styles",
                     help:
                         '<p>Multiple styles can be applied to one table by using an array</p>' +
                         '<p><strong>Note:</strong> Styles applied on top of each other get merged - eg. the style applying the red font in this example is merged with the grey background</p>' +
@@ -230,7 +249,8 @@
                 },
                 striped4: {
                     description:
-                        'Merging: Styles can replace',
+                        'Styles can overwrite existing cell styles',
+                    group: "Merging Styles",
                     help:
                         '<p>If the "merge" attribute is added to a style and equal to false, the style will <strong>replace</strong> any existing styles in a cell instead of merging with it.</p>' +
                         '<p>This example is identical to the last except that the style in column A is replaced with the effect of there being no row striping in column A.</p>',
@@ -270,61 +290,23 @@
                         },
                     ],
                 },
-                multicells: {
-                    description: 'Cell references: Multiple cells referenced using arrays',
-                    help:
-                        '<p>You can apply a style to multiple cell selections by specifying the cells as an array</p>' +
-                        '<p>Apply the indexed style #5 to column A, row 5, cell B8, and from row 10 to 12 in columns C and D and the last column from row 15 to 20</p>' +
-                        '<p>Note: yes the from and to cells are back to front in the "D12:C10" selection, but this works fine as well</p>',
-                    excelStyles: {
-                        cells: ['A', '5', 'B8', 'D12:C10', '>15:>20'],
-                        index: 5,
-                    },
-                },
-                last3rows: {
-                    description: 'Cell references: Selecting back from the last row and column',
-                    help:
-                        '<p>Scroll to the bottom of the Excel sheet to see the changes.</p>',
-                    excelStyles: [
-                        {
-                            cells: '-2>',
-                            index: 40,
-                        },
-                        {
-                            cells: '-0',
-                            index: 12,
-                        },
-                        {
-                            cells: '-5:-7',
-                            index: 40,
-                        },
-                        {
-                            cells: 'B-12:D-10',
-                            index: 45,
-                        },
-                    ],
-                },
-                everything: {
-                    description: 'Cell references: Select everything',
-                    help: '',
-                    excelStyles: [
-                        {
-                            cells: ':',
-                            index: 45,
-                        },
-                    ],
-                },
                 numFmt: {
-                    description: 'Number formats: Apply custom number formats to cells and fix dollar display',
+                    description: 'Custom number formats - format date, fix dollar display',
+                    group: "Number formats",
                     help:
-                        '<p>Ages formatted to 3 decimal places, negatives in brackets, on Column D</p>' +
+                        '<p>Date formatted with month as abbreviated text on Column E.</p>' +
                         '<p>Pesky currency display - this may change depending on where you are in the world, but for me the currency display in all the examples' +
-                        ' has the $ symbol at the end of the number in column F. In this example we fix it!</p>',
+                        ' has the $ symbol at the end of the number in column F. In this example we fix it!</p>' +
+                        '<p>Ages formatted to 3 decimal places, negatives in brackets, on Column D (pointless but possible)</p>' +
+                        '<p><strong>PLEASE NOTE:</strong> For dates to work with excel number formatting, at this stage they must be output in the form' +
+                        ' yyyy-mm-dd (see the below spreadsheet as an example). If your dates are in a different format on your table, you can use the' +
+                        ' <a href="https://datatables.net/extensions/buttons/examples/html5/outputFormat-orthogonal" target="_blank">orthogonal data</a>' +
+                        ' feature in DataTables to change your data to this format on export. Use a library like dateJs or Moment.js to manipulate your date.',
                     excelStyles: [
                         {
-                            cells: 'D',
+                            cells: 'E',
                             style: {
-                                numFmt: '#,##0.0000;(#,##0.0000)',
+                                numFmt: 'dd MMM YYYY',
                             },
                         },
                         {
@@ -333,10 +315,17 @@
                                 numFmt: '[$$-en-US] #,##0.00',
                             },
                         },
+                        {
+                            cells: 'D',
+                            style: {
+                                numFmt: '#,##0.0000;(#,##0.0000)',
+                            },
+                        },
                     ],
                 },
                 numFmt2: {
-                    description: 'Number formats: Formats can be used from a template',
+                    description: 'Formats can be used from a template',
+                    group: "Number formats",
                     help:
                         '<p>Number formats defined in a template can be applied to specific cells.</p><p>If no cell references are given then' +
                         ' the cell reference is taken from the template, but if you provide a cell reference this is used instead.</p>' +
@@ -354,7 +343,8 @@
                     ],
                 },
                 widths: {
-                    description: 'Cell size and alignment: Set custom width, height and alignment',
+                    description: 'Set custom width, height and alignment',
+                    group: "Cell size and alignment",
                     help:
                         '<p>Column width and row height can be defined</p>' +
                         '<p>Column F has the width adjusted to 30</p>' +
@@ -385,8 +375,56 @@
                         },
                     ],
                 },
+                multicells: {
+                    description: 'Multiple cells referenced using arrays',
+                    group: "Cell references",
+                    help:
+                        '<p>You can apply a style to multiple cell selections by specifying the cells as an array</p>' +
+                        '<p>Apply the indexed style #5 to column A, row 5, cell B8, and from row 10 to 12 in columns C and D and the last column from row 15 to 20</p>' +
+                        '<p>Note: yes the from and to cells are back to front in the "D12:C10" selection, but this works fine as well</p>',
+                    excelStyles: {
+                        cells: ['A', '5', 'B8', 'D12:C10', '>15:>20'],
+                        index: 5,
+                    },
+                },
+                last3rows: {
+                    description: 'Selecting back from the last row and column',
+                    group: "Cell references",
+                    help:
+                        '<p>Scroll to the bottom of the Excel sheet to see the changes.</p>',
+                    excelStyles: [
+                        {
+                            cells: '-2>',
+                            index: 40,
+                        },
+                        {
+                            cells: '-0',
+                            index: 12,
+                        },
+                        {
+                            cells: '-5:-7',
+                            index: 40,
+                        },
+                        {
+                            cells: 'B-12:D-10',
+                            index: 45,
+                        },
+                    ],
+                },
+                everything: {
+                    description: 'Select everything',
+                    group: "Cell references",
+                    help: '',
+                    excelStyles: [
+                        {
+                            cells: ':',
+                            index: 45,
+                        },
+                    ],
+                },
                 smart_rowref1: {
-                    description: 'Smart row references: Select customized tables in a clever way',
+                    description: 'Select customized tables in a clever way',
+                    group: "Smart row references",
                     help: '<p>When referencing rows, there needs to be a way to account for the <a href="https://datatables.net/reference/button/excelHtml5#Options" target="_blank">various export options</a> that may be used without having to change your cell references.</p>' +
                         '<p>If you make a nice style for your table and then decide to have an optional message displayed at the top, or remove the title, how do you decide what row the data starts from?</p>' +
                         '<p>With Smart Row References, you use row numbers (like normal), but they only match the data rows. To refer to the other parts of the table you use the following lower case letters:' + 
@@ -424,7 +462,8 @@
 
                 },
                 smart_rowref2: {
-                    description: 'Smart row references: Different config, same excelStyles, same results.',
+                    description: 'Different config, same excelStyles, same results.',
+                    group: "Smart row references",
                     help: '<p>These are exactly the same excelStyles as the previous examples, but with the messageTop and footer turned off. The same row styles still work.</p>',
                     excelStyles: [
                         {
@@ -454,28 +493,38 @@
                             index: 17,
                         }
                     ]
-
                 }
             };
 
             $(document).ready(function () {
                 $('#included_content').load('data1.html', function () {
-                    var lastSection = '';
+                    var currentGroup = '';
+                    var html = '';
                     for (var i in exampleStyles) {
-                        var desc = exampleStyles[i].description
-                        $('#selected_style').append(
-                            '<option value="' +
+                        var desc = exampleStyles[i].description;
+                        var group = exampleStyles[i].group;
+                        if(group !== currentGroup) {
+                            if(currentGroup !== '') {
+                                html += '</optgroup>';
+                            }
+                            html += '<optgroup label="' + group + '">';
+                            currentGroup = group;
+                        }
+                        html += '<option value="' +
                                 i +
                                 '">' +
                                 desc +
-                                '</option>'
-                        );
+                                '</option>';
                     }
+                    if(currentGroup !== '') {
+                        html += '</optgroup>';
+                    }
+                    $('#selected_style').append( html );
                     $('#selected_style').change(function () {
                         var style = exampleStyles[$(this).val()];
                         $('#excel_styles').val(
                             '"excelStyles": ' +
-                                JSON.stringify(style.excelStyles, null, 2)
+                                JSON.stringify(style.excelStyles, null, 4)
                         );
                         $('#help').html(style.help);
                     });
@@ -603,8 +652,11 @@
                     <li>Click on the 'Excel' button to download the spreadsheet with the style applied</li>
                     <li>Try another example</li>
                     <li>Edit the style code yourself to make your own style!</li>
-                    <li>Download it from Github and use it on your site: <a href="https://github.com/pjjonesnz/datatables-buttons-excel-styles" target="_blank">https://github.com/pjjonesnz/datatables-buttons-excel-styles</a></li>
+                    <li>Download it from Github or npm and use it on your site</li>
                     </ol>
+                    <p>Github: <a href="https://github.com/pjjonesnz/datatables-buttons-excel-styles" target="_blank">https://github.com/pjjonesnz/datatables-buttons-excel-styles</a><br />
+                    npm: <a href="https://www.npmjs.com/package/datatables-buttons-excel-styles" target="_blank">https://www.npmjs.com/package/datatables-buttons-excel-styles</a>
+                    (npm install datatables-buttons-excel-styles)</p>
                 </p>
                 
                 <form>
