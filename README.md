@@ -332,9 +332,34 @@ fill: {
 
 | Attribute | Meaning | Type | Example | Aliases |
 |---|---|---|---|---|
-| type      | Type of pattern       | String | `type: "lightUp"`<br />Default: `"solid"` | |
+| type      | Type of pattern       | [Pattern Type String](#pattern-type-string) | `type: "lightUp"`<br />Default: `"solid"` | |
 | fgColor   | Foreground color      | String or<br />[Color Object](#color-object)    | `fgColor: "FF0000"`<br />`fgColor: { rgb: "FF0000", tint: 0.54 }`   | color |
 | bgColor   | Background color      | String or<br />[Color Object](#color-object)    | `bgColor: "FF0000"`<br />`bgColor: { rgb: "FF0000", tint: 0.54 }`   | |
+
+#### Pattern Type String
+
+This list along with examples can be [found here](https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_PatternType_topic_ID0EBYQFB.html). Note that support for pattern types is good with Excel but limited with some other viewers.
+
+| Value | Meaning | 
+|---|---|
+| darkDown | Dark Down |
+| darkGray | Dark Gray |
+| darkGrid | Dark Grid |
+| darkHorizontal | Dark Horizontal |
+| darkTrellis | Dark Trellis |
+| darkUp | Dark Up |
+| darkVertical | Dark Vertical |
+| gray0625 | Gray 0.0625 |
+| gray125 | Gray 0.125 |
+| lightDown | Light Down |
+| lightGray | Light Gray |
+| lightGrid | Light Grid |
+| lightHorizontal | Light Horizontal |
+| lightTrellis | Light Trellis |
+| lightUp | Light Up |
+| lightVertical | Light Vertical |
+| mediumGray | Medium Gray |
+| solid | Solid |
 
 #### Gradient Object
 
@@ -388,7 +413,7 @@ alignment: {
 | Attribute | Meaning | Type | Info |
 |---|---|---|---|
 | horizontal    | Horizontal Alignment  | [Horizontal Alignment Enum](#horizontal-alignment-enum) |
-| indent        | Indent                | Integer                   | value is multipled by 3 text spaces |
+| indent        | Indent                | Integer                   | value is multiplied by 3 text spaces |
 | readingOrder  | Reading Order         | Integer                   | 0 - Context Dependent<br />1 - Left-to-Right<br />2 - Right-to-Left |
 | shrinkToFit   | Shrink To Fit         | Boolean                   | Should text be shrunk to fit cell width |
 | textRotation  | Text Rotation         | Unsigned Integer (0 - 180)  | Degrees to rotate text
@@ -531,6 +556,7 @@ To the C-Rex team for their excellent [Office Open XML File Format Reference](ht
   * [Fill Object](#fill-object)
     + [Fill Attributes](#fill-attributes)
       - [Pattern Object](#pattern-object)
+      - [Pattern Type String](#pattern-type-string)
       - [Gradient Object](#gradient-object)
       - [Stop Object](#stop-object)
   * [NumFmt String](#numfmt-string)
