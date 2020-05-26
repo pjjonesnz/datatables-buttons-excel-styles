@@ -34,7 +34,7 @@ Now you can simply style your downloaded tables without having to learn the intr
 
 This plugin adds a new option `excelStyles` to the [DataTables Buttons configuration array](https://datatables.net/reference/option/buttons.buttons).
 
-Add a `excelStyles` option to your button, containing either a single [Excel Style Object](#Excel-Style-Object) or an array of Excel Style Objects to be applied to your table.
+Add an `excelStyles` option to your button, containing either a single [Excel Style Object](#Excel-Style-Object) or an array of Excel Style Objects to be applied to your table.
 
 ### Style Example
 
