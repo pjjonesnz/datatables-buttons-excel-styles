@@ -7,7 +7,7 @@
             content="width=device-width, initial-scale=1, minimum-scale=1.0, user-scalable=no"
         />
         <title>
-            Simple Single Template
+            Combine Template and Custom Styles
         </title>
 
         <!-- 1. Add jQuery -->
@@ -58,10 +58,26 @@
                     dom: 'Bfrtip',
                     buttons: [
                         {
-                            extend: 'excel', // Extend the excel button   
-                            excelStyles: { // Add an excelStyles definition
-                                template: 'blue_medium', // Apply the 'blue_medium' template
-                            },
+                            extend: 'excel',                    // Extend the excel button
+                            excelStyles: [                      // Add an excelStyles definition
+                                {                 
+                                    template: 'green_medium',   // Apply the 'green_medium' template
+                                },
+                                {
+                                    cells: 'sh',                // Use Smart References (s) to target the header row (h)
+                                    style: {                    // Add a style block
+                                        font: {                 // Style the font
+                                            size: 14,           // Size 14
+                                            b: false,           // Turn off the default bolding of the header
+                                        },
+                                        fill: {                 // Style the fill/background
+                                            pattern: {          // Add a pattern (default type is solid)
+                                                color: '1C3144' // Define the color
+                                            }
+                                        }
+                                    }
+                                }
+                            ]                            
                         },
                     ],
                 });
@@ -71,10 +87,9 @@
     <body>
         <!-- Begin page content -->
         <main role="main" class="container">
-            <h1 class="mt-5">Simple Single Template</h1>
+            <h1 class="mt-5">Combine Template and Custom Styles</h1>
             <p class="lead">
-                Simple example of applying a buttons.html5.styles <strong>template</strong> to a
-                DataTable.
+                Example of combining a Template and a Custom Style
             </p>
             <div class="container mt-4">
                 <p>
@@ -82,10 +97,10 @@
                     define the Excel style:
                 </p>
             </div>
-            <script src="https://gist.github.com/pjjonesnz/ec92e273e15a000b14858293f0373a87.js"></script>
+            <script src="https://gist.github.com/pjjonesnz/3241a71babb5b49680a0adb97020cd77.js"></script>
             <p class="pl-2 mt-4">
                 Click the Excel button to run this script and download the styled table:
-            </p>            
+            </p>
             <div class="container border p-4 mt-4">
                 <table id="myTable" style="width: 100%;">
                     <thead>

@@ -58,9 +58,22 @@
                     dom: 'Bfrtip',
                     buttons: [
                         {
-                            extend: 'excel', // Extend the excel button   
-                            excelStyles: { // Add an excelStyles definition
-                                template: 'blue_medium', // Apply the 'blue_medium' template
+                            extend: 'excel',                    // Extend the excel button
+                            excelStyles: {                      // Add an excelStyles definition
+                                cells: '2',                     // to row 2
+                                style: {                        // The style block
+                                    font: {                     // Style the font
+                                        name: 'Arial',          // Font name
+                                        size: '14',             // Font size
+                                        color: 'FFFFFF',        // Font Color
+                                        b: false,               // Remove bolding from header row
+                                    },
+                                    fill: {                     // Style the cell fill (background)
+                                        pattern: {              // Type of fill (pattern or gradient)
+                                            color: '457B9D',    // Fill color
+                                        }
+                                    }
+                                }
                             },
                         },
                     ],
@@ -73,7 +86,7 @@
         <main role="main" class="container">
             <h1 class="mt-5">Simple Single Template</h1>
             <p class="lead">
-                Simple example of applying a buttons.html5.styles <strong>template</strong> to a
+                Simple example of applying a buttons.html5.styles <strong>style</strong> to a
                 DataTable.
             </p>
             <div class="container mt-4">
@@ -82,7 +95,7 @@
                     define the Excel style:
                 </p>
             </div>
-            <script src="https://gist.github.com/pjjonesnz/ec92e273e15a000b14858293f0373a87.js"></script>
+            <script src="https://gist.github.com/pjjonesnz/77d08d491d9a8f4f8ca52ab24470d5ad.js"></script>
             <p class="pl-2 mt-4">
                 Click the Excel button to run this script and download the styled table:
             </p>            
