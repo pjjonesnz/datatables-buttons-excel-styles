@@ -324,7 +324,7 @@ fill: {
 ### Fill Attributes
 
 | Attribute | Meaning | Type | Aliases |
-|---|---|---|---|---|
+|---|---|---|---|
 | pattern   | Pattern Fill  | [Pattern Object](#Pattern-Object)   | patternFill |
 | gradient  | Gradient Fill | [Gradient Object](#Gradient-Object)    | gradientFill |
 
