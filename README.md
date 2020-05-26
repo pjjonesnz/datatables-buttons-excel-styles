@@ -118,7 +118,7 @@ $('#myTable').DataTable({
 ```
 ### Built-in Styles
 
-Built-in styles can also be used.
+Built-in styles can also be used. See the [built in style reference](https://datatables.net/reference/button/excelHtml5#Built-in-styles)
 
 ```js
 $('#myTable').DataTable({
@@ -135,14 +135,13 @@ $('#myTable').DataTable({
 });
 ```
 
-[Built in style reference](https://datatables.net/reference/button/excelHtml5#Built-in-styles)
+## excelStyles Attribute
 
+The excelStyles attribute contains either a single Excel Style Objects or an array of Excel Style Objects
 
-## excelStyles Object
+### Excel Style Object
 
-The excelStyles is either a single Style Object or an array of Style Objects
-
-| Option | Description | Type | Default |
+| Attribute | Description | Type | Default |
 |---|---|---|---|
 | cells | The cell or cell range that the style is being applied to. | String<br />(Cell Reference) |
 | rowref | Enables smart row references if set to "smart" | false \| "smart" | false |
@@ -188,7 +187,7 @@ For examples of using these cell selections, while the docs are being written, p
 
 There are five main properties available within a Style Object.
 
-| Block name | Description | Type |
+| Attribute | Description | Type |
 |---|---|---|
 | font | To style the font used in a cell | Font Object |
 | border | The border of the cell | Border Object |
@@ -200,12 +199,14 @@ There are five main properties available within a Style Object.
 
 The font style is the simplest and consists of an object with the font attributes listed as key:value pairs inside.
 
-```json
-font: {
-    name: "Arial",
-    size: 18,
-    u: true,          // Single underline
-    color: "D75F41"
+```js
+{
+    font: {
+        name: "Arial",
+        size: 18,
+        u: true,          // Single underline
+        color: "D75F41"
+    }
 }
 ```
 
@@ -235,8 +236,8 @@ The commonly used font attributes are listed below. A full list can be found in 
 
 The border of a cell can be defined by a simple object
 
-```json
-bottom: {
+```js
+border: {
     top: "thin",            // Thin black border at top of cell/s
     bottom: {
         style: "thick",
@@ -280,40 +281,46 @@ bottom: {
 The fill style can either be a pattern or a gradient. While these styles are fully supported by Excel on all devices, many of the advanced pattern and gradient options are not completely supported by other spreadsheet viewers (eg. the default ios viewer)
 
 **Solid background color**
-```json
-fill: {
-    pattern: {
-        color: "457B9D",
+```js
+{
+    fill: {
+        pattern: {
+            color: "457B9D",
+        }
     }
 }
 ```
 
 **Patterned background**
-```json
-fill: {
-    pattern: {
-        type: "lightUp",
-        fgColor: "1C3144",
-        bgColor: "C3D898",
+```js
+{
+    fill: {
+        pattern: {
+            type: "lightUp",
+            fgColor: "1C3144",
+            bgColor: "C3D898",
+        }
     }
 }
 ```
 
 **Gradient background**
-```json
-fill: {
-    gradient: {
-        degree: 90,
-        stop: [
-            {
-                position: 0,
-                color: "000000",
-            },
-            {
-                position: 1,
-                color: "CC0000",
-            }
-        ]
+```js
+{
+    fill: {
+        gradient: {
+            degree: 90,
+            stop: [
+                {
+                    position: 0,
+                    color: "000000",
+                },
+                {
+                    position: 1,
+                    color: "CC0000",
+                }
+            ]
+        }
     }
 }
 ```
