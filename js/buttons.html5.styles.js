@@ -639,6 +639,9 @@
             translate: {
                 size: 'sz',
                 strong: 'b',
+                bold: 'b',
+                italic: 'i',
+                underline: 'u',
             },
             color: {
                 val: 'rgb',
