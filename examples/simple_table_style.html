@@ -328,16 +328,21 @@
                         '<p>Number formats defined in a template can be applied to specific cells.</p><p>If no cell references are given then' +
                         ' the cell reference is taken from the template, but if you provide a cell reference this is used instead.</p>' +
                         '<p>Note: this could give weird results for some of the templates, but using the individual template parts like this works great!</p>' +
-                        '<p>Also try the following: currency_us, currency_gb</p>',
+                        '<p>Also try the following: currency_us, currency_gb, date_long</p>',
                     excelStyles: [
                         {
-                            cells: 'D',
-                            template: 'decimal_2',
+                            cells: 'E',
+                            template: 'date_medium',
                         },
                         {
                             cells: 'F',
                             template: 'currency_eu',
                         },
+                        {
+                            cells: 'D',
+                            template: 'decimal_2',
+                        },
+                        
                     ],
                 },
                 widths: {

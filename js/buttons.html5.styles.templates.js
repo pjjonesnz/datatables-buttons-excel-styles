@@ -75,6 +75,24 @@
         }
     };
 
+    DataTable.ext.buttons.excelHtml5.getExcelTemplates = function() {
+         if (_templatesGenerated === false) {
+             _generate_table_templates();
+         }
+         return _templates;
+    }
+
+    DataTable.ext.buttons.excelHtml5.listExcelTemplates = function () {
+        var templates = this.getExcelTemplates();
+        var list = [];
+        for(var i in templates) {
+            if(templates[i].desc !== undefined) {
+                list.push(i + ',' + templates[i].desc);
+            } 
+        }
+        console.log(list.join("\n"));
+    };
+
     /**
      * Standard templates.
      * 
@@ -84,6 +102,7 @@
      */
     var _templates = {
         b: {
+            desc: 'Bold',
             es: {
                 cells: 's1:-0',
                 style: {
@@ -94,6 +113,7 @@
             },
         },
         u: {
+            desc: 'Underline',
             es: {
                 cells: 's1:-0',
                 style: {
@@ -104,6 +124,7 @@
             },
         },
         i: {
+            desc: 'Italics',
             es: {
                 cells: 's1:-0',
                 style: {
@@ -114,6 +135,7 @@
             },
         },
         title_medium: {
+            desc: 'Title: medium size',
             es: {
                 cells: ['st'],
                 style: {
@@ -128,6 +150,7 @@
             },
         },
         currency_us: {
+            desc: 'Currency: USD',
             es: {
                 style: {
                     numFmt: '[$$-en-US] #,##0.00',
@@ -135,6 +158,7 @@
             },
         },
         currency_eu: {
+            desc: 'Currency: Euro',
             es: {
                 style: {
                     numFmt: '[$€-x-euro2] #,##0.00',
@@ -142,6 +166,7 @@
             },
         },
         currency_gb: {
+            desc: 'Currency: GBP',
             es: {
                 style: {
                     numFmt: '[$£-en-GB]#,##0.00',
@@ -149,6 +174,7 @@
             },
         },
         int: {
+            desc: 'Number: Integer',
             es: {
                 style: {
                     numFmt: '#,##0;(#,##0)',
@@ -156,6 +182,7 @@
             },
         },
         decimal_1: {
+            desc: 'Number: 1 decimal place',
             es: {
                 style: {
                     numFmt: '#,##0.0;(#,##0.0)',
@@ -163,6 +190,7 @@
             },
         },
         decimal_2: {
+            desc: 'Number: 2 decimal places',
             es: {
                 style: {
                     numFmt: '#,##0.00;(#,##0.00)',
@@ -170,6 +198,7 @@
             },
         },
         decimal_3: {
+            desc: 'Number: 3 decimal places',
             es: {
                 style: {
                     numFmt: '#,##0.000;(#,##0.000)',
@@ -177,9 +206,26 @@
             },
         },
         decimal_4: {
+            desc: 'Number: 4 decimal places',
             es: {
                 style: {
                     numFmt: '#,##0.0000;(#,##0.0000)',
+                },
+            },
+        },
+        date_long: {
+            desc: 'Date: Long format - eg. 24 September 1979',
+            es: {
+                style: {
+                    numFmt: 'd mmmm yyyy',
+                },
+            },
+        },
+        date_medium: {
+            desc: 'Date: Medium format - eg. 4 Jun 1987',
+            es: {
+                style: {
+                    numFmt: 'd mmm yyyy',
                 },
             },
         },
