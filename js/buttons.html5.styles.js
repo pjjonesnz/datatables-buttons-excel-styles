@@ -579,9 +579,11 @@
                         applyTable[styleLookup[currentCellStyle]].push(tag);
                     }
                     // Set column width
-                    $('col[min="' + col + '"]', sheet)
-                        .attr('width', style.width)
-                        .attr('customWidth', true);
+                    if(style.width !== undefined) {
+                        $('col[min="' + col + '"]', sheet)
+                            .attr('width', style.width)
+                            .attr('customWidth', true);
+                    }
                 }
 
                 // Set row heights
