@@ -156,7 +156,7 @@
                     ],
                 },
                 excelgreen: {
-                    description: 'Excel green table example using templates',
+                    description: 'Green table using templates',
                     group: "Templates",
                     help:
                         "<p>If you include the 'buttons.html5.styles.templates.js' library, you'll have access to a bunch of predefined styles which make it even easier!</p>" +
@@ -166,7 +166,7 @@
                     },
                 },
                 excelgreen2: {
-                    description: 'Excel Green Template with custom heading',
+                    description: 'Green table with custom heading',
                     group: "Templates",
                     help:
                         '<p>You can mix templates with your own style definitions. This one uses the same green template with a special orange heading!</p>',
@@ -188,18 +188,16 @@
                     ],
                 },
                 excelgreen3: {
-                    description: 'Excel Blue Template with Heading Template',
+                    description: 'Blue table with green heading',
                     group: "Templates",
                     help:
-                        '<p>You can even mix templates. The templates are built with parts that can be referenced separately. Lots of templates are under construction right now - May 2020.</p>',
-                    excelStyles: [
-                        {
-                            template: 'blue_medium',
-                        },
-                        {
-                            template: 'header_green',
-                        },
-                    ],
+                        '<p>You can even mix templates. The templates are built with parts that can be referenced separately</p>' +
+                        '<p>You can either define one template per Style Object, or as in this example you can pass the template names as an array</p>' +
+                        '<p>Note that the later templates (eg. "header_green") overwrite any similar styles of the preceding templates (in this case the background color of the heading is changed to green).</p>',
+                    excelStyles: 
+                    {
+                        template: ['blue_medium','header_green'],
+                    },
                 },
                 striped3: {
                     description:
