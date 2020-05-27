@@ -1,6 +1,6 @@
 {
   "name": "datatables-buttons-excel-styles",
-  "version": "0.7.7",
+  "version": "0.7.8",
   "description": "Easy custom styling of the Excel export from DataTables jQuery plug-in.",
   "main": "js/buttons.html5.styles.js",
   "scripts": {
@@ -11,7 +11,7 @@
     "update_version": "npm run update_script_version && npm run update_template_version && npm run update_example_version && npm run update_readme_version",
     "update_script_version": "rexreplace \"\\* @version: .*\" \"* @version: %npm_package_version%\" js/buttons.html5.styles.js -G",
     "update_template_version": "rexreplace \"\\* @version: .*\" \"* @version: %npm_package_version%\" js/buttons.html5.styles.templates.js -G",
-    "update_example_version": "rexreplace \"\\.min\\.js\\?version=[^\\\"]*\" \".min.js?version=%npm_package_version%\" examples/*.html",
+    "update_example_version": "rexreplace \"\\.js\\?version=[^\\\"]*\" \".js?version=%npm_package_version%\" examples/*.html",
     "update_readme_version": "rexreplace \"excel-styles@[^/]*/\" \"excel-styles@%npm_package_version%/\" README.md",
     "build": "npm run update_version && npm run uglify",
     "git_push": "git push && git push --tags",

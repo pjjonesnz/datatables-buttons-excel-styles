@@ -1,7 +1,7 @@
 /**
  * Styling for DataTables Buttons Excel XLSX (Open Office XML) creation
  *
- * @version: 0.7.7
+ * @version: 0.7.8
  * @description Add and process a custom 'excelStyles' option to easily customize the DataTables Excel Stylesheet output
  * @file buttons.html5.styles.js
  * @copyright © 2020 Beyond the Box Creative

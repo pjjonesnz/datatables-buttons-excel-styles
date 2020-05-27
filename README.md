@@ -26,8 +26,8 @@ Now you can simply style your downloaded tables without having to learn the intr
 2. Include the javascript files for this plugin from the following cdn, or download from this repository and add the scripts in the js/ folder to your page.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.7/js/buttons.html5.styles.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.7/js/buttons.html5.styles.templates.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.8/js/buttons.html5.styles.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.8/js/buttons.html5.styles.templates.min.js"></script>
 ```
 
 ## Usage
