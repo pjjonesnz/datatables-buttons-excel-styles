@@ -463,6 +463,17 @@ excelStyles: {                // Add an excelStyles definition
 }
 ```
 
+Multiple templates can be applied by using an array. If a second template target the same cell style as the preceding one, it will overwrite that style.
+
+```js
+excelStyles: {              // Add an excelStyles definition
+    template: [             // Apply multiple templates
+        "gold_medium",      // Apply the 'gold_medium' template to the entire table
+        "header_cyan"       // Overwrite the header with the 'header_cyan' style
+    ],    
+}
+```
+
 Some of the template parts are suitable to apply to a specific cell or cell range. 
 If you don't define `cells`, the template will be applied to the default range of cells defined within the template itself. If no default range or cell reference is defined, then the template will be skipped.
 
@@ -473,18 +484,40 @@ excelStyles: {                  // Add an excelStyles definition
 }
 ```
 
+For multiple templates targeting different cell ranges, use an array of Style Objects with the cells and template defined in each object
+
+```js
+excelStyles: [
+    {                  
+        cells: "sD",
+        template: "currency_eu",
+    },
+    {                  
+        cells: "sE",
+        template: "date_long",
+    }
+]
+```
+
 ## Template List
 
-This has only just been added to the plugin (20th May 2020 as of version 0.5), so the templates are still pretty limited buy will be expanded as time allows.
-
-### Full table templates
+### Full Table Templates
 
 | Template Name | Description                   |
 |---|---|
-| blue_medium   | Blue medium weight table      |
-| green_medium  | Green medium weight table     |
+| black_medium | Complete table: black theme |
+| blue_gray_medium | Complete table: blue-gray theme |
+| blue_medium | Complete table: blue theme |
+| cyan_medium | Complete table: cyan theme |
+| gold_medium | Complete table: gold theme |
+| gray_medium | Complete table: gray theme |
+| green_medium | Complete table: green theme |
+| light_gray_medium | Complete table: light-gray theme |
+| orange_medium | Complete table: orange theme |
 
-### Template parts
+Each of the Full Table Templates above automatically applies the Header & Footer, Row Stripes, Row Borders & Table Outline templates.
+
+### Template Parts
 
 | Part Name     | Description       | Default Cell Reference |
 |---|---|---|
@@ -494,21 +527,57 @@ This has only just been added to the plugin (20th May 2020 as of version 0.5), s
 | i             | Italic            | `s1:-0` All data rows |
 | |
 | **Headers and Footers** |
-| header_blue   | Blue header and footer    | `['sh', 'sf']` Header and footer |
-| header_green  | Green header and footer   | `['sh', 'sf']` Header and footer |
+| header_black | Header: black | `['sh', 'sf']` Header and footer |
+| header_blue | Header: blue | `['sh', 'sf']` Header and footer |
+| header_blue_gray | Header: blue_gray | `['sh', 'sf']` Header and footer |
+| header_cyan | Header: cyan | `['sh', 'sf']` Header and footer |
+| header_gold | Header: gold | `['sh', 'sf']` Header and footer |
+| header_gray | Header: gray | `['sh', 'sf']` Header and footer |
+| header_green | Header: green | `['sh', 'sf']` Header and footer |
+| header_light_gray | Header: light_gray | `['sh', 'sf']` Header and footer |
+| header_orange | Header: orange | `['sh', 'sf']` Header and footer |
 | |
 | **Row Stripes** |
-| stripes_blue  | Blue row stripes          | `s1:n,2` All columns, every second row of the data rows |
-| stripes_green | Green row stripes         | `s1:n,2` All columns, every second row of the data rows |
+| stripes_black | Stripes: black | `s1:n,2` All columns, every second row of the data rows |
+| stripes_blue | Stripes: blue | `s1:n,2` All columns, every second row of the data rows |
+| stripes_blue_gray | Stripes: blue_gray | `s1:n,2` All columns, every second row of the data rows |
+| stripes_cyan | Stripes: cyan | `s1:n,2` All columns, every second row of the data rows |
+| stripes_gold | Stripes: gold | `s1:n,2` All columns, every second row of the data rows |
+| stripes_gray | Stripes: gray | `s1:n,2` All columns, every second row of the data rows |
+| stripes_green | Stripes: green | `s1:n,2` All columns, every second row of the data rows |
+| stripes_light_gray | Stripes: light_gray | `s1:n,2` All columns, every second row of the data rows |
+| stripes_orange | Stripes: orange | `s1:n,2` All columns, every second row of the data rows |
 | |
-| **Row Borders** |
-| rowlines_blue | Blue border top and bottom of rows | `sh:f` All columns, every row from the header to the footer |
-| rowlines_green | Green border top and bottom of rows | `sh:f` All columns, every row from the header to the footer |
+| **Row Borders Top & Bottom** |
+| rowlines_black | Rowlines: black | `sh:f` All columns, every row from the header to the footer |
+| rowlines_blue | Rowlines: blue | `sh:f` All columns, every row from the header to the footer |
+| rowlines_blue_gray | Rowlines: blue_gray | `sh:f` All columns, every row from the header to the footer |
+| rowlines_cyan | Rowlines: cyan | `sh:f` All columns, every row from the header to the footer |
+| rowlines_gold | Rowlines: gold | `sh:f` All columns, every row from the header to the footer |
+| rowlines_gray | Rowlines: gray | `sh:f` All columns, every row from the header to the footer |
+| rowlines_green | Rowlines: green | `sh:f` All columns, every row from the header to the footer |
+| rowlines_light_gray | Rowlines: light_gray | `sh:f` All columns, every row from the header to the footer |
+| rowlines_orange | Rowlines: orange | `sh:f` All columns, every row from the header to the footer |
 | |
-| **Currency Number Format** |
+| **Table Outline** |
+| outline_black | Outline: black |
+| outline_blue | Outline: blue |
+| outline_blue_gray | Outline: blue_gray |
+| outline_cyan | Outline: cyan |
+| outline_gold | Outline: gold |
+| outline_gray | Outline: gray |
+| outline_green | Outline: green |
+| outline_light_gray | Outline: light_gray |
+| outline_orange | Outline: orange |
+| |
+| **Currency Format** |
 | currency_us | US currency number format |
 | currency_eu | Euro currency number format |
 | currency_gb | GB Pound currency number format |
+| |
+| **Date Format** |
+| date_long | Date: Long format - eg. 24 September 1979 |
+| date_medium | Date: Medium format - eg. 4 Dec 1987 |
 | |
 | **Number Format** |
 | int         | Integer number format |
