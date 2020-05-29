@@ -15,9 +15,11 @@ Now you can **easily style the Excel download** of your DataTable without having
 
 [Table of Contents](#table-of-contents)
 
+
 ## Demo
 
 [View the live Excel style demo which contains multiple examples](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html)
+
 
 ## Installing
 
@@ -30,11 +32,13 @@ Now you can **easily style the Excel download** of your DataTable without having
 <script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.8/js/buttons.html5.styles.templates.min.js"></script>
 ```
 
+
 ## Usage
 
 This plugin adds a new option named `excelStyles` to the [DataTables Buttons configuration](https://datatables.net/reference/option/buttons.buttons).
 
 This option will contain your style which consists of either a single [Excel Style Object](#excel-style-object) or an array of [Excel Style Objects](#excel-style-object) to be applied to your table.
+
 
 ### Style Example
 
@@ -67,6 +71,7 @@ $("#myTable").DataTable({
 });
 ```
 
+
 ### Template Example
 
 [Pre-defined templates](#pre-defined-templates) are a quick option for a nice output. [See this example live](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_template_style.html)
@@ -84,6 +89,7 @@ $("#myTable").DataTable({
     ],
 });
 ```
+
 
 ### Styles and Templates Combined
 
@@ -118,6 +124,8 @@ $("#myTable").DataTable({
     ],
 });
 ```
+
+
 ### Built-in Styles
 
 Built-in styles can also be used. See the [DataTables built-in style reference](https://datatables.net/reference/button/excelHtml5#Built-in-styles) for pre-defined style definitions.
@@ -136,6 +144,7 @@ $("#myTable").DataTable({
     ],
 });
 ```
+
 
 ## Applying your Styles
 
@@ -160,6 +169,7 @@ buttons: [
 ]
 ```
 
+
 ## Excel Style Object
 
 The `excelStyles` DataTables Buttons option is added as a configuration item for the DataTables Buttons object. It contains either a single Excel Style Object or an array of Excel Style Objects.
@@ -174,6 +184,7 @@ The `excelStyles` DataTables Buttons option is added as a configuration item for
 | merge     | Merge this style with the existing cell style | Boolean | true |
 | width     | Set the column width          | Double |
 | height    | Set the row height            | Double |
+
 
 ## Cell Reference
 
@@ -209,6 +220,7 @@ range of cells in different locations (eg. applying the same style to the header
 
 For examples of using these cell selections please [view the demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html), or have a look at the templates in [buttons.html5.styles.templates.js](https://github.com/pjjonesnz/datatables-buttons-excel-styles/blob/master/js/buttons.html5.styles.templates.js)
 
+
 ## Style Object
 
 There are five main properties available within a Style Object.
@@ -220,6 +232,7 @@ There are five main properties available within a Style Object.
 | fill      | To style the cell fill (ie. the cell background color and pattern) | [Fill Object](#fill-object) |
 | numFmt    | Apply a number format (eg. define currency display, decimal places, etc.) | [NumFmt String](#numfmt-string) |
 | alignment | Horizontal and vertical alignment of the cell content | [Alignment Object](#alignment-object) |
+
 
 ## Font Object
 
@@ -233,6 +246,7 @@ font: {
     color: "D75F41"
 }
 ```
+
 
 ### Font Attributes 
 
@@ -250,11 +264,14 @@ The commonly used font attributes are listed below. A full list can be found in 
 | u         | Underline      | Boolean or<br />String  | `u: true` (single underline)<br />`u: "singleAccounting"`<br />`u: "double"`<br />`u: "doubleAccounting"` | underline |
 | vertAlign | Subscript<br />Superscript | String              | `vertAlign: "subscript"`<br />`vertAlign: "superscript"`  | |
 
+
 #### Color Object
+
 | Attribute | Meaning | Type | Example | Default |
 |---|---|---|---|---|
 | rgb   | Hex RGB or ARGB color value           | String | `rgb: "0C96FD"`<br />`rgb: "800C96FD"` |
 | tint  | The tint value applied to the color   | Double (-1.0 to 1.0)  | `tint: -0.3` | 0.0 |
+
 
 ## Border Object
 
@@ -271,19 +288,24 @@ border: {
 }
 ```
 
+
 ### Border Attributes
 
 | Attribute | Meaning | Type | Example | 
 |---|---|---|---|
 | top<br />bottom<br />left<br />right<br />diagonal | Border position | String (Border Style)<br />[Border Style Object](#border-style-object) | `top: "thin"`<br />`bottom: { style: "dashed", color: "A9D08E" }` |
 
+
 #### Border Style Object
+
 | Attribute | Meaning | Type | Example | 
 |---|---|---|---|
 | style | The style of the border   | Enum ([Border Styles String](#border-styles-string))      | `style: "medium"` |
 | color | The border color          | String or<br />[Color Object](#color-object)  | `color: "FF0000"`<br />`color: { rgb: "FF0000", tint: 0.54 }` |
 
+
 #### Border Styles String
+
 | Value | Meaning | 
 |---|---|
 | dashDot           | Dash Dot Pattern                      |
@@ -305,7 +327,9 @@ border: {
 
 The fill style can either be a pattern or a gradient. While these styles are fully supported by Excel on all devices, many of the advanced pattern and gradient options are not completely supported by other spreadsheet viewers (eg. the default ios viewer)
 
+
 **Solid background color**
+
 ```js
 fill: {
     pattern: {
@@ -314,7 +338,9 @@ fill: {
 }
 ```
 
+
 **Patterned background**
+
 ```js
 fill: {
     pattern: {
@@ -325,7 +351,9 @@ fill: {
 }
 ```
 
+
 **Gradient background**
+
 ```js
 fill: {
     gradient: {
@@ -344,12 +372,14 @@ fill: {
 }
 ```
 
+
 ### Fill Attributes
 
 | Attribute | Meaning | Type | Aliases |
 |---|---|---|---|
 | pattern   | Pattern Fill  | [Pattern Object](#pattern-object)   | patternFill |
 | gradient  | Gradient Fill | [Gradient Object](#gradient-object)    | gradientFill |
+
 
 #### Pattern Object
 
@@ -358,6 +388,7 @@ fill: {
 | type      | Type of pattern       | [Pattern Type String](#pattern-type-string) | `type: "lightUp"`<br />Default: `"solid"` | |
 | fgColor   | Foreground color      | String or<br />[Color Object](#color-object)    | `fgColor: "FF0000"`<br />`fgColor: { rgb: "FF0000", tint: 0.54 }`   | color |
 | bgColor   | Background color      | String or<br />[Color Object](#color-object)    | `bgColor: "FF0000"`<br />`bgColor: { rgb: "FF0000", tint: 0.54 }`   | |
+
 
 #### Pattern Type String
 
@@ -384,6 +415,7 @@ This list along with examples can be [found here](https://c-rex.net/projects/sam
 | mediumGray | Medium Gray |
 | solid | Solid |
 
+
 #### Gradient Object
 
 | Attribute | Meaning | Type | Example | 
@@ -393,12 +425,14 @@ This list along with examples can be [found here](https://c-rex.net/projects/sam
 | left<br />right<br />top<br />bottom | Edge position percentage of the inner rectangle<br />for path gradients | Double<br />(0.0 - 1.0) | `left: "0.3"` |
 | stop   | Array of two or more gradient stops  | Array of [Stop Objects](#stop-object) | `stop: [{ position: "0", color: "#FF0000"}, ..., ...]` |
 
+
 #### Stop Object
 
 | Attribute | Meaning | Type | Example | 
 |---|---|---|---|
 | position  | Position percentage | Double<br />(0.0 to 1.0)    | `position: "0"`<br />`position: "1"` |
 | color     | Color               | String or<br />[Color Object](#color-object)          | `fgColor: "FF0000"`<br />`fgColor: { rgb: "FF0000", tint: 0.54 }`   |
+
 
 ## NumFmt String
 
@@ -419,6 +453,7 @@ The easiest way to find a custom code using Excel is as follows:
 5. Click 'Custom' in the category list
 6. Copy the code from the 'Type' input and use that as your NumFmt String
 
+
 ## Alignment Object
 
 The alignment object applies alignment to the content of your cells.
@@ -431,6 +466,7 @@ alignment: {
 }
 ```
 
+
 ### Alignment Attributes
 
 | Attribute | Meaning | Type | Info |
@@ -442,6 +478,7 @@ alignment: {
 | textRotation  | Text Rotation         | Unsigned Integer (0 - 180)  | Degrees to rotate text
 | vertical      | Vertical Alignment    | [Vertical Alignment Enum](#vertical-alignment-enum) |
 | wrapText      | Word Wrapping         | Boolean |
+
 
 #### Horizontal Alignment Enum
 
@@ -456,6 +493,7 @@ alignment: {
 | left                  | Left Horizontal Alignment |
 | right                 | Right Horizontal Alignment |
 
+
 #### Vertical Alignment Enum
 
 | Value | Meaning |
@@ -465,6 +503,7 @@ alignment: {
 | distributed       | Distributed Vertical Alignment |
 | justify           | Justified Vertically |
 | top               | Align Top |
+
 
 ## Pre-defined templates
 
@@ -522,7 +561,9 @@ excelStyles: [
 ]
 ```
 
+
 ## Template List
+
 
 ### Full Table Templates
 
@@ -539,6 +580,7 @@ excelStyles: [
 | orange_medium | Complete table: orange theme |
 
 Each of the Full Table Templates above automatically applies the Header & Footer, Row Stripes, Row Borders & Table Outline templates.
+
 
 ### Template Parts
 
@@ -609,9 +651,11 @@ Each of the Full Table Templates above automatically applies the Header & Footer
 | decimal_3   | Number format - three decimal places, negatives in brackets |
 | decimal_4   | Number format - four decimal places, negatives in brackets |
 
+
 ## License
 
 This plugin is released under the MIT license. You are free to use, modify and distribute this software, as long as the copyright header is left intact.
+
 
 ## Contributing
 
@@ -619,11 +663,13 @@ I hope this plugin helps you output beautiful spreadsheets from your DataTables.
 
 Please let me know if you have any helpful comments or code that you would like to contribute or if this plugin has been helpful.
 
+
 ## Thanks
 
 To the DataTables.net team for making jQuery table display so much easier and more beautiful!
 
 To the C-Rex team for their excellent [Office Open XML File Format Reference](https://c-rex.net/projects/samples/ooxml/e1/index.html)
+
 
 ## Table of Contents
 
