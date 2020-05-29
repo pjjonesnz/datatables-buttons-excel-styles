@@ -4,26 +4,26 @@
 [![GitHub license](https://img.shields.io/github/license/pjjonesnz/datatables-buttons-excel-styles)](https://github.com/pjjonesnz/datatables-buttons-excel-styles/blob/master/LICENSE.md)
 [![npm](https://img.shields.io/npm/v/datatables-buttons-excel-styles)](https://www.npmjs.com/package/datatables-buttons-excel-styles)
 
-**Add beautifully styled Excel output to your DataTables.**
+**Add beautifully styled Excel output to your DataTables**
 
 [DataTables](https://www.datatables.net) is an amazing tool to display your tables in a user friendly way, and the [Buttons](https://www.datatables.net/extensions/buttons/) extension makes downloading those tables a breeze. 
 
-Now you can simply style your downloaded tables without having to learn the intricacies of SpreadsheetML using either:
+Now you can **easily style the Excel download** of your DataTable without having to learn the intricacies of Office Open XML using either:
 
-* Styles: Your own custom defined font, border, background and number format style, and/or
-* Pre-defined Templates: A selection of templates to apply to your table or selected cells
+* Custom Styles - Your own custom defined font, border, background, number format and alignment styles, or
+* Pre-defined Templates - A selection of templates to apply to your entire table or selected cells
 
 [Table of Contents](#table-of-contents)
 
 ## Demo
 
-[View the Excel style demo containing multiple examples](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html)
+[View the live Excel style demo which contains multiple examples](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html)
 
 ## Installing
 
-1. If you don't already have DataTables set up to download excel spreadsheets, add jQuery, DataTables, Buttons Extension and JSZip to your page. [Download from DataTables.net](https://www.datatables.net/download/)
+1. If you don't already have the 'Excel' download button running on your DataTable, make sure you add the Buttons Extension and JSZip to your page. [Download from DataTables.net](https://www.datatables.net/download/)
 
-2. Include the javascript files for this plugin from the following cdn, or download from this repository and add the scripts in the js/ folder to your page.
+2. Include the javascript files for this plugin from the following cdn, or download from git or npm and add the scripts in the 'js/' folder to your page.
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.8/js/buttons.html5.styles.min.js"></script>
@@ -32,9 +32,9 @@ Now you can simply style your downloaded tables without having to learn the intr
 
 ## Usage
 
-This plugin adds a new option `excelStyles` to the [DataTables Buttons configuration array](https://datatables.net/reference/option/buttons.buttons).
+This plugin adds a new option named `excelStyles` to the [DataTables Buttons configuration](https://datatables.net/reference/option/buttons.buttons).
 
-Add an `excelStyles` option to your button, containing either a single [Excel Style Object](#excel-style-object) or an array of Excel Style Objects to be applied to your table.
+This option will contain your style which consists of either a single [Excel Style Object](#excel-style-object) or an array of [Excel Style Objects](#excel-style-object) to be applied to your table.
 
 ### Style Example
 
@@ -135,6 +135,29 @@ $("#myTable").DataTable({
         },
     ],
 });
+```
+
+## Applying your Styles
+
+In most cases your styles will be automatically applied by this plugin, but please consider the following.
+
+**Please Note:** This plugin hooks in using the [customize option](https://datatables.net/reference/button/excel) in the DataTables Buttons configuration to automatically run when you click on the Excel button. If you are already using the `customize` method to apply other table formatting or modification, you can run this plugin by calling `applyStyles` from within your `customize` method as follows:
+
+```js
+buttons: [
+    {
+        extend: "excel",
+        excelStyles: {
+            // ... custom Excel Style Objects defined ...
+        },
+        customize: function(xlsx) {
+            // ... your custom code here ...
+
+            // Apply the excelStyles
+            this.applyStyles(xlsx); 
+        }
+    }
+]
 ```
 
 ## Excel Style Object

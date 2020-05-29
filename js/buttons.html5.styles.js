@@ -12,8 +12,6 @@
  *
  * Create the required styles using the custom 'excelStyles' option in the button's config
  * @see https://datatables.net/reference/button/excel
- *
- * @todo Documentation on 'excelStyles' options - 'Coming soon...'
  */
 
 (function (factory) {
@@ -339,6 +337,11 @@
         return 1;
     };
 
+    /**
+     * Get the index number of the last row in the worksheet
+     * 
+     * @param {object} sheet Worksheet
+     */
     var _getMaxSheetRow = function (sheet) {
         return Number($('sheetData row', sheet).last().attr('r'));
     };
@@ -405,11 +408,6 @@
     };
 
     /**
-     * Datatables config settings, used to calculate smart row references
-     */
-    //var _tableConfig = {};
-
-    /**
      * Row references for smart row references
      */
     var _rowRefs = {
@@ -423,7 +421,7 @@
     };
 
     /**
-     * Load the row references for smart rows into an object
+     * Load the row references for smart rows into the _rowRefs object
      *
      * @param {object} config Config options that affect the index of the rows
      * @param {object} sheet Spreadsheet - to calculate length
@@ -606,7 +604,7 @@
     };
 
     /**
-     * Attributes to use when translating the simplified excelStyles object
+     * Internal attributes to use when translating the simplified Excel Style Objects
      * to a format that Excel understands
      *
      * @example
@@ -750,7 +748,7 @@
     };
 
     /**
-     * Find the node value in the _translateAttributes object
+     * Find a node value in the _translateAttributes object
      *
      * @param {array} keyArray Hierarchy of nodes to search
      * @return {any|undefined} Value of the node
@@ -846,8 +844,6 @@
      * @param {string|object}   attributeValue  The value of the attribute to add
      * @param {object}          parentNode      The parent xml node
      * @param {array}           nodeHierarchy   Array of node names in this tree
-     *
-     * @todo Replace jQuery function setting attributes when passed an object with plain javascript
      */
     var _addXMLAttribute = function (
         styleType,
@@ -879,11 +875,6 @@
             $(parentNode).attr(txAttr);
         }
     };
-
-    /**
-     * The xml Doc we're working on
-     */
-    var _xmlStyleDoc;
 
     /**
      * The xml Doc we're working on
@@ -934,6 +925,14 @@
         }
     };
 
+    /**
+     * Determine if we should merge attributes or replace them
+     * 
+     * To fix issues with gradientFill options causing Excel to throw an error
+     * 
+     * @param {string} attributeName Name of the attributes
+     * @param {array} nodeHierarchy Array of node names in this tree
+     */
     var _doWeMerge = function (attributeName, nodeHierarchy) {
         var merge = _findNodeValue(
             nodeHierarchy.concat([attributeName, 'merge'])
@@ -944,6 +943,15 @@
         return true;
     };
 
+    /**
+     * Remove node siblings which would cause Excel to throw an error
+     * 
+     * eg. You can't apply a patternFill and a gradientFill to the same call
+     * 
+     * @param {string} attributeName Name of the attribute
+     * @param {object} parentNode The parent xml node
+     * @param {array} nodeHierarchy Array of node names in this tree
+     */
     var _purgeUnwantedSiblings = function (
         attributeName,
         parentNode,
@@ -961,7 +969,7 @@
     };
 
     /**
-     * Add Style to the stylesheet
+     * Add Style to the stylesheet using either a built-in style or a custom defined style
      *
      * @param {object} xlsx
      * @param {object|int} addStyle Definition of style to add as an object, or (int) styleID if using a built in style
@@ -1054,6 +1062,13 @@
         return cellXfs.childNodes.length - 1;
     };
 
+    /**
+     * Merge existing cell style with the new custom Excel Style to be applied
+     *
+     * @param {object} addStyle Excel Style Object to be applied to the cell
+     * @param {int} currentCellStyle Current index of the cell being updated
+     * @return {int} Index of the newly created style
+     */
     var _mergeWithStyle = function (addStyle, currentCellStyle) {
         var cellXfs = _xmlStyleDoc.getElementsByTagName('cellXfs')[0];
         var style = addStyle.style;

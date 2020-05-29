@@ -9,8 +9,6 @@
  * @license MIT
  *
  * Include this file after including the buttons.html5.styles.js (along with the required DataTables dependencies)
- *
- * @todo Add extra templates really soon
  */
 
 (function (factory) {
