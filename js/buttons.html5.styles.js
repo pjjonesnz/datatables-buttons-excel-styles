@@ -164,6 +164,7 @@
      *
      * @param {string} cells Cell names in an Excel-like structure
      * @param {object} sheet The worksheet to enable finding of the last column/row
+     * @param {boolean} smartRowOption Has the smartRow option been set
      * @return {object} Parsed rows and columns, in number format (ie. columns referenced by number, not letter)
      */
     var _parseExcellyReference = function (cells, sheet, smartRowOption) {
@@ -367,6 +368,7 @@
      * Convert column name to index
      *
      * @param {string} columnName Name of the excel column, eg. A, B, C, AB, etc.
+     * @param {object} sheet Worksheet
      * @return {number} Index number of the column
      */
     var _parseColumnName = function (columnName, sheet) {
@@ -472,6 +474,7 @@
         }
 
         var sheet = xlsx.xl.worksheets['sheet1.xml'];
+        _xmlStyleDoc = xlsx.xl['styles.xml'];
 
         // load config settings for smart row references
         var config = DataTable.Api().buttons.exportInfo(this);
@@ -521,6 +524,12 @@
                     continue;
                 }
 
+                // If a condition is supplied, add this style as a conditional style
+                if( style.condition != undefined) {
+                    _addConditionalStyle(sheet, style, selection);
+                    continue;
+                }
+
                 for (
                     var col = selection.fromCol;
                     col <= selection.toCol;
@@ -559,13 +568,11 @@
                                     : 0;
                                 if (!styleId) {
                                     newStyleId = _addXMLStyle(
-                                        xlsx,
                                         style,
                                         mergeWithCellStyle
                                     );
                                 } else {
                                     newStyleId = _addXMLStyle(
-                                        xlsx,
                                         styleId,
                                         mergeWithCellStyle
                                     );
@@ -635,6 +642,21 @@
      * @var {object} _translateAttributes
      */
     var _translateAttributes = {
+        conditionalFormatting: {
+            cfRule: {
+                default: {
+                    priority: '1',
+                },
+                formula: {
+                    child: true,
+                    merge: false,
+                    val: 'formulaValue',
+                    formulaValue: {
+                        textNode: true,
+                    },
+                },
+            },
+        },
         font: {
             translate: {
                 size: 'sz',
@@ -785,7 +807,6 @@
      * Should this attribute be created as a child node?
      *
      * @param {array} nodeHierarchy
-     * @param {string} tagName
      * @param {string} attributeName
      * @return {boolean}
      */
@@ -797,6 +818,24 @@
             value.child === true
         );
     };
+
+    /**
+     * Should this attribute be created as a textNode?
+     *
+     * @param {array} nodeHierarchy
+     * @param {string} attributeName
+     * @return {boolean}
+     */
+    var _isTextNode = function (nodeHierarchy, attributeName) {
+        var value = _findNodeValue(nodeHierarchy.concat([attributeName]));
+        return (
+            value !== undefined &&
+            value.textNode !== undefined &&
+            value.textNode === true
+        );
+    };
+
+    
 
     /**
      * Get translated tagName to translate commonly used html names to XML name (eg size: 'sz')
@@ -815,10 +854,7 @@
     /**
      * Get the attributes to add to the node
      *
-     * @param {string} styleType
-     * @param {string} tagName
-     * @param {string} attributeName
-     * @param {string} value
+     * @param {string} attributeValue
      * @param {array}  nodeHierarchy   Array of node names in this tree
      */
     var _getStringAttribute = function (attributeValue, nodeHierarchy) {
@@ -867,12 +903,23 @@
                         nodeHierarchy
                     );
                 } else {
-                    $(parentNode).attr(key, value);
+                    if (_isTextNode(nodeHierarchy, key)) {
+                        parentNode.appendChild(_xmlStyleDoc.createTextNode(value));
+                    }
+                    else {
+                        $(parentNode).attr(key, value);
+                    }
                 }
             }
         } else if (attributeValues !== '') {
             var txAttr = _getStringAttribute(attributeValues, nodeHierarchy);
-            $(parentNode).attr(txAttr);
+            for(var i in txAttr) {
+                if (_isTextNode(nodeHierarchy, i)) {
+                    parentNode.appendChild(_xmlStyleDoc.createTextNode(txAttr[i]));
+                } else {
+                    parentNode.setAttribute(i, txAttr[i]);
+                }
+            }
         }
     };
 
@@ -971,14 +1018,14 @@
     /**
      * Add Style to the stylesheet using either a built-in style or a custom defined style
      *
-     * @param {object} xlsx
      * @param {object|int} addStyle Definition of style to add as an object, or (int) styleID if using a built in style
+     * @param {object|int} currentCellStyle The current style of the cell to merge with
+     * @return {int} Style ID
      */
-    var _addXMLStyle = function (xlsx, addStyle, currentCellStyle) {
+    var _addXMLStyle = function (addStyle, currentCellStyle) {
         if (typeof addStyle === 'object' && addStyle.style === undefined) {
             return currentCellStyle;
         }
-        _xmlStyleDoc = xlsx.xl['styles.xml'];
         if (typeof addStyle === 'object') {
             return _mergeWithStyle(addStyle, currentCellStyle);
         } else {
@@ -1137,6 +1184,72 @@
         _updateContainerCount(cellXfs);
         return cellXfs.childNodes.length - 1;
     };
+
+    /**
+     * Add conditional formatting to a spreadsheet
+     * 
+     * @param {xls} sheet 
+     * @param {object} excelStyle ExcelStyle object
+     * @param {array} selection The cell range selected
+     */
+    var _addConditionalStyle = function (sheet, excelStyle, selection) {
+        // Only apply conditional if a style is defined
+        if (excelStyle.style == undefined) {
+            return;
+        }
+
+        // Create new dxf incremental formatting style
+        var dxfs = _xmlStyleDoc.getElementsByTagName('dxfs')[0];
+        var dxfNode = _xmlStyleDoc.createElement('dxf');
+        dxfs.appendChild(dxfNode);
+        _updateContainerCount(dxfs);
+
+        // Add style to dxf block
+        var style = excelStyle.style;
+        var parentNode;
+        for (var type in style) {
+            parentNode = _xmlStyleDoc.createElement(type);
+            dxfNode.appendChild(parentNode);
+            style[type] = _mergeDefault([type], style[type]);
+
+            for (var attributeName in style[type]) {
+                var attributeValue = style[type][attributeName];
+                _addXMLNode(type, attributeName, attributeValue, parentNode, [
+                    type,
+                ]); 
+            }
+        }
+
+        var dxfId = dxfs.childNodes.length - 1;
+
+        var worksheet = sheet.getElementsByTagName('worksheet')[0];
+        var conditionalFormatting = sheet.createElement('conditionalFormatting');
+
+        var cellRef = _getRangeFromSelection(selection);
+        conditionalFormatting.setAttribute('sqref',cellRef);
+        worksheet.appendChild(conditionalFormatting);
+
+        var condition = excelStyle.condition
+        condition.dxfId = dxfId;
+        _addXMLNode('conditionalFormatting', 'cfRule', condition, conditionalFormatting, [
+            'conditionalFormatting',
+        ]);
+        console.log(sheet);
+    };
+
+    /**
+     * Convert a cell selection into a Range (ignoring cell skipping, etc.)
+     * 
+     * @param {array} selection Parsed excelly reference
+     * @return {string} Cell range, eg. "A3:A45"
+     */
+    var _getRangeFromSelection = function(selection) {
+        return _parseColumnIndex(selection.fromCol) +
+            String(selection.fromRow) +
+            ':' +
+            _parseColumnIndex(selection.toCol) +
+            String(selection.toRow);
+    }
 
     /**
      * Update the count attribute on style type containers

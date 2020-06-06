@@ -496,6 +496,72 @@
                             index: 17,
                         }
                     ]
+                },
+                conditional: {
+                    description: 'Add styles conditionally - Between',
+                    group: "Conditional formatting",
+                    help: '<p>You can conditionally apply styles to a table.</p>' +
+                    '<p>You can use the following operators: between, equal, greaterThan, greaterThanOrEqual, lessThan, lessThanOrEqual, notBetween, notEqual</p>',
+                    excelStyles: [
+                        {
+                            cells: 'sF',
+                            condition: {
+                                type: 'cellIs',
+                                operator: 'between',
+                                formula: [150000,200000],
+                            },
+                            style: {
+                                font: {
+                                    b: true,
+                                },
+                                fill: {                     // Style the cell fill (background)
+                                    pattern: {              // Type of fill (pattern or gradient)
+                                        bgColor: 'FFCCCC',  // Fill color
+                                    }
+                                }
+                            }
+                        },
+                        
+                    ]
+                },
+                 conditional2: {
+                    description: 'Add styles conditionally - Greater Than and Less Than',
+                    group: "Conditional formatting",
+                    help: '<p>You can conditionally apply styles to a table.</p>' +
+                    '<p>Income greater than $100000, age less than 40</p>' +
+                    '<p>You can use the following operators: between, equal, greaterThan, greaterThanOrEqual, lessThan, lessThanOrEqual, notBetween, notEqual</p>',                    
+                    excelStyles: [
+                        {
+                            cells: 'sF',
+                            condition: {
+                                type: 'cellIs',
+                                operator: 'greaterThan',
+                                formula: 100000,
+                            },
+                            style: {
+                                fill: {                     // Style the cell fill (background)
+                                    pattern: {              // Type of fill (pattern or gradient)
+                                        bgColor: 'CCFFCC',  // Fill color
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            cells: 'sD',
+                            condition: {
+                                type: 'cellIs',
+                                operator: 'lessThan',
+                                formula: 40,
+                            },
+                            style: {
+                                fill: {                     // Style the cell fill (background)
+                                    pattern: {              // Type of fill (pattern or gradient)
+                                        bgColor: 'CCCCFF',  // Fill color
+                                    }
+                                }
+                            }
+                        },
+                    ]
                 }
             };
 

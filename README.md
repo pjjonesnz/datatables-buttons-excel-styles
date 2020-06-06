@@ -42,7 +42,9 @@ This option will contain your style which consists of either a single [Excel Sty
 
 ### Style Example
 
-With a custom [Style Object](#style-object) you can customize your spreadsheet to look exactly as you'd like it to. Either use familiar Excel cell references or take advantage of the [Cell Reference](#cell-reference) definitions available, to target specific parts of your worksheet. [See this example live](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_style.html)
+With a custom [Style Object](#style-object) you can customize your spreadsheet to look exactly as you'd like it to. Either use familiar Excel cell references or take advantage of the [Cell Reference](#cell-reference) definitions available, to target specific parts of your worksheet. 
+
+[See this example live](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_style.html)
 
 ```js
 $("#myTable").DataTable({
@@ -74,7 +76,9 @@ $("#myTable").DataTable({
 
 ### Template Example
 
-[Pre-defined templates](#pre-defined-templates) are a quick option for a nice output. [See this example live](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_template_style.html)
+[Pre-defined templates](#pre-defined-templates) are a quick option for a nice output. 
+
+[See this example live](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/single_template_style.html)
 
 ```js
 $("#myTable").DataTable({
@@ -93,7 +97,9 @@ $("#myTable").DataTable({
 
 ### Styles and Templates Combined
 
-You can easily combine the two. Start with a nice design and then make it yours! [See this example live](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/combine_template_and_style.html)
+You can easily combine the two. Start with a nice design and then make it yours! 
+
+[See this example live](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/combine_template_and_style.html)
 
 ```js
 $("#myTable").DataTable({
@@ -146,6 +152,45 @@ $("#myTable").DataTable({
 ```
 
 
+### Conditional Formatting
+
+You can apply [Conditional Styles](#conditional-styles) to cells. This is a Beta feature, so not all Excel conditional formatting is currently supported, but the most common conditional number formatting is. You can also only apply custom styles (ie. not templates or built-in styles).
+
+The major benefit to using this method (as opposed to writing your own customize method to add fixed styles to cells) is that the applied styles automatically update when you make changes to your data inside of Excel.
+
+[See this example live](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/conditional_style.html)
+
+```js
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",                        // Extend the excel button
+            excelStyles: {                          // Add an excelStyles definition
+                cells: "sF",                        // (s) Smart row reference, All data rows in column F
+                condition: {                        // Add this style conditionally
+                    type: 'cellIs',                 // Use the 'cellIs' condition type
+                    operator: 'between',            // Use the 'between' operator
+                    formula: [150000,200000],   // Add the two numbers to match between
+                },
+                style: {                            // The style block
+                    font: {
+                        bold: true,
+                    },
+                    fill: {
+                        pattern: {
+                            bgColor: "457B9D",      // NOTE: An excel quirk is that conditional solid fills need 
+                                                    // the bgColor set, not the fgColor as for normal fills. 
+                        }
+                    }
+                }
+            },
+        },
+    ],
+});
+```
+
+
 ## Applying your Styles
 
 In most cases your styles will be automatically applied by this plugin, but please consider the following.
@@ -184,6 +229,7 @@ The `excelStyles` DataTables Buttons option is added as a configuration item for
 | merge     | Merge this style with the existing cell style | Boolean | true |
 | width     | Set the column width          | Double |
 | height    | Set the row height            | Double |
+| condition | Condition to match for conditional formatting | [Condition Object](#condition-object) |
 
 
 ## Cell Reference
@@ -650,6 +696,52 @@ Each of the Full Table Templates above automatically applies the Header & Footer
 | decimal_2   | Number format - two decimal places, negatives in brackets |
 | decimal_3   | Number format - three decimal places, negatives in brackets |
 | decimal_4   | Number format - four decimal places, negatives in brackets |
+
+
+## Conditional Styles
+
+Conditional formatting causes styles to only be applied to cells if the condition is met.
+
+### Condition Object
+
+| Attribute | Description | Type |
+|---|---|---|
+| type      | The type of conditional formatting rule | String |
+| operator  | When type is 'cellIs', sets the comparison type | [Operator Enum](#operator-enum) |
+| formula   | The data to compare | Number/String<br>Array (for between or notBetween operators) |
+
+Example:
+
+```js
+condition: {
+    type: "cellIs",
+    operator: "greaterThan",
+    formula: 150000,
+}
+```
+
+Also:
+
+```js
+condition: {
+    type: "cellIs",
+    operator: "notBetween",
+    formula: [150000,200000],
+}
+```
+
+#### Operator Enum
+
+| Value | Meaning |
+|---|---|
+| between               | Value is between the two numbers in the formula array |
+| equal                 | Value is equal to the number in the formula |
+| greaterThan           | Value is greater than the number in the formula |
+| greaterThanOrEqual    | Value is greater than or equal to the number in the formula |
+| lessThan              | Value is less than the number in the formula |
+| lessThanOrEqual       | Value is less than or equal to the number in the formula |
+| notBetween            | Value is NOT between the two numbers in the formula array |
+| notEqual              | Value is NOT equal to the number in the formula |
 
 
 ## License
