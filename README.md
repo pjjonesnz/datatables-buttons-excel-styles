@@ -704,11 +704,12 @@ Conditional formatting causes styles to only be applied to cells if the conditio
 
 ### Condition Object
 
-| Attribute | Description | Type |
-|---|---|---|
+| Attribute | Description | Type | Default |
+|---|---|---|---|
 | type      | The type of conditional formatting rule | String |
 | operator  | When type is 'cellIs', sets the comparison type | [Operator Enum](#operator-enum) |
 | formula   | The data to compare | Number/String<br>Array (for between or notBetween operators) |
+| priority  | The priority of this conditional formatting rule | Number | 1 |
 
 Example:
 
