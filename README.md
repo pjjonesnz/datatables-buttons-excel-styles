@@ -28,8 +28,8 @@ Now you can **easily style the Excel download** of your DataTable without having
 2. Include the javascript files for this plugin from the following cdn, or download from git or npm and add the scripts in the 'js/' folder to your page.
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.8/js/buttons.html5.styles.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.7.8/js/buttons.html5.styles.templates.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.8.0/js/buttons.html5.styles.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/datatables-buttons-excel-styles@0.8.0/js/buttons.html5.styles.templates.min.js"></script>
 ```
 
 
