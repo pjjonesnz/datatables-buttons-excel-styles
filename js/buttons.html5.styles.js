@@ -655,6 +655,17 @@
                         textNode: true,
                     },
                 },
+                dataBar: {
+                    child: true,
+                    cfvo: {
+                        child: true,
+                        merge: false,
+                    },
+                    color: {
+                        child: true,
+                        val: 'rgb',
+                    },
+                },
             },
         },
         font: {
