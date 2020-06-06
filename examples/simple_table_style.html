@@ -604,7 +604,60 @@
                             }
                         },
                     ]
-                }
+                },
+                conditional4: {
+                    description: 'ColorScale formatting',
+                    group: "Conditional formatting",
+                    help: '<p>You can add colorScales to a table.</p>' +
+                    '<p>This example goes from white to red.</p>' +
+                    '<p>ColorScales don\'t require a Style Object</p>',
+                    excelStyles: [
+                        {
+                            cells: 'sF',
+                            condition: {
+                                type: 'colorScale',
+                                colorScale: {
+                                    color: ['FFFFFF','FF0000']
+                                }
+                            }
+                        },
+                        
+                    ]
+                },
+                conditional5: {
+                    description: 'DataBar formatting',
+                    group: "Conditional formatting",
+                    help: '<p>You can add a dataBar to a table.</p>' +
+                    '<p>DataBars don\'t require a Style Object</p>',
+                    excelStyles: [
+                        {
+                            cells: 'sF',
+                            condition: {
+                                type: 'dataBar',
+                                dataBar: {
+                                    color: ['8888FF']
+                                }
+                            }
+                        },
+                        
+                    ]
+                },
+                conditional6: {
+                    description: 'IconSet formatting',
+                    group: "Conditional formatting",
+                    help: '<p>You can add an iconSet to a table.</p>' +
+                    '<p>IconSets don\'t require a Style Object</p>',
+                    excelStyles: [
+                        {
+                            cells: 'sF',
+                            condition: {
+                                type: 'iconSet',
+                                iconSet: {}
+                            }
+                        },
+                        
+                    ]
+                },
             };
 
             $(document).ready(function () {

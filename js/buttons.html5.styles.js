@@ -657,6 +657,12 @@
                 },
                 dataBar: {
                     child: true,
+                    default: {
+                        cfvo: [
+                            { type: 'min', val: 0 },
+                            { type: 'max', val: 0 },
+                        ],
+                    },
                     cfvo: {
                         child: true,
                         merge: false,
@@ -664,6 +670,40 @@
                     color: {
                         child: true,
                         val: 'rgb',
+                    },
+                },
+                colorScale: {
+                    child: true,
+                    default: {
+                        cfvo: [
+                            { type: 'min', val: 0 },
+                            { type: 'max', val: 0 },
+                        ],
+                    },
+                    cfvo: {
+                        child: true,
+                        merge: false,
+                    },
+                    color: {
+                        child: true,
+                        merge: false,
+                        val: 'rgb',
+                    },
+                },
+                iconSet: {
+                    child: true,
+                    default: {
+                        iconSet: '4Rating',
+                        cfvo: [
+                            { type: 'percentile', val: 0 },
+                            { type: 'percentile', val: 33 },
+                            { type: 'percentile', val: 67 },
+                            { type: 'percentile', val: 100 },
+                        ],
+                    },
+                    cfvo: {
+                        child: true,
+                        merge: false,
                     },
                 },
             },
@@ -1204,10 +1244,6 @@
      * @param {array} selection The cell range selected
      */
     var _addConditionalStyle = function (sheet, excelStyle, selection) {
-        // Only apply conditional if a style is defined
-        if (excelStyle.style == undefined) {
-            return;
-        }
 
         // Create new dxf incremental formatting style
         var dxfs = _xmlStyleDoc.getElementsByTagName('dxfs')[0];
@@ -1216,7 +1252,7 @@
         _updateContainerCount(dxfs);
 
         // Add style to dxf block
-        var style = excelStyle.style;
+        var style = excelStyle.style ? excelStyle.style : {};
         var parentNode;
         for (var type in style) {
             parentNode = _xmlStyleDoc.createElement(type);
