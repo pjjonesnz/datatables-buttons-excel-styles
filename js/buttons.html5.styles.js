@@ -340,7 +340,7 @@
 
     /**
      * Get the index number of the last row in the worksheet
-     * 
+     *
      * @param {object} sheet Worksheet
      */
     var _getMaxSheetRow = function (sheet) {
@@ -411,7 +411,7 @@
 
     /**
      * Convert a cell name into col and row object
-     * 
+     *
      * @param {string} cellName Name of a cell, eg. B4
      * @return {object} Column and row index
      */
@@ -487,7 +487,7 @@
 
     /**
      * Insert cells into a spreadsheet
-     * 
+     *
      * // Add cell information (without pushCol or pushRow it replaces any existing data in those cells)
      *
      * insertCells: [
@@ -499,9 +499,9 @@
      *      cells: 'sE1:-0',
      *      content: '',
      * }]
-     * 
+     *
      * Use pushCol to push the columns to the right over
-     * 
+     *
      * insertCells: [
      * {
      *      cells: 'sEh',
@@ -513,9 +513,9 @@
      *      content: '',
      *      pushCol: true
      * }]
-     * 
+     *
      * Use pushRow to insert the row, pushing the existing row down by one
-     * 
+     *
      * insertCells: [
      * {
      *   cells: 'sA5',
@@ -589,17 +589,27 @@
                         var existingCell = _getExistingCell(cellId, sheet);
                         var newCol;
                         if (existingCell !== false) {
-                            if(insertObject.pushRow !== undefined && insertObject.pushRow === true) {
+                            if (
+                                insertObject.pushRow !== undefined &&
+                                insertObject.pushRow === true
+                            ) {
                                 // Insert row
-                                var newRow = _createNode(sheet, 'row', { attr: { r: row}});
-                                existingCell.parent().before(newRow);
-                                _pushRow(existingCell.parent(),1);
-                                existingCell.parent().nextAll().each(function() {
-                                    _pushRow($(this),1);
+                                var newRow = _createNode(sheet, 'row', {
+                                    attr: { r: row },
                                 });
+                                existingCell.parent().before(newRow);
+                                _pushRow(existingCell.parent(), 1);
+                                existingCell
+                                    .parent()
+                                    .nextAll()
+                                    .each(function () {
+                                        _pushRow($(this), 1);
+                                    });
                                 newRow.appendChild(cell);
-                            }
-                            else if (insertObject.pushCol !== undefined && insertObject.pushCol === true) {
+                            } else if (
+                                insertObject.pushCol !== undefined &&
+                                insertObject.pushCol === true
+                            ) {
                                 // Insert content
                                 existingCell.before(cell);
                                 newCol = _pushCol(existingCell, 1);
@@ -653,20 +663,19 @@
         }
     };
 
-    var _pushRow = function(row, rowsToPush) {
+    var _pushRow = function (row, rowsToPush) {
         var rowID = row.attr('r');
         var newRowID = parseInt(rowID) + 1;
         row.attr('r', newRowID);
-        row.children().each(function() {
+        row.children().each(function () {
             var cell = $(this);
             var cellID = cell.attr('r');
             var cellColRow = _parseCellName(cellID);
             var newCellID =
-                String(_parseColumnIndex(cellColRow.col)) +
-                String(newRowID);
-            cell.attr('r',newCellID);
+                String(_parseColumnIndex(cellColRow.col)) + String(newRowID);
+            cell.attr('r', newCellID);
         });
-    }
+    };
 
     var _pushCol = function (cell, colsToPush) {
         var cellID = cell.attr('r');
@@ -728,6 +737,10 @@
             _insertCells(this.insertCells, sheet, config);
         }
 
+        if (this.pageStyle !== undefined) {
+            _applyPageStyle(this.pageStyle, sheet, config);
+        }
+
         // Load excelStyles and also check exportOptions for backwards compatibility
         var excelStyles = this.excelStyles || this.exportOptions.excelStyles;
         if (excelStyles === undefined) {
@@ -778,7 +791,7 @@
                 }
 
                 // If a condition is supplied, add this style as a conditional style
-                if( style.condition != undefined) {
+                if (style.condition != undefined) {
                     _addConditionalStyle(sheet, style, selection);
                     continue;
                 }
@@ -837,7 +850,7 @@
                         applyTable[styleLookup[currentCellStyle]].push(tag);
                     }
                     // Set column width
-                    if(style.width !== undefined) {
+                    if (style.width !== undefined) {
                         $('col[min="' + col + '"]', sheet)
                             .attr('width', style.width)
                             .attr('customWidth', true);
@@ -860,6 +873,17 @@
             for (var i in applyTable) {
                 $(applyTable[i].join(), sheet).attr('s', i);
             }
+        }
+    };
+
+    var _applyPageStyle = function (pageStyle, sheet, config) {
+        var parentNode = sheet.getElementsByTagName('worksheet')[0];
+        pageStyle = _mergeDefault(['worksheet'], pageStyle);
+        for (var type in pageStyle) {
+            var attributeValue = pageStyle[type];
+            _addXMLNode('pageStyle', type, attributeValue, parentNode, [
+                'worksheet',
+            ]);
         }
     };
 
@@ -1071,6 +1095,19 @@
                 },
             },
         },
+        worksheet: {
+            default: {
+                printOptions: '',
+                pageMargins: '',
+                pageSetup: '',
+            },
+            sheetPr: {
+                insertBefore: 'cols',
+                pageSetUpPr: {
+                    child: true,
+                },
+            },
+        },
     };
 
     /**
@@ -1139,8 +1176,6 @@
         );
     };
 
-    
-
     /**
      * Get translated tagName to translate commonly used html names to XML name (eg size: 'sz')
      *
@@ -1153,6 +1188,13 @@
             nodeHierarchy.concat(['translate', tagName])
         );
         return newKey !== undefined ? newKey : tagName;
+    };
+
+    var _getAppendPosition = function (nodeHierarchy, tagName) {
+        var value = _findNodeValue(
+            nodeHierarchy.concat([tagName, 'insertBefore'])
+        );
+        return value === undefined ? 'end' : value;
     };
 
     /**
@@ -1208,18 +1250,21 @@
                     );
                 } else {
                     if (_isTextNode(nodeHierarchy, key)) {
-                        parentNode.appendChild(_xmlStyleDoc.createTextNode(value));
-                    }
-                    else {
+                        parentNode.appendChild(
+                            _xmlStyleDoc.createTextNode(value)
+                        );
+                    } else {
                         $(parentNode).attr(key, value);
                     }
                 }
             }
         } else if (attributeValues !== '') {
             var txAttr = _getStringAttribute(attributeValues, nodeHierarchy);
-            for(var i in txAttr) {
+            for (var i in txAttr) {
                 if (_isTextNode(nodeHierarchy, i)) {
-                    parentNode.appendChild(_xmlStyleDoc.createTextNode(txAttr[i]));
+                    parentNode.appendChild(
+                        _xmlStyleDoc.createTextNode(txAttr[i])
+                    );
                 } else {
                     parentNode.setAttribute(i, txAttr[i]);
                 }
@@ -1251,16 +1296,26 @@
         var attributeName = _getTranslatedKey(nodeHierarchy, attributeName);
         _purgeUnwantedSiblings(attributeName, parentNode, nodeHierarchy);
         attributeValue = _makeArray(attributeValue);
-
         var mergeWith = _doWeMerge(attributeName, nodeHierarchy);
 
         for (var i in attributeValue) {
             var childNode;
-            if ( !mergeWith || parentNode.getElementsByTagName(attributeName).length === 0)
-                childNode = parentNode.appendChild(
-                    _xmlStyleDoc.createElement(attributeName)
-                );
-            else {
+            if (
+                !mergeWith ||
+                parentNode.getElementsByTagName(attributeName).length === 0
+            ) {
+                var position = _getAppendPosition(nodeHierarchy, attributeName);
+                if (position === 'end') {
+                    childNode = parentNode.appendChild(
+                        _xmlStyleDoc.createElement(attributeName)
+                    );
+                } else {
+                    var beforeNode = parentNode.getElementsByTagName(position)[0];
+                    childNode = parentNode.insertBefore(
+                        _xmlStyleDoc.createElement(attributeName), beforeNode
+                    );
+                }
+            } else {
                 childNode = parentNode.getElementsByTagName(attributeName)[0];
             }
 
@@ -1276,9 +1331,9 @@
 
     /**
      * Determine if we should merge attributes or replace them
-     * 
+     *
      * To fix issues with gradientFill options causing Excel to throw an error
-     * 
+     *
      * @param {string} attributeName Name of the attributes
      * @param {array} nodeHierarchy Array of node names in this tree
      */
@@ -1286,7 +1341,7 @@
         var merge = _findNodeValue(
             nodeHierarchy.concat([attributeName, 'merge'])
         );
-        if( merge !== undefined && merge === false) {
+        if (merge !== undefined && merge === false) {
             return false;
         }
         return true;
@@ -1294,9 +1349,9 @@
 
     /**
      * Remove node siblings which would cause Excel to throw an error
-     * 
+     *
      * eg. You can't apply a patternFill and a gradientFill to the same call
-     * 
+     *
      * @param {string} attributeName Name of the attribute
      * @param {object} parentNode The parent xml node
      * @param {array} nodeHierarchy Array of node names in this tree
@@ -1489,13 +1544,12 @@
 
     /**
      * Add conditional formatting to a spreadsheet
-     * 
-     * @param {xls} sheet 
+     *
+     * @param {xls} sheet
      * @param {object} excelStyle ExcelStyle object
      * @param {array} selection The cell range selected
      */
     var _addConditionalStyle = function (sheet, excelStyle, selection) {
-
         // Create new dxf incremental formatting style
         var dxfs = _xmlStyleDoc.getElementsByTagName('dxfs')[0];
         var dxfNode = _xmlStyleDoc.createElement('dxf');
@@ -1514,40 +1568,48 @@
                 var attributeValue = style[type][attributeName];
                 _addXMLNode(type, attributeName, attributeValue, parentNode, [
                     type,
-                ]); 
+                ]);
             }
         }
 
         var dxfId = dxfs.childNodes.length - 1;
 
         var worksheet = sheet.getElementsByTagName('worksheet')[0];
-        var conditionalFormatting = sheet.createElement('conditionalFormatting');
+        var conditionalFormatting = sheet.createElement(
+            'conditionalFormatting'
+        );
 
         var cellRef = _getRangeFromSelection(selection);
-        conditionalFormatting.setAttribute('sqref',cellRef);
+        conditionalFormatting.setAttribute('sqref', cellRef);
         worksheet.appendChild(conditionalFormatting);
 
-        var condition = excelStyle.condition
+        var condition = excelStyle.condition;
         condition.dxfId = dxfId;
-        _addXMLNode('conditionalFormatting', 'cfRule', condition, conditionalFormatting, [
+        _addXMLNode(
             'conditionalFormatting',
-        ]);
+            'cfRule',
+            condition,
+            conditionalFormatting,
+            ['conditionalFormatting']
+        );
         console.log(sheet);
     };
 
     /**
      * Convert a cell selection into a Range (ignoring cell skipping, etc.)
-     * 
+     *
      * @param {array} selection Parsed excelly reference
      * @return {string} Cell range, eg. "A3:A45"
      */
-    var _getRangeFromSelection = function(selection) {
-        return _parseColumnIndex(selection.fromCol) +
+    var _getRangeFromSelection = function (selection) {
+        return (
+            _parseColumnIndex(selection.fromCol) +
             String(selection.fromRow) +
             ':' +
             _parseColumnIndex(selection.toCol) +
-            String(selection.toRow);
-    }
+            String(selection.toRow)
+        );
+    };
 
     /**
      * Update the count attribute on style type containers
