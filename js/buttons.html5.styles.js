@@ -438,6 +438,31 @@
     };
 
     /**
+     * Get a smart reference for the row number
+     * 
+     * @param {int} rowIndex The index of the row
+     */
+    function _getSmartRefFromIndex(rowIndex) {
+        if(rowIndex >= _rowRefs.dt && rowIndex <= _rowRefs.db) {
+            return rowIndex - _rowRefs.dt + 1;
+        }
+        switch(rowIndex) {
+            case _rowRefs.t:
+                return 't';
+            case _rowRefs.m:
+                return 'm';
+            case _rowRefs.h:
+                return 'h';
+            case _rowRefs.f:
+                return 'f';
+            case _rowRefs.b:
+                return 'b';
+            default:
+                return undefined;
+        }
+    }
+
+    /**
      * Load the row references for smart rows into the _rowRefs object
      *
      * @param {object} config Config options that affect the index of the rows
@@ -565,8 +590,14 @@
                         row += selection.nthRow
                     ) {
                         var cellId = String(colLetter) + String(row);
-
-                        var text = insertObject.content;
+                        var smartRowID = _getSmartRefFromIndex(row);
+                        
+                        var text;
+                        if (typeof insertObject.content === 'function') {
+                            text = insertObject.content(cellId, col, row, smartRowID);
+                        } else {
+                            text = insertObject.content;
+                        }
 
                         var cell = _createNode(sheet, 'c', {
                             attr: {
@@ -1592,7 +1623,6 @@
             conditionalFormatting,
             ['conditionalFormatting']
         );
-        console.log(sheet);
     };
 
     /**
