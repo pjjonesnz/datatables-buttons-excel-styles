@@ -200,9 +200,9 @@ $("#myTable").DataTable({
 });
 ```
 
-## NEW - June 2020 - Replace or insert cells, columns and rows
+## Replace or insert cells, columns and rows
 
-See the demo site for more examples, here are the basics. More documentation to come...
+NEW - June 2020 - See the demo site for more examples, here are the basics. More documentation to come...
 
 ```js
 $("#myTable").DataTable({
@@ -250,20 +250,23 @@ In most cases your styles will be automatically applied by this plugin, but plea
 **Please Note:** This plugin hooks in using the [customize option](https://datatables.net/reference/button/excel) in the DataTables Buttons configuration to automatically run when you click on the Excel button. If you are already using the `customize` method to apply other table formatting or modification, you can run this plugin by calling `applyStyles` from within your `customize` method as follows:
 
 ```js
-buttons: [
-    {
-        extend: "excel",
-        excelStyles: {
-            // ... custom Excel Style Objects defined ...
-        },
-        customize: function(xlsx) {
-            // ... your custom code here ...
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {
+                // ... custom Excel Style Objects defined ...
+            },
+            customize: function(xlsx) {
+                // ... your custom code here ...
 
-            // Apply the excelStyles
-            this.applyStyles(xlsx); 
+                // Apply the excelStyles
+                this.applyStyles(xlsx); 
+            }
         }
-    }
-]
+    ]
+});
 ```
 
 
@@ -316,7 +319,8 @@ range of cells in different locations (eg. applying the same style to the header
 * `sB3` - Column B, row 3 of the data rows
 * [and more...](./docs/cell_references.md)
 
-For examples of using these cell selections please [view the demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html), or have a look at the templates in [buttons.html5.styles.templates.js](https://github.com/pjjonesnz/datatables-buttons-excel-styles/blob/master/js/buttons.html5.styles.templates.js)
+For examples of using these cell selections please [view the demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html), 
+or have a look at the templates in [buttons.html5.styles.templates.js](https://github.com/pjjonesnz/datatables-buttons-excel-styles/blob/master/js/buttons.html5.styles.templates.js)
 
 
 ## Style Object
@@ -337,15 +341,28 @@ There are five main properties available within a Style Object.
 The font style is the simplest and consists of an object with the font attributes listed as key:value pairs inside.
 
 ```js
-font: {
-    name: "Arial",
-    size: 18,
-    u: true,          // Single underline
-    color: "D75F41"
-}
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {
+                cells: "A2:",
+                style: {
+
+                    // Font Object
+                    font: {
+                        name: "Arial",
+                        size: 18,
+                        u: true,          // Single underline
+                        color: "D75F41"
+                    }
+                }
+            }
+        }
+    ]
+});
 ```
-
-
 ### Font Attributes 
 
 The commonly used font attributes are listed below. A full list can be found in the [Office Open XML Spec](https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_font_topic_ID0EAXC6.html)
@@ -376,14 +393,28 @@ The commonly used font attributes are listed below. A full list can be found in 
 The border of a cell can be defined by a simple object
 
 ```js
-border: {
-    top: "thin",            // Thin black border at top of cell/s
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {
+                cells: "A2:",
+                style: {
 
-    bottom: {               // At the bottom of the cell/s apply a
-        style: "thick",     // thick border with
-        color: "A9D08E",    // a lovely hue of green
-    },
-}
+                    // Border Object
+                    border: {
+                        top: "thin",            // Thin black border at top of cell/s
+                        bottom: {               // At the bottom of the cell/s apply a
+                            style: "thick",     // thick border with
+                            color: "A9D08E",    // a lovely hue of green
+                        },
+                    }
+                }
+            }
+        }
+    ]
+});
 ```
 
 
@@ -429,45 +460,90 @@ The fill style can either be a pattern or a gradient. While these styles are ful
 **Solid background color**
 
 ```js
-fill: {
-    pattern: {
-        color: "457B9D",
-    }
-}
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {
+                cells: "A2:",
+                style: {
+
+                    // Solid Fill
+                    fill: {
+                        pattern: {
+                            color: "457B9D",
+                        }
+                    }
+                }
+            }
+        }
+    ]
+});
 ```
 
 
 **Patterned background**
 
 ```js
-fill: {
-    pattern: {
-        type: "lightUp",
-        fgColor: "1C3144",
-        bgColor: "C3D898",
-    }
-}
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {
+                cells: "A2:",
+                style: {
+
+                    // Patterned Fill
+                    fill: {
+                        pattern: {
+                            type: "lightUp",
+                            fgColor: "1C3144",
+                            bgColor: "C3D898",
+                        }
+                    }
+                }
+            }
+        }
+    ]
+});
 ```
 
 
 **Gradient background**
 
 ```js
-fill: {
-    gradient: {
-        degree: 90,
-        stop: [
-            {
-                position: 0,
-                color: "000000",
-            },
-            {
-                position: 1,
-                color: "CC0000",
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {
+                cells: "A2:",
+                style: {
+
+                    // Gradient Fill
+                    fill: {
+                        gradient: {
+                            degree: 90,
+                            stop: [
+                                {
+                                    position: 0,
+                                    color: "000000",
+                                },
+                                {
+                                    position: 1,
+                                    color: "CC0000",
+                                }
+                            ]
+                        }
+                    }
+                }
             }
-        ]
-    }
-}
+        }
+    ]
+});
 ```
 
 
@@ -537,7 +613,22 @@ This list along with examples can be [found here](https://c-rex.net/projects/sam
 The numFmt attribute is used to apply advanced formatting to cells containing numbers. It consists of a single string with the number formatting code.
 
 ```js
-numFmt: "#,##0.0000;(#,##0.0000)"
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {
+                cells: "A2:",
+                style: {
+
+                    // NumFmt String
+                    numFmt: "#,##0.0000;(#,##0.0000)"
+                }
+            }
+        }
+    ]
+});
 ```
 
 See Microsoft's guide for [Number format codes](https://support.office.com/en-us/article/Number-format-codes-5026BBD6-04BC-48CD-BF33-80F18B4EAE68)
@@ -557,11 +648,27 @@ The easiest way to find a custom code using Excel is as follows:
 The alignment object applies alignment to the content of your cells.
 
 ```js
-alignment: {
-    vertical: "center",
-    horizontal: "left",
-    wrapText: true,
-}
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {
+                cells: "A2:",
+                style: {
+
+                    // Alignment Object
+                    alignment: {
+                        vertical: "center",
+                        horizontal: "left",
+                        wrapText: true,
+                    }
+
+                }
+            }
+        }
+    ]
+});
 ```
 
 
@@ -610,27 +717,52 @@ Predefined templates are located in the `buttons.html5.styles.templates.min.js` 
 Templates are as simple to apply as this:
 
 ```js
-excelStyles: {                // Add an excelStyles definition
-    template: "blue_medium",  // Apply the 'blue_medium' template
-}
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {                // Add an excelStyles definition
+                template: "blue_medium",  // Apply the 'blue_medium' template
+            }
+        }
+    ]
+});
 ```
 
 Complete templates are made up of **template parts** that can also be individually applied:
 
 ```js
-excelStyles: {                // Add an excelStyles definition
-    template: "header_blue",  // Apply the 'header_blue' template part (white font on a blue background in the header/footer)
-}
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {                // Add an excelStyles definition
+                template: "header_blue",  // Apply the 'header_blue' template part (white font on a blue background in the header/footer)
+            }
+        }
+    ]
+});
 ```
 
 Multiple templates can be applied by using an array. If a second template target the same cell style as the preceding one, it will overwrite that style.
 
 ```js
-excelStyles: {              // Add an excelStyles definition
-    template: [             // Apply multiple templates
-        "gold_medium",      // Apply the 'gold_medium' template to the entire table
-        "header_cyan"       // Overwrite the header with the 'header_cyan' style
-    ],    
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {              // Add an excelStyles definition
+                template: [             // Apply multiple templates
+                    "gold_medium",      // Apply the 'gold_medium' template to the entire table
+                    "header_cyan"       // Overwrite the header with the 'header_cyan' style
+                ],    
+            }
+        }
+    ]
+});
 }
 ```
 
@@ -638,25 +770,41 @@ Some of the template parts are suitable to apply to a specific cell or cell rang
 If you don't define `cells`, the template will be applied to the default range of cells defined within the template itself. If no default range or cell reference is defined, then the template will be skipped.
 
 ```js
-excelStyles: {                  // Add an excelStyles definition
-    cells: "sD3",               // Column D, row 3 of the data rows
-    template: "currency_eu",    // Format the cells with a predefined numFmt displaying the values as Euro currency
-}
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {                  // Add an excelStyles definition
+                cells: "sD3",               // Column D, row 3 of the data rows
+                template: "currency_eu",    // Format the cells with a predefined numFmt 
+            }                               // displaying the values as Euro currency
+        }
+    ]
+});
 ```
 
 For multiple templates targeting different cell ranges, use an array of Style Objects with the cells and template defined in each object
 
 ```js
-excelStyles: [
-    {                  
-        cells: "sD",
-        template: "currency_eu",
-    },
-    {                  
-        cells: "sE",
-        template: "date_long",
-    }
-]
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: [
+                {                  
+                    cells: "sD",
+                    template: "currency_eu",
+                },
+                {                  
+                    cells: "sE",
+                    template: "date_long",
+                }
+            ]
+        }
+    ]
+});
 ```
 
 
@@ -766,21 +914,59 @@ Conditional formatting causes styles to only be applied to cells if the conditio
 Example:
 
 ```js
-condition: {
-    type: "cellIs",
-    operator: "greaterThan",
-    formula: 150000,
-}
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {
+                cells: "sF",                    // Smart select Column F
+
+                // Conditional formatting block
+                condition: {
+                    type: "cellIs",
+                    operator: "greaterThan",
+                    formula: 150000,
+                },
+                style: {
+                    fill: {
+                        pattern: {
+                            bgColor: "F78989"   // Brighter red (Note the Excel gotcha requires
+                        }                       // bgColor for conditional formatting)
+                    }
+                }
+            }
+        }
+    ]
+});
 ```
 
 Also:
 
 ```js
-condition: {
-    type: "cellIs",
-    operator: "notBetween",
-    formula: [150000,200000],
-}
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {
+                cells: "sF",                    // Smart select Column F
+                condition: {
+                    type: "cellIs",
+                    operator: "notBetween",
+                    formula: [150000,200000],
+                },
+                style: {
+                    fill: {
+                        pattern: {
+                            bgColor: "F78989"   // Brighter red (Note the Excel gotcha requires
+                        }                       // bgColor for conditional formatting)
+                    }
+                }
+            }
+        }
+    ]
+});
 ```
 
 #### Operator Enum
@@ -826,12 +1012,15 @@ To the C-Rex team for their excellent [Office Open XML File Format Reference](ht
     + [Template Example](#template-example)
     + [Styles and Templates Combined](#styles-and-templates-combined)
     + [Built-in Styles](#built-in-styles)
+    + [Conditional Formatting](#conditional-formatting)
+  * [Replace or insert cells, columns and rows](#replace-or-insert-cells-columns-and-rows)
+  * [Applying your Styles](#applying-your-styles)
   * [Excel Style Object](#excel-style-object)
   * [Cell Reference](#cell-reference)
   * [Style Object](#style-object)
   * [Font Object](#font-object)
     + [Font Attributes](#font-attributes)
-      - [Color Object](#color-object) (for font, border and fill color)
+      - [Color Object](#color-object)
   * [Border Object](#border-object)
     + [Border Attributes](#border-attributes)
       - [Border Style Object](#border-style-object)
@@ -848,9 +1037,12 @@ To the C-Rex team for their excellent [Office Open XML File Format Reference](ht
       - [Horizontal Alignment Enum](#horizontal-alignment-enum)
       - [Vertical Alignment Enum](#vertical-alignment-enum)
   * [Pre-defined templates](#pre-defined-templates)
-    + [Template List](#template-list)
-      - [Full table templates](#full-table-templates)
-      - [Template parts](#template-parts)
+  * [Template List](#template-list)
+    + [Full Table Templates](#full-table-templates)
+    + [Template Parts](#template-parts)
+  * [Conditional Styles](#conditional-styles)
+    + [Condition Object](#condition-object)
+      - [Operator Enum](#operator-enum)
   * [License](#license)
   * [Contributing](#contributing)
   * [Thanks](#thanks)
