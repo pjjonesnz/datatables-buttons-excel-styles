@@ -6,6 +6,16 @@
 
 **Add beautifully styled Excel output to your DataTables**
 
+* Style the font, border, background, number-format of your table
+* Target cells, columns, rows, headers, footers, title, message and messageBottom
+* Target cell ranges using familiar Excel cell references
+* Conditional formatting
+* Insert or replace cells, columns and rows
+* Easy JSON configuration options
+* Simple templates built in for fast styling
+* Currency formatting, fix the standard US$ display
+* Smart targeting of rows useful for styling a spreadsheet that sometimes has message, header, etc. turned off
+
 [DataTables](https://www.datatables.net) is an amazing tool to display your tables in a user friendly way, and the [Buttons](https://www.datatables.net/extensions/buttons/) extension makes downloading those tables a breeze. 
 
 Now you can **easily style the Excel download** of your DataTable without having to learn the intricacies of Office Open XML using either:
@@ -190,6 +200,48 @@ $("#myTable").DataTable({
 });
 ```
 
+## NEW - June 2020 - Replace or insert cells, columns and rows
+
+See the demo site for more examples, here are the basics. More documentation to come...
+
+```js
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",                // Extend the excel button
+            insertCells: [                  // Add an insertCells config option 
+            {
+                cells: 'sCh',               // Target the header with smart selection
+                content: 'New column C',    // New content for the cells
+                pushCol: true,              // pushCol causes the column to be inserted
+            },
+            {
+                cells: 'sC1:C-0',           // Target the data
+                content: '',                // Add empty content
+                pushCol: true               // push the columns to the right over one
+            },
+            {
+                cells: 's5:6',              // Target data row 5 and 6
+                content: '',                // Add empty content
+                pushRow: true               // push the rows down to insert the content
+            },
+            {
+                cells: 'B3',                // Target cell B3
+                content: 'THIS IS CELL B3', // without pushCol or pushRow defined, the cell
+                                            // is overwritten
+            }
+            ],
+            excelStyles: [{
+                template: 'cyan_medium',    // Add a template to the result
+            },{
+                cells: 'sG',                // Set a width for the column pushed to G
+                width: 20,
+            }]
+        },
+    ],
+});
+```
 
 ## Applying your Styles
 

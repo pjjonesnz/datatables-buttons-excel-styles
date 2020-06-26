@@ -658,6 +658,84 @@
                         
                     ]
                 },
+                insertCells1: {
+                    description: 'Inserting Cells',
+                    group: "Inserting/Replacing Cells, Cols and Rows",
+                    help: '<p>You can insert or replace cells, columns and rows.</p>' +
+                    '<p>Instead of using excelStyles, you use a new config option insertCells</p>' +
+                    '<p>You\'ll notice that the header row for column C isn\'t bold. You can easily add this with a excelStyles object</p>' +
+                    '<p>Also, column G is now VERY thin! At present even though the cells are inserted, the column widths aren\'t moved. The next example shows you how to fix this.</p>',
+                    insertCells: [
+                    {
+                        cells: 'sCh',
+                        content: 'New column C',
+                        pushCol: true,
+                    },
+                    {
+                        cells: 'sC1:C-0',
+                        content: '',
+                        pushCol: true
+                    }]
+                },
+                insertCells2: {
+                    description: 'Inserting Cells with style',
+                    group: "Inserting/Replacing Cells, Cols and Rows",
+                    help: '<p>You can insert or replace cells, columns and rows.</p>' +
+                    '<p>Combine styles and cell insertion</p>' +
+                    '<p>This example adds the width to column G so you can see it again as well as a nice template.</p>',
+                    insertCells: [
+                    {
+                        cells: 'sCh',
+                        content: 'New column C',
+                        pushCol: true,
+                    },
+                    {
+                        cells: 'sC1:C-0',
+                        content: '',
+                        pushCol: true
+                    }],
+                    excelStyles: [{
+                        template: 'cyan_medium',
+                    },{
+                        cells: 'sG',
+                        width: 20,
+                    }]
+                },
+                insertCells3: {
+                    description: 'Overwriting Cells',
+                    group: "Inserting/Replacing Cells, Cols and Rows",
+                    help: '<p>The pushCol option in the previous example caused your new data to be inserted. Without that option the cells are overwritten</p>',
+                    insertCells: [
+                    {
+                        cells: 'sCh',
+                        content: 'Overwritten C',
+                    },
+                    {
+                        cells: 'sC1:C-0',
+                        content: '',
+                    }],
+                    excelStyles: [{
+                        template: 'light_gray_medium',
+                    },{
+                        cells: 'sG',
+                        width: 20,
+                    }]
+                },
+                insertCells4: {
+                    description: 'Inserting Rows',
+                    group: "Inserting/Replacing Cells, Cols and Rows",
+                    help: '<p>The pushRow option in this example causes a new row to be inserted.</p>' +
+                    '<p>The insertCells function runs before the excelStyles function, so any styles you add will be applied to these new cells',
+                    insertCells: [
+                    {
+                        cells: 's5:6',
+                        content: '',
+                        pushRow: true
+                    }],
+                    excelStyles: {
+                        template: 'blue_gray_medium',
+                    }
+                },
             };
 
             $(document).ready(function () {
@@ -686,10 +764,25 @@
                     $('#selected_style').append( html );
                     $('#selected_style').change(function () {
                         var style = exampleStyles[$(this).val()];
+
+                        var jsonObj = {};
+
+                        if(style.excelStyles !== undefined) {
+                            jsonObj.excelStyles = style.excelStyles;
+                        }
+                        if(style.insertCells !== undefined) {
+                            jsonObj.insertCells = style.insertCells;
+                        }    
                         $('#excel_styles').val(
-                            '"excelStyles": ' +
-                                JSON.stringify(style.excelStyles, null, 4)
+                            JSON.stringify(jsonObj, null, 4)
                         );
+                        // }
+                        // else {
+                        //     $('#excel_styles').val(
+                        //         '{\n "insertCells": ' +
+                        //             JSON.stringify(style.insertCells, null, 4) + '\n}'
+                        //     );
+                        // }
                         $('#help').html(style.help);
                     });
                     $('#selected_style').change();
@@ -704,7 +797,7 @@
                                     
 
                                     var excelStyleString =
-                                        '{' + $('#excel_styles').val() + '}';
+                                        $('#excel_styles').val();
                                     var test = '0123456789';
                                     try {
                                         var json = JSON.parse(excelStyleString);
@@ -757,8 +850,17 @@
                                         config.footer = false;
                                     }
                                     
-                                    config.excelStyles =
-                                        json.excelStyles;
+                                    if(json.excelStyles !== undefined) {
+                                        config.excelStyles =
+                                            json.excelStyles;
+                                    } else {
+                                        config.excelStyles = [];
+                                    }
+                                    if(json.insertCells !== undefined) {
+                                        config.insertCells = json.insertCells;
+                                    } else {
+                                        config.insertCells = [];
+                                    }
                                     $.fn.dataTable.ext.buttons.excelHtml5.action.call(
                                         this,
                                         e,
