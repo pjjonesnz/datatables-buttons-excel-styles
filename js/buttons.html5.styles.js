@@ -404,6 +404,15 @@
         return nextNumber > 0 ? _parseColumnIndex(nextNumber) + letter : letter;
     };
 
+    var _parseCellName = function (cellName) {
+        var pattern = /^([A-Z]+)([0-9]+)$/;
+        var matches = pattern.exec(cellName);
+        if (matches === null) {
+            return false;
+        }
+        return { col: _parseColumnName(matches[1]), row: matches[2] };
+    };
+
     /**
      * Datatables config settings, used to calculate smart row references
      */
@@ -459,27 +468,255 @@
     }
 
     /**
+     * Turn a value into an array if it isn't already one
+     *
+     * @param {any|array} value
+     */
+    var _makeArray = function (value) {
+        if (!Array.isArray(value)) {
+            return [value];
+        }
+        return value;
+    };
+
+    /**
+     * Insert cells into a spreadsheet
+     * 
+     * // Add cell information (without pushCol or pushRow it replaces any existing data in those cells)
+     *
+     * insertCells: [
+     * {
+     *      cells: 'sEh',
+     *      content: 'column E',
+     * },
+     * {
+     *      cells: 'sE1:-0',
+     *      content: '',
+     * }]
+     * 
+     * Use pushCol to push the columns to the right over
+     * 
+     * insertCells: [
+     * {
+     *      cells: 'sEh',
+     *      content: 'column E',
+     *      pushCol: true,
+     * },
+     * {
+     *      cells: 'sE1:-0',
+     *      content: '',
+     *      pushCol: true
+     * }]
+     * 
+     * Use pushRow to insert the row, pushing the existing row down by one
+     * 
+     * insertCells: [
+     * {
+     *   cells: 'sA5',
+     *   content: 'THIS IS A ROW BREAK',
+     *   pushRow: true,
+     * }]
+     *
+     * @param {*} cells
+     * @param {*} xlsx
+     */
+    var _insertCells = function (insertCells, sheet, config) {
+        insertCells = _makeArray(insertCells);
+        var maxCol = 0;
+        for (var j in insertCells) {
+            var insertObject = insertCells[j];
+            var cells =
+                insertObject.cells !== undefined
+                    ? _makeArray(insertObject.cells)
+                    : ['1:'];
+
+            var smartRowRef = false;
+            if (insertObject.rowref && style.rowref == 'smart') {
+                smartRowRef = true;
+            }
+            for (var i in cells) {
+                var selection = _parseExcellyReference(
+                    cells[i],
+                    sheet,
+                    smartRowRef
+                );
+                // If a valid cell selection is not found, skip this style
+                if (selection === false) {
+                    continue;
+                }
+                for (
+                    var col = selection.fromCol;
+                    col <= selection.toCol;
+                    col += selection.nthCol
+                ) {
+                    if (col > maxCol) {
+                        maxCol = col;
+                    }
+                    var colLetter = _parseColumnIndex(col);
+                    for (
+                        var row = selection.fromRow;
+                        row <= selection.toRow;
+                        row += selection.nthRow
+                    ) {
+                        var cellId = String(colLetter) + String(row);
+
+                        var text = insertObject.content;
+
+                        var cell = _createNode(sheet, 'c', {
+                            attr: {
+                                t: 'inlineStr',
+                                r: cellId,
+                            },
+                            children: {
+                                row: _createNode(sheet, 'is', {
+                                    children: {
+                                        row: _createNode(sheet, 't', {
+                                            text: text,
+                                            attr: {
+                                                'xml:space': 'preserve',
+                                            },
+                                        }),
+                                    },
+                                }),
+                            },
+                        });
+                        var existingCell = _getExistingCell(cellId, sheet);
+                        var newCol;
+                        if (existingCell !== false) {
+                            if(insertObject.pushRow !== undefined && insertObject.pushRow === true) {
+                                // Insert row
+                                var newRow = _createNode(sheet, 'row', { attr: { r: row}});
+                                existingCell.parent().before(newRow);
+                                _pushRow(existingCell.parent(),1);
+                                existingCell.parent().nextAll().each(function() {
+                                    _pushRow($(this),1);
+                                });
+                                newRow.appendChild(cell);
+                            }
+                            else if (insertObject.pushCol !== undefined && insertObject.pushCol === true) {
+                                // Insert content
+                                existingCell.before(cell);
+                                newCol = _pushCol(existingCell, 1);
+                                if (newCol > maxCol) {
+                                    maxCol = newCol;
+                                }
+                                existingCell.nextAll().each(function () {
+                                    newCol = _pushCol($(this), 1);
+                                    if (newCol > maxCol) {
+                                        maxCol = newCol;
+                                    }
+                                });
+                            } else {
+                                // Replace content
+                                existingCell.replaceWith(cell);
+                            }
+                        } else {
+                            // Add content to end
+                            $('row', sheet)[row - 1].appendChild(cell);
+                        }
+                    }
+                }
+            }
+            // Update columns
+            var sheetColCount = $('col', sheet).length;
+            if (sheetColCount < maxCol) {
+                for (var i = sheetColCount + 1; i <= maxCol; i++) {
+                    var newCol = _createNode(sheet, 'col', {
+                        attr: {
+                            min: i,
+                            max: i,
+                        },
+                    });
+                    $('cols', sheet)[0].appendChild(newCol);
+                }
+            }
+            // Update smart row references
+            _loadRowRefs(config, sheet);
+        }
+        console.log(sheetColCount);
+        console.log(sheet);
+        //throw new Error();
+    };
+
+    var _getExistingCell = function (cellID, sheet) {
+        var cell = $('sheetData row c[r="' + cellID + '"]', sheet);
+        if (cell.length === 0) {
+            return false;
+        } else {
+            return cell;
+        }
+    };
+
+    var _pushRow = function(row, rowsToPush) {
+        var rowID = row.attr('r');
+        var newRowID = parseInt(rowID) + 1;
+        row.attr('r', newRowID);
+        row.children().each(function() {
+            var cell = $(this);
+            var cellID = cell.attr('r');
+            var cellColRow = _parseCellName(cellID);
+            var newCellID =
+                String(_parseColumnIndex(cellColRow.col)) +
+                String(newRowID);
+            cell.attr('r',newCellID);
+        });
+    }
+
+    var _pushCol = function (cell, colsToPush) {
+        var cellID = cell.attr('r');
+        var cellColRow = _parseCellName(cellID);
+        var newCellID =
+            String(_parseColumnIndex(cellColRow.col + colsToPush)) +
+            String(cellColRow.row);
+        cell.attr('r', newCellID);
+        return cellColRow.col + 1;
+    };
+
+    var _createNode = function (doc, nodeName, opts) {
+        var tempNode = doc.createElement(nodeName);
+
+        if (opts) {
+            if (opts.attr) {
+                $(tempNode).attr(opts.attr);
+            }
+
+            if (opts.children) {
+                $.each(opts.children, function (key, value) {
+                    tempNode.appendChild(value);
+                });
+            }
+
+            if (opts.text !== null && opts.text !== undefined) {
+                tempNode.appendChild(doc.createTextNode(opts.text));
+            }
+        }
+
+        return tempNode;
+    };
+
+    /**
      * Apply excelStyles to the XML stylesheet
      *
      * @param {object} xlsx
      */
     DataTable.ext.buttons.excelHtml5._applyExcelStyles = function (xlsx) {
-        // Load excelStyles and also check exportOptions for backwards compatibility
-        var excelStyles = this.excelStyles || this.exportOptions.excelStyles;
-        if (excelStyles === undefined) {
-            return;
-        }
-        if (!Array.isArray(excelStyles)) {
-            excelStyles = [excelStyles];
-        }
-
         var sheet = xlsx.xl.worksheets['sheet1.xml'];
-
         // load config settings for smart row references
         var config = DataTable.Api().buttons.exportInfo(this);
         config.header = this.header;
         config.footer = this.footer;
         _loadRowRefs(config, sheet);
+
+        if (this.insertCells !== undefined) {
+            _insertCells(this.insertCells, sheet, config);
+        }
+
+        // Load excelStyles and also check exportOptions for backwards compatibility
+        var excelStyles = this.excelStyles || this.exportOptions.excelStyles;
+        if (excelStyles === undefined) {
+            return;
+        }
+        excelStyles = _makeArray(excelStyles);
 
         for (var i in excelStyles) {
             var style = excelStyles[i];
@@ -503,10 +740,9 @@
             if (style.index !== undefined && typeof style.index === 'number') {
                 styleId = style.index;
             }
-            var cells = style.cells !== undefined ? style.cells : ['1:'];
-            if (!Array.isArray(cells)) {
-                cells = [cells];
-            }
+            var cells =
+                style.cells !== undefined ? _makeArray(style.cells) : ['1:'];
+
             var smartRowRef = false;
             if (style.rowref && style.rowref == 'smart') {
                 smartRowRef = true;
@@ -579,7 +815,7 @@
                         applyTable[styleLookup[currentCellStyle]].push(tag);
                     }
                     // Set column width
-                    if(style.width !== undefined) {
+                    if (style.width !== undefined) {
                         $('col[min="' + col + '"]', sheet)
                             .attr('width', style.width)
                             .attr('customWidth', true);
@@ -908,15 +1144,16 @@
     ) {
         var attributeName = _getTranslatedKey(nodeHierarchy, attributeName);
         _purgeUnwantedSiblings(attributeName, parentNode, nodeHierarchy);
-        if (!Array.isArray(attributeValue)) {
-            attributeValue = [attributeValue];
-        }
+        attributeValue = _makeArray(attributeValue);
 
         var mergeWith = _doWeMerge(attributeName, nodeHierarchy);
 
         for (var i in attributeValue) {
             var childNode;
-            if ( !mergeWith || parentNode.getElementsByTagName(attributeName).length === 0)
+            if (
+                !mergeWith ||
+                parentNode.getElementsByTagName(attributeName).length === 0
+            )
                 childNode = parentNode.appendChild(
                     _xmlStyleDoc.createElement(attributeName)
                 );
@@ -938,7 +1175,7 @@
         var merge = _findNodeValue(
             nodeHierarchy.concat([attributeName, 'merge'])
         );
-        if( merge !== undefined && merge === false) {
+        if (merge !== undefined && merge === false) {
             return false;
         }
         return true;
