@@ -554,6 +554,8 @@
     var _insertCells = function (insertCells, sheet, config) {
         insertCells = _makeArray(insertCells);
         var maxCol = 0;
+        var initialWidth = $('col', sheet).length;
+        var maxWidth = 0;
         for (var j in insertCells) {
             var insertObject = insertCells[j];
             var cells =
@@ -575,11 +577,13 @@
                 if (selection === false) {
                     continue;
                 }
+                var contentArrayIndex = 0;
                 for (
                     var col = selection.fromCol;
                     col <= selection.toCol;
                     col += selection.nthCol
                 ) {
+                    maxWidth = 0;
                     if (col > maxCol) {
                         maxCol = col;
                     }
@@ -591,14 +595,22 @@
                     ) {
                         var cellId = String(colLetter) + String(row);
                         var smartRowID = _getSmartRefFromIndex(row);
-                        
-                        var text;
+
+                        var text = insertObject.content;
                         if (typeof insertObject.content === 'function') {
                             text = insertObject.content(cellId, col, row, smartRowID);
-                        } else {
-                            text = insertObject.content;
+                        } 
+                        if (Array.isArray(text)) {
+                            if (contentArrayIndex >= text.length) {
+                                contentArrayIndex = 0;
+                            }
+                            text = text[contentArrayIndex];
+                            contentArrayIndex++;
                         }
-
+                        var width = _calcColWidth(text);
+                        if (width > maxWidth) {
+                            maxWidth = width;
+                        }
                         var cell = _createNode(sheet, 'c', {
                             attr: {
                                 t: 'inlineStr',
@@ -662,31 +674,100 @@
                             $('row', sheet)[row - 1].appendChild(cell);
                         }
                     }
+                    _addColIfRequired(col, maxCol, maxWidth, sheet);
                 }
             }
-            // Update columns
-            var sheetColCount = $('col', sheet).length;
-            if (sheetColCount < maxCol) {
-                for (var i = sheetColCount + 1; i <= maxCol; i++) {
-                    var newCol = _createNode(sheet, 'col', {
-                        attr: {
-                            min: i,
-                            max: i,
-                        },
-                    });
-                    $('cols', sheet)[0].appendChild(newCol);
-                }
-            }
+            
+            
             // Update smart row references
             _loadRowRefs(config, sheet);
         }
-        console.log(sheetColCount);
+         _pushMergedColEnd(initialWidth, sheet);
+        //console.log(sheetColCount);
         console.log(sheet);
         //throw new Error();
     };
 
-    var _getExistingCell = function (cellID, sheet) {
-        var cell = $('sheetData row c[r="' + cellID + '"]', sheet);
+    var _calcColWidth = function(str) {
+        var len, lineSplit;
+
+        // from buttons.html5.js
+        if (str.indexOf('\n') !== -1) {
+            lineSplit = str.split('\n');
+            lineSplit.sort(function (a, b) {
+                return b.length - a.length;
+            });
+
+            len = lineSplit[0].length;
+        } else {
+            len = str.length;
+        }
+        return len;
+    }
+
+    var _addColIfRequired = function (insertedCol, maxCol, maxWidth, sheet) {
+        // Update columns
+        var sheetColCount = sheet.getElementsByTagName('col').length;
+        if (sheetColCount < maxCol) {
+            if (maxWidth > 40) {
+                maxWidth = 40;
+            }
+            if(maxWidth < 6) {
+                maxWidth = 6;
+            }
+            maxWidth *= 1.35;
+            var insertBefore = sheet.getElementsByTagName('col')[
+                insertedCol - 1
+            ];
+            for (var i = sheetColCount + 1; i <= maxCol; i++) {
+                var newCol = _createNode(sheet, 'col', {
+                    attr: {
+                        min: i,
+                        max: i,
+                        width: maxWidth,
+                        customWidth: 1,
+                    },
+                });
+
+                sheet
+                    .getElementsByTagName('cols')[0]
+                    .insertBefore(newCol, insertBefore);
+            }
+            _updateCellMinMax(sheet);
+        } else {
+            // update width if required
+            if (maxWidth > 40) {
+                maxWidth = 40;
+            }
+            if (maxWidth < 6) {
+                maxWidth = 6;
+            }
+            maxWidth *= 1.35;
+            var column = sheet.getElementsByTagName('col')[
+                insertedCol - 1
+            ];
+            var currentWidth = $(column).attr('width');
+            if(currentWidth < 6) {
+                currentWidth = 6;
+            }
+            if(maxWidth > currentWidth) {
+                $(column).attr('width', maxWidth);
+                $(column).attr('customWidth', 1);
+            }
+        }
+    };
+
+    var _updateCellMinMax = function(sheet) {
+        var cells = sheet.getElementsByTagName('col');
+        for(var i=0; i<cells.length; i++) {
+            var cell = $(cells[i]);
+            cell.attr('min', i+1);
+            cell.attr('max', i+1);
+        }
+    }
+
+    var _getExistingCell = function (cellId, sheet) {
+        var cell = $('sheetData row c[r="' + cellId + '"]', sheet);
         if (cell.length === 0) {
             return false;
         } else {
@@ -694,9 +775,27 @@
         }
     };
 
+    var _pushMergedColEnd = function (initialWidth, sheet) {
+        var newWidth = $('col', sheet).length;
+        if(newWidth == initialWidth) {
+            return;
+        }
+        var mergeCells = sheet.getElementsByTagName('mergeCell');
+        if (mergeCells.length > 0) {
+            for (var i = 0; i < mergeCells.length; i++) {
+                var mc = mergeCells[i];
+                var ref = _parseExcellyReference($(mc).attr('ref'), sheet, false);
+                if(ref.toCol >= initialWidth) {
+                    var newRef = _parseColumnIndex(ref.fromCol) + String(ref.fromRow) + ':' + _parseColumnIndex(newWidth) + String(ref.toRow);
+                    $(mc).attr('ref', newRef);
+                }
+            }
+        }
+    };
+
     var _pushRow = function (row, rowsToPush) {
         var rowID = row.attr('r');
-        var newRowID = parseInt(rowID) + 1;
+        var newRowID = parseInt(rowID) + rowsToPush;
         row.attr('r', newRowID);
         row.children().each(function () {
             var cell = $(this);
@@ -1131,6 +1230,16 @@
                 printOptions: '',
                 pageMargins: '',
                 pageSetup: '',
+            },
+            pageMargins: {
+                default: {
+                    left: '',
+                    right: '',
+                    top: '',
+                    bottom: '',
+                    header: '',
+                    footer: '',
+                },
             },
             sheetPr: {
                 insertBefore: 'cols',

@@ -658,35 +658,16 @@
                         
                     ]
                 },
-                insertCells1: {
-                    description: 'Inserting Cells',
-                    group: "Inserting/Replacing Cells, Cols and Rows",
-                    help: '<p>You can insert or replace cells, columns and rows.</p>' +
-                    '<p>Instead of using excelStyles, you use a new config option insertCells</p>' +
-                    '<p>You\'ll notice that the header row for column C isn\'t bold. You can easily add this with a excelStyles object</p>' +
-                    '<p>Also, column G is now VERY thin! At present even though the cells are inserted, the column widths aren\'t moved. The next example shows you how to fix this.</p>',
-                    insertCells: [
-                    {
-                        cells: 'sCh',
-                        content: 'New column C',
-                        pushCol: true,
-                    },
-                    {
-                        cells: 'sC1:C-0',
-                        content: '',
-                        pushCol: true
-                    }]
-                },
                 insertCells2: {
                     description: 'Inserting Cells with style',
                     group: "Inserting/Replacing Cells, Cols and Rows",
                     help: '<p>You can insert or replace cells, columns and rows.</p>' +
-                    '<p>Combine styles and cell insertion</p>' +
-                    '<p>This example adds the width to column G so you can see it again as well as a nice template.</p>',
+                    '<p>Instead of using excelStyles, you use a new config option insertCells</p>' +
+                    '<p>You can combine styles and cell insertion</p>',
                     insertCells: [
                     {
                         cells: 'sCh',
-                        content: 'New column C',
+                        content: 'New Column C',
                         pushCol: true,
                     },
                     {
@@ -697,14 +678,56 @@
                     excelStyles: [{
                         template: 'cyan_medium',
                     },{
-                        cells: 'sG',
-                        width: 20,
+                        cells: 'sCh',
+                        style: {
+                            font: {
+                                b: true,
+                            }
+                        }
                     }]
+                },
+                insertCells4: {
+                    description: 'Inserting Rows',
+                    group: "Inserting/Replacing Cells, Cols and Rows",
+                    help: '<p>The pushRow option in this example causes a new row to be inserted with content as an array.</p>' +
+                    '<p>It also inserts a blank row above and below the new row.</p>' +
+                    '<p>The insertCells function runs before the excelStyles function, so any styles you add will be applied to these new cells',
+                    insertCells: [
+                        {
+                            cells: 's5',
+                            content: ['This','Is','My','Nice','New','Row'],
+                            pushRow: true
+                        },
+                        {
+                            cells: ['s5','s7'],
+                            content: '',
+                            pushRow: true
+                        }
+                    ],
+                    excelStyles: [
+                        {
+                            template: 'blue_gray_medium',
+                        },
+                        {
+                            cells: 's5:6',
+                            style: {
+                                font: {
+                                    b: true,
+                                },
+                                alignment: {
+                                    horizontal: 'center'
+                                }
+                            }
+                        }
+                    ]
                 },
                 insertCells3: {
                     description: 'Overwriting Cells',
                     group: "Inserting/Replacing Cells, Cols and Rows",
-                    help: '<p>The pushCol option in the previous example caused your new data to be inserted. Without that option the cells are overwritten</p>',
+                    help: '<p>The pushCol option in the previous example caused your new data to be inserted. Without a pushCol or pushRow option the cells are overwritten. In this case it is overwriting the "Office" column</p>' +
+                    '<p>Although I can\'t show you the example on this page, content can also be passed through a function. Your function gets passed the following attributes (cellId, col, row, smartRow)</p>' +
+                    '<p>cellID: Excel reference to cell (eg. A3)<br/>col: The column index<br />row: The row index<br/>smartRow: The smart row reference</p>' +
+                    '<p><a href="./page_style.html">See the example page here</a></p>',
                     insertCells: [
                     {
                         cells: 'sCh',
@@ -712,29 +735,18 @@
                     },
                     {
                         cells: 'sC1:C-0',
-                        content: '',
+                        content: ['Item 1','Item 2'], 
                     }],
                     excelStyles: [{
                         template: 'light_gray_medium',
                     },{
-                        cells: 'sG',
-                        width: 20,
+                        cells: 'sCh',
+                        style: {
+                            font: {
+                                b: true,
+                            }
+                        }
                     }]
-                },
-                insertCells4: {
-                    description: 'Inserting Rows',
-                    group: "Inserting/Replacing Cells, Cols and Rows",
-                    help: '<p>The pushRow option in this example causes a new row to be inserted.</p>' +
-                    '<p>The insertCells function runs before the excelStyles function, so any styles you add will be applied to these new cells',
-                    insertCells: [
-                    {
-                        cells: 's5:6',
-                        content: '',
-                        pushRow: true
-                    }],
-                    excelStyles: {
-                        template: 'blue_gray_medium',
-                    }
                 },
             };
 

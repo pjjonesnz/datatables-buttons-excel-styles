@@ -11,6 +11,7 @@
 * Target cell ranges using familiar Excel cell references
 * Conditional formatting
 * Insert or replace cells, columns and rows
+* Set the default page printing options using a pageStyle config option
 * Easy JSON configuration options
 * Simple templates built in for fast styling
 * Currency formatting, fix the standard US$ display
@@ -28,8 +29,7 @@ Now you can **easily style the Excel download** of your DataTable without having
 
 ## Demo
 
-[View the live Excel style demo which contains multiple examples](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html)
-
+[View the live Excel style demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html) containing lots of examples of how to style your Excel sheet
 
 ## Installing
 
@@ -202,7 +202,9 @@ $("#myTable").DataTable({
 
 ## Replace or insert cells, columns and rows
 
-NEW - June 2020 - See the demo site for more examples, here are the basics. More documentation to come...
+NEW - June 2020 - See the demo site for more examples, here are the basics. 
+
+[Inserting rows demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/page_style.html)
 
 ```js
 $("#myTable").DataTable({
@@ -211,37 +213,82 @@ $("#myTable").DataTable({
         {
             extend: "excel",                // Extend the excel button
             insertCells: [                  // Add an insertCells config option 
-            {
-                cells: 'sCh',               // Target the header with smart selection
-                content: 'New column C',    // New content for the cells
-                pushCol: true,              // pushCol causes the column to be inserted
-            },
-            {
-                cells: 'sC1:C-0',           // Target the data
-                content: '',                // Add empty content
-                pushCol: true               // push the columns to the right over one
-            },
-            {
-                cells: 's5:6',              // Target data row 5 and 6
-                content: '',                // Add empty content
-                pushRow: true               // push the rows down to insert the content
-            },
-            {
-                cells: 'B3',                // Target cell B3
-                content: 'THIS IS CELL B3', // without pushCol or pushRow defined, the cell
-                                            // is overwritten
-            }
+                {
+                    cells: 'sCh',               // Target the header with smart selection
+                    content: 'New column C',    // New content for the cells
+                    pushCol: true,              // pushCol causes the column to be inserted
+                },
+                {
+                    cells: 'sC1:C-0',           // Target the data
+                    content: '',                // Add empty content
+                    pushCol: true               // push the columns to the right over one
+                },
+                {
+                    cells: 's5:6',              // Target data row 5 and 6
+                    content: '',                // Add empty content
+                    pushRow: true               // push the rows down to insert the content
+                },
+                {
+                    cells: 'B3',                // Target cell B3
+                    content: 'THIS IS CELL B3', // without pushCol or pushRow defined, the cell
+                                                // is overwritten
+                }
             ],
-            excelStyles: [{
+            excelStyles: {
                 template: 'cyan_medium',    // Add a template to the result
-            },{
-                cells: 'sG',                // Set a width for the column pushed to G
-                width: 20,
-            }]
+            }
         },
     ],
 });
 ```
+
+## Printer defaults
+
+New - June 2020 - Printer default settings. 
+
+[Printer defaults demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/page_style.html)
+
+```js
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",                // Extend the excel button
+            pageStyle: {
+                sheetPr: {
+                    pageSetUpPr: {
+                        fitToPage: 1            // Fit the printing to the page
+                    } 
+                },
+                printOptions: {
+                    horizontalCentered: true,
+                    verticalCentered: true,
+                },
+                pageSetup: {
+                    orientation: "landscape",   // Orientation
+                    paperSize: "9",             // Paper size (1 = Letter, 9 = A4)
+                    fitToWidth: "1",            // Fit to page width
+                    fitToHeight: "0",           // Fit to page height
+                },
+                pageMargins: {
+                    left: "0.2",
+                    right: "0.2",
+                    top: "0.4",
+                    bottom: "0.4",
+                    header: "0",
+                    footer: "0",
+                },
+                
+            },
+            excelStyles: {
+                template: 'blue_gray_medium',    // Add a template style as well if you like
+            }
+        },
+    ],
+});
+```
+
+[pageSetup options can be found here](https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_pageSetup_topic_ID0EHZ54.html)
 
 ## Applying your Styles
 
