@@ -439,14 +439,14 @@
 
     /**
      * Get a smart reference for the row number
-     * 
+     *
      * @param {int} rowIndex The index of the row
      */
     function _getSmartRefFromIndex(rowIndex) {
-        if(rowIndex >= _rowRefs.dt && rowIndex <= _rowRefs.db) {
+        if (rowIndex >= _rowRefs.dt && rowIndex <= _rowRefs.db) {
             return rowIndex - _rowRefs.dt + 1;
         }
-        switch(rowIndex) {
+        switch (rowIndex) {
             case _rowRefs.t:
                 return 't';
             case _rowRefs.m:
@@ -598,8 +598,13 @@
 
                         var text = insertObject.content;
                         if (typeof insertObject.content === 'function') {
-                            text = insertObject.content(cellId, col, row, smartRowID);
-                        } 
+                            text = insertObject.content(
+                                cellId,
+                                col,
+                                row,
+                                smartRowID
+                            );
+                        }
                         if (Array.isArray(text)) {
                             if (contentArrayIndex >= text.length) {
                                 contentArrayIndex = 0;
@@ -677,18 +682,14 @@
                     _addColIfRequired(col, maxCol, maxWidth, sheet);
                 }
             }
-            
-            
+
             // Update smart row references
             _loadRowRefs(config, sheet);
         }
-         _pushMergedColEnd(initialWidth, sheet);
-        //console.log(sheetColCount);
-        console.log(sheet);
-        //throw new Error();
+        _pushMergedColEnd(initialWidth, sheet);
     };
 
-    var _calcColWidth = function(str) {
+    var _calcColWidth = function (str) {
         var len, lineSplit;
 
         // from buttons.html5.js
@@ -703,7 +704,7 @@
             len = str.length;
         }
         return len;
-    }
+    };
 
     var _addColIfRequired = function (insertedCol, maxCol, maxWidth, sheet) {
         // Update columns
@@ -712,7 +713,7 @@
             if (maxWidth > 40) {
                 maxWidth = 40;
             }
-            if(maxWidth < 6) {
+            if (maxWidth < 6) {
                 maxWidth = 6;
             }
             maxWidth *= 1.35;
@@ -743,28 +744,26 @@
                 maxWidth = 6;
             }
             maxWidth *= 1.35;
-            var column = sheet.getElementsByTagName('col')[
-                insertedCol - 1
-            ];
+            var column = sheet.getElementsByTagName('col')[insertedCol - 1];
             var currentWidth = $(column).attr('width');
-            if(currentWidth < 6) {
+            if (currentWidth < 6) {
                 currentWidth = 6;
             }
-            if(maxWidth > currentWidth) {
+            if (maxWidth > currentWidth) {
                 $(column).attr('width', maxWidth);
                 $(column).attr('customWidth', 1);
             }
         }
     };
 
-    var _updateCellMinMax = function(sheet) {
+    var _updateCellMinMax = function (sheet) {
         var cells = sheet.getElementsByTagName('col');
-        for(var i=0; i<cells.length; i++) {
+        for (var i = 0; i < cells.length; i++) {
             var cell = $(cells[i]);
-            cell.attr('min', i+1);
-            cell.attr('max', i+1);
+            cell.attr('min', i + 1);
+            cell.attr('max', i + 1);
         }
-    }
+    };
 
     var _getExistingCell = function (cellId, sheet) {
         var cell = $('sheetData row c[r="' + cellId + '"]', sheet);
@@ -777,16 +776,25 @@
 
     var _pushMergedColEnd = function (initialWidth, sheet) {
         var newWidth = $('col', sheet).length;
-        if(newWidth == initialWidth) {
+        if (newWidth == initialWidth) {
             return;
         }
         var mergeCells = sheet.getElementsByTagName('mergeCell');
         if (mergeCells.length > 0) {
             for (var i = 0; i < mergeCells.length; i++) {
                 var mc = mergeCells[i];
-                var ref = _parseExcellyReference($(mc).attr('ref'), sheet, false);
-                if(ref.toCol >= initialWidth) {
-                    var newRef = _parseColumnIndex(ref.fromCol) + String(ref.fromRow) + ':' + _parseColumnIndex(newWidth) + String(ref.toRow);
+                var ref = _parseExcellyReference(
+                    $(mc).attr('ref'),
+                    sheet,
+                    false
+                );
+                if (ref.toCol >= initialWidth) {
+                    var newRef =
+                        _parseColumnIndex(ref.fromCol) +
+                        String(ref.fromRow) +
+                        ':' +
+                        _parseColumnIndex(newWidth) +
+                        String(ref.toRow);
                     $(mc).attr('ref', newRef);
                 }
             }
@@ -868,7 +876,7 @@
         }
 
         if (this.pageStyle !== undefined) {
-            _applyPageStyle(this.pageStyle, sheet, config);
+            _applyPageStyle(this.pageStyle, sheet, xlsx);
         }
 
         // Load excelStyles and also check exportOptions for backwards compatibility
@@ -1006,15 +1014,52 @@
         }
     };
 
-    var _applyPageStyle = function (pageStyle, sheet, config) {
-        var parentNode = sheet.getElementsByTagName('worksheet')[0];
+    var _applyPageStyle = function (pageStyle, sheet, xlsx) {
         pageStyle = _mergeDefault(['worksheet'], pageStyle);
         for (var type in pageStyle) {
             var attributeValue = pageStyle[type];
-            _addXMLNode('pageStyle', type, attributeValue, parentNode, [
-                'worksheet',
-            ]);
+            switch (type) {
+                case 'repeatHeading':
+                    _addRepeatHeading(attributeValue, sheet, xlsx);
+                    break;
+                default:
+                    var parentNode = sheet.getElementsByTagName('worksheet')[0];
+                    _addXMLNode('pageStyle', type, attributeValue, parentNode, [
+                        'worksheet',
+                    ]);
+            }
         }
+    };
+
+    /**
+     * Add the xml to repeat the page heading on each printed page
+     * 
+     * Use 'repeatHeading: value' in the pageStyle object to define.
+     * 
+     * The value can be:
+     *      true - to repeat the heading row on every page
+     *      An excelly row reference (eg. st:h to repeat the title and heading on each page)
+     */
+    var _addRepeatHeading = function (value, sheet, xlsx) {
+        var rows = 'sh:h';
+        if (value !== true && value !== false) {
+            rows = value;
+        }
+        var rowSelection = _parseExcellyReference(rows, sheet, false);
+
+        var workbook = xlsx.xl['workbook.xml'];
+
+        var parentNode = workbook.getElementsByTagName('workbook')[0];
+        var addObject = {
+            definedName: {
+                name: '_xlnm.Print_Titles',
+                localSheetId: '0',
+                rows: 'Sheet1!$' + rowSelection.fromRow + ':$' + rowSelection.toRow,
+            }
+        };
+        _addXMLNode('workbook', 'definedNames', addObject, parentNode, [
+            'workbook',
+        ]);
     };
 
     /**
@@ -1248,6 +1293,18 @@
                 },
             },
         },
+        // The workbook area is only used at this stage to allow the repeatHeading option
+        workbook: {
+            definedNames: {
+                insertBefore: 'calcPr',
+                definedName: {
+                    child: true,
+                    rows: {
+                        textNode: true,
+                    },
+                },
+            },
+        },
     };
 
     /**
@@ -1450,9 +1507,12 @@
                         _xmlStyleDoc.createElement(attributeName)
                     );
                 } else {
-                    var beforeNode = parentNode.getElementsByTagName(position)[0];
+                    var beforeNode = parentNode.getElementsByTagName(
+                        position
+                    )[0];
                     childNode = parentNode.insertBefore(
-                        _xmlStyleDoc.createElement(attributeName), beforeNode
+                        _xmlStyleDoc.createElement(attributeName),
+                        beforeNode
                     );
                 }
             } else {

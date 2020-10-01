@@ -202,7 +202,7 @@ $("#myTable").DataTable({
 
 ## Replace or insert cells, columns and rows
 
-NEW - June 2020 - See the demo site for more examples, here are the basics. 
+This isn't fully documented yet, but is very clear from the example below. Please see the demo site for further examples, but here are the basics. 
 
 [Inserting rows demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/page_style.html)
 
@@ -244,7 +244,9 @@ $("#myTable").DataTable({
 
 ## Printer defaults
 
-New - June 2020 - Printer default settings. 
+Printer default settings can be defined using the pageStyle option. I haven't completed a full list of options yet, but it's pretty clear from the example below.
+
+Note that the 'repeatHeading' option can be set to true to repeat the heading at the top of each printed page, or can also be a [cell reference](./docs/cell_references.md) - note that only the row part of the reference is used (eg. `repeatHeading: 'st:h'` will repeat the title and heading row on each printed page.)
 
 [Printer defaults demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/page_style.html)
 
@@ -278,7 +280,7 @@ $("#myTable").DataTable({
                     header: "0",
                     footer: "0",
                 },
-                
+                repeatHeading: true,
             },
             excelStyles: {
                 template: 'blue_gray_medium',    // Add a template style as well if you like
