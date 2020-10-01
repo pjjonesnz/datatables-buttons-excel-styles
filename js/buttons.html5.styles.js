@@ -1020,7 +1020,11 @@
             var attributeValue = pageStyle[type];
             switch (type) {
                 case 'repeatHeading':
+                case 'repeatRow':
                     _addRepeatHeading(attributeValue, sheet, xlsx);
+                    break;
+                case 'repeatCol':
+                    _addRepeatColumns(attributeValue, sheet, xlsx);
                     break;
                 default:
                     var parentNode = sheet.getElementsByTagName('worksheet')[0];
@@ -1040,26 +1044,60 @@
      *      true - to repeat the heading row on every page
      *      An excelly row reference (eg. st:h to repeat the title and heading on each page)
      */
-    var _addRepeatHeading = function (value, sheet, xlsx) {
+    var _addRepeatHeading = function(value, sheet, xlsx) {
         var rows = 'sh:h';
         if (value !== true && value !== false) {
             rows = value;
         }
         var rowSelection = _parseExcellyReference(rows, sheet, false);
+        var selectionString =
+            'Sheet1!$' + rowSelection.fromRow + ':$' + rowSelection.toRow;
 
+        _addRepeat(selectionString, xlsx);
+    }
+
+    /**
+     * Allow repeating of columns as well using repeatCol option
+     */
+    var _addRepeatColumns = function (value, sheet, xlsx) {
+        var cols = 'A:A';
+        if (value !== true && value !== false) {
+            cols = value;
+        }
+        var colSelection = _parseExcellyReference(cols, sheet, false);
+        var selectionString =
+            'Sheet1!$' +
+            _parseColumnIndex(colSelection.fromCol) +
+            ':$' +
+            _parseColumnIndex(colSelection.toCol);
+
+        _addRepeat(selectionString, xlsx);
+    };
+
+    var _addRepeat = function (selectionString, xlsx) {
         var workbook = xlsx.xl['workbook.xml'];
-
         var parentNode = workbook.getElementsByTagName('workbook')[0];
+
+        var repeats = []
+        
+        var existing = workbook.getElementsByName('_xlnm.Print_Titles');
+        if(existing.length > 0) {
+            repeats.push(existing[0].textContent);
+            existing[0].textContent = '';
+        }
+        repeats.push(selectionString);
+
         var addObject = {
             definedName: {
                 name: '_xlnm.Print_Titles',
                 localSheetId: '0',
-                rows: 'Sheet1!$' + rowSelection.fromRow + ':$' + rowSelection.toRow,
-            }
+                rows: repeats.join(','),
+            },
         };
         _addXMLNode('workbook', 'definedNames', addObject, parentNode, [
             'workbook',
         ]);
+        console.log(workbook);
     };
 
     /**
@@ -1301,6 +1339,7 @@
                     child: true,
                     rows: {
                         textNode: true,
+                        merge: false,
                     },
                 },
             },

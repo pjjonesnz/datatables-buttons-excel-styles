@@ -246,7 +246,7 @@ $("#myTable").DataTable({
 
 Printer default settings can be defined using the pageStyle option. I haven't completed a full list of options yet, but it's pretty clear from the example below.
 
-Note that the 'repeatHeading' option can be set to true to repeat the heading at the top of each printed page, or can also be a [cell reference](./docs/cell_references.md) - note that only the row part of the reference is used (eg. `repeatHeading: 'st:h'` will repeat the title and heading row on each printed page.)
+The 'repeatHeading' option can be set to true to repeat the heading at the top of each printed page, or can also be a [cell reference](./docs/cell_references.md) - note that only the row part of the reference is used (eg. `repeatHeading: 'st:h'` will repeat the title and heading row on each printed page.)  The 'repeatCol' option repeats columns when the table width spans multiple pages.
 
 [Printer defaults demo](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/page_style.html)
 
@@ -280,7 +280,8 @@ $("#myTable").DataTable({
                     header: "0",
                     footer: "0",
                 },
-                repeatHeading: true,
+                repeatHeading: true,    // Repeat the heading row at the top of each page
+                repeatCol: 'A:A',       // Repeat column A (for pages wider than a single printed page)
             },
             excelStyles: {
                 template: 'blue_gray_medium',    // Add a template style as well if you like
