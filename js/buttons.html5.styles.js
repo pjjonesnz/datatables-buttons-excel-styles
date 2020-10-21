@@ -1498,6 +1498,9 @@
             var txAttr = _getStringAttribute(attributeValues, nodeHierarchy);
             for (var i in txAttr) {
                 if (_isTextNode(nodeHierarchy, i)) {
+                    if(typeof txAttr[i] === 'string') {
+                        txAttr[i] = '"' + txAttr[i] + '"';
+                    }
                     parentNode.appendChild(
                         _xmlStyleDoc.createTextNode(txAttr[i])
                     );
