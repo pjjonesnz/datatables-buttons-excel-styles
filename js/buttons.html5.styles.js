@@ -356,12 +356,12 @@
     var _getMaxColumnIndex = function (sheet) {
         var maxColumn = 0;
         $('cols col', sheet).each(function () {
-            var colMax = $(this).attr('max');
+            var colMax = Number($(this).attr('max'));
             if (colMax > maxColumn) {
                 maxColumn = colMax;
             }
         });
-        return Number(maxColumn);
+        return maxColumn;
     };
 
     /**
