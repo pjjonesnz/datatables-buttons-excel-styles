@@ -1311,18 +1311,15 @@
         worksheet: {
             default: {
                 printOptions: '',
-                pageMargins: '',
-                pageSetup: '',
-            },
-            pageMargins: {
-                default: {
-                    left: '',
-                    right: '',
-                    top: '',
-                    bottom: '',
-                    header: '',
-                    footer: '',
+                pageMargins: {
+                    left: '0.7',
+                    right: '0.7',
+                    top: '0.75',
+                    bottom: '0.75',
+                    header: '0.3',
+                    footer: '0.3',
                 },
+                pageSetup: '',
             },
             mergeCells: {
                 updateCount: true,
