@@ -1324,6 +1324,14 @@
                     footer: '',
                 },
             },
+            mergeCells: {
+                updateCount: true,
+                mergeCell: {
+                    child: true,
+                    merge: false,
+                    val: 'ref',
+                }
+            },
             sheetPr: {
                 insertBefore: 'cols',
                 pageSetUpPr: {
@@ -1380,6 +1388,8 @@
         return obj;
     };
 
+
+
     /**
      * Should this attribute be created as a child node?
      *
@@ -1393,6 +1403,15 @@
             value !== undefined &&
             value.child !== undefined &&
             value.child === true
+        );
+    };
+
+    var _doUpdateCount = function (nodeHierarchy, attributeName) {
+        var value = _findNodeValue(nodeHierarchy.concat([attributeName]));
+        return (
+            value !== undefined &&
+            value.updateCount !== undefined &&
+            value.updateCount === true
         );
     };
 
@@ -1565,6 +1584,9 @@
                 childNode,
                 nodeHierarchy.concat(attributeName)
             );
+        }
+        if(_doUpdateCount(nodeHierarchy, attributeName)) {
+            _updateContainerCount(childNode);
         }
     };
 

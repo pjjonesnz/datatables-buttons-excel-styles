@@ -65,9 +65,29 @@
                     buttons: [
                         {
                             extend: 'excel',                    // Extend the excel button   
-                            excelStyles: {                      // Add an excelStyles definition
-                                template: 'blue_gray_medium',   // Apply the 'blue_gray_medium' template
-                            },
+                            excelStyles: [
+                                {                      // Add an excelStyles definition
+                                    template: 'blue_gray_medium',  // Apply the 'blue_gray_medium' template
+                                },
+                                {
+                                    cells: ['A17:A19','C19:D19'],  // Format the two cells ranges that are merged
+                                    style: {
+                                        font: {
+                                            b: true,
+                                        },
+                                        alignment: {
+                                            vertical: "center",
+                                            horizontal: "center",
+                                        },
+                                        border: {
+                                            top: 'thick',
+                                            bottom: 'thick',
+                                            left: 'thick',
+                                            right: 'thick',
+                                        }
+                                    }
+                                }
+                            ],
                             insertCells: [
                                 {
                                     cells: 'sCh:Dh',
@@ -83,6 +103,14 @@
                                     cells: ['s15','s17'],
                                     content: '',
                                     pushRow: true
+                                },
+                                {
+                                    cells: ['A17'],               // Using the mergeCells option in pageStyle below
+                                    content: 'Row Span Example',
+                                },
+                                {
+                                    cells: ['C19'],               // Using the mergeCells option in pageStyle below
+                                    content: 'Col Span Example',
                                 },
                                 {
                                     cells: ['sC1:D14','sC18:D-0'],
@@ -114,6 +142,12 @@
                                     header: "0",
                                     footer: "0",
                                 },
+                                mergeCells: {                   // Merge Cells
+                                    mergeCell: [
+                                        'A17:A19',
+                                        'C19:D19',
+                                    ]
+                                },
                                 repeatHeading: true,
                                 repeatCol: 'A:A',
                             }
@@ -128,7 +162,7 @@
         <main role="main" class="container">
             <h1 class="mt-5">Page Styles and Inserting Cells</h1>
             <p class="lead">
-                Page styles can be added to adjust your default printer settings and you can also insert cells.
+                Page styles can be added to adjust your default printer settings and you can also insert and merge cells.
             </p>
             <div class="container mt-4">
                 <p>
