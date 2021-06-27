@@ -524,6 +524,36 @@
                         
                     ]
                 },
+                conditional7: {
+                    description: 'Add styles conditionally - Using a formula',
+                    group: "Conditional formatting",
+                    help: '<p>You can also use formulas. In this example we use a formula to highlight an entire row</p>' +
+                        '<p>Target the cells you want to apply the formatting to, in this case s: targets ALL columns in all data rows</p>' +
+                        '<p>Set type to "expression" and set the formula.  NOTE: Don\'t precede the formula with a = like you normally would in Excel.<p>' +
+                        '<p><strong>IMPORTANT: </strong>See the $ before the F3, this makes use that only this cell is used for the condition match in each row.</p>' +
+                        '<p>Also note that you can\'t use smart cell references in the formula - you need to use standard Excel cell references and point to the ' +
+                        'first row that you have selected with "cells".  In this case, the first row of data is 3 (row 1 = title, row 2 = table header)</p>' +
+                        '<p>Try setting the formula to this: "AND($F3>150000,$B3=\\"Software Engineer\\")"  - note the escaping of the speechmarks</p>',
+                    excelStyles: [
+                        {
+                            cells: "s:",
+                            condition: {
+                                type: "expression",
+                                formula: "AND($F3>150000,$F3<250000)"
+                            },
+                            style: {
+                                font: {
+                                    b: true
+                                },
+                                fill: {
+                                    pattern: {
+                                        bgColor: "FFCCCC"
+                                    }
+                                }
+                            }
+                        }
+                    ]
+                },
                  conditional2: {
                     description: 'Add styles conditionally - Greater Than and Less Than',
                     group: "Conditional formatting",
