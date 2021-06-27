@@ -164,9 +164,11 @@ $("#myTable").DataTable({
 
 ### Conditional Formatting
 
-You can apply [Conditional Styles](#conditional-styles) to cells. This is a Beta feature, so not all Excel conditional formatting is currently supported, but the most common conditional number formatting is. You can also only apply custom styles (ie. not templates or built-in styles).
+You can apply [Conditional Styles](#conditional-styles) to cells. Not all Excel conditional formatting is currently supported, but the most common conditional number formatting is as well as formulas which cover most other use cases. Note that you can only apply custom styles (ie. not templates or built-in styles).
 
-The major benefit to using this method (as opposed to writing your own customize method to add fixed styles to cells) is that the applied styles automatically update when you make changes to your data inside of Excel.
+ColorScale, DataBar and IconSets are also supported.  See the [test site](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html) for examples.
+
+The major benefit to using this method (as opposed to writing your own customize method to add fixed styles to cells) is that **the applied styles automatically update when you make changes to your data inside of Excel AFTER opening the sheet**.
 
 [See this example live](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/conditional_style.html)
 
@@ -956,10 +958,16 @@ Conditional formatting causes styles to only be applied to cells if the conditio
 
 | Attribute | Description | Type | Default |
 |---|---|---|---|
-| type      | The type of conditional formatting rule | String |
-| operator  | When type is 'cellIs', sets the comparison type | [Operator Enum](#operator-enum) |
+| type      | The type of conditional formatting rule. | [Type Enum](#type-enum) |
+| operator  | When type is 'cellIs', sets the comparison type. Don't use with expression. | [Operator Enum](#operator-enum) |
 | formula   | The data to compare | Number/String<br>Array (for between or notBetween operators) |
 | priority  | The priority of this conditional formatting rule | Number | 1 |
+
+NOTE: As this feature is still not complete, not all [conditional types](https://c-rex.net/projects/samples/ooxml/e1/Part4/OOXML_P4_DOCX_ST_CfType_topic_ID0EFYEFB.html) have been tested. 
+
+Presently `cellIs` and `expression` have been tested with examples on the [test site](https://www.pauljones.co.nz/github/buttons-html5-styles/examples/simple_table_style.html).  The 'expression' type should cover most use cases.  ColorScale, dataBar and iconSet formatting also work with examples on the test site. 
+
+Also
 
 Example:
 
@@ -991,7 +999,7 @@ $("#myTable").DataTable({
 });
 ```
 
-Also:
+Using multiple values
 
 ```js
 $("#myTable").DataTable({
@@ -1018,6 +1026,45 @@ $("#myTable").DataTable({
     ]
 });
 ```
+
+Using a formula
+
+```js
+$("#myTable").DataTable({
+    dom: "Bfrtip",
+    buttons: [
+        {
+            extend: "excel",
+            excelStyles: {
+                cells: "s:",                    // Smart select all data rows - ie. apply to entire row
+                condition: {
+                    type: "expression",         // Use a forumula
+                    formula: "AND($F3>150000,$B3=\"Software Engineer\")",   // The formula - make sure you escape strings and use WITHOUT leading = (equals) sign.  You also can't use smart row references in the formula.  Note the $ in front of the cell reference to lock it to the column.
+                },
+                style: {
+                    fill: {
+                        pattern: {
+                            bgColor: "F78989"   // Brighter red (Note the Excel gotcha requires
+                        }                       // bgColor for conditional formatting)
+                    }
+                }
+            }
+        }
+    ]
+});
+```
+
+#### Type Enum
+
+| Value | Meaning |
+|---|---|
+| cellIs               | Compares a cell value using an operator  |
+| expression           | Evaluate a formula |
+| colorScale           | Creates a gradated color scale on the cells |
+| dataBar              | Displays a gradated data bar in the range of cells |
+| iconSet              | Applies icons to cells according to their values |
+
+Note: See the demo site for examples as colorScale, dataBar and iconSet need specific attributes set.
 
 #### Operator Enum
 
