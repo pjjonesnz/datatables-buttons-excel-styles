@@ -886,6 +886,13 @@
         }
         excelStyles = _makeArray(excelStyles);
 
+        /**
+         * Cache the links to the spreadsheet cells
+         */
+        var tag_cache = [];
+
+        var sheet_data = sheet.querySelectorAll('sheetData row');
+
         for (var i in excelStyles) {
             var style = excelStyles[i];
             /**
@@ -895,11 +902,6 @@
              * if there isn't a match in the table, then create the new style.
              */
             var styleLookup = {};
-
-            /**
-             * A list of styles created and the cell selectors to apply them to
-             */
-            var applyTable = {};
 
             /**
              * Are we using an existing style index rather than a style definition object
@@ -916,6 +918,7 @@
             if (style.rowref && style.rowref == 'smart') {
                 smartRowRef = true;
             }
+
             for (var i in cells) {
                 var selection = _parseExcellyReference(
                     cells[i],
@@ -946,15 +949,37 @@
                         row += selection.nthRow
                     ) {
                         var tag =
-                            'row[r="' +
-                            row +
-                            '"] c[r="' +
                             colLetter +
-                            row +
-                            '"]';
+                            row;
 
+                        
                         // Get current style from cell
-                        var currentCellStyle = $(tag, sheet).attr('s') || 0;
+                        if(tag_cache[tag] == undefined) {
+
+                            // var searchTag =
+                            //     'row[r="' +
+                            //     row +
+                            //     '"] c[r="' +
+                            //     colLetter +
+                            //     row +
+                            //     '"]';
+                            //var cacheCellRef = sheet.querySelector(searchTag);
+
+                            // New - cell selection in version 1.2 
+                            // The next four lines can be replaced with the above commented code if this doesn't work
+                            if(sheet_data[row-1] == undefined || sheet_data[row-1].childNodes[col-1] == undefined) {
+                                continue;
+                            }
+                            var cacheCellRef = sheet_data[row-1].childNodes[col-1];
+
+                            var cellInitialStyle = cacheCellRef.getAttribute('s') || 0;
+                            tag_cache[tag] = {
+                                cellRef: cacheCellRef,
+                                initialStyle: cellInitialStyle,
+                                style: cellInitialStyle,
+                            };
+                        }
+                        var currentCellStyle = tag_cache[tag].style;
 
                         // If a new style hasn't been created, based on this currentCellStyle, then...
                         if (styleLookup[currentCellStyle] == undefined) {
@@ -983,15 +1008,14 @@
                                 }
                             }
                             styleLookup[currentCellStyle] = newStyleId;
-                            applyTable[styleLookup[currentCellStyle]] = [];
                         }
-                        applyTable[styleLookup[currentCellStyle]].push(tag);
+                        tag_cache[tag].style = styleLookup[currentCellStyle];
                     }
                     // Set column width
                     if (style.width !== undefined) {
-                        $('col[min="' + col + '"]', sheet)
-                            .attr('width', style.width)
-                            .attr('customWidth', true);
+                        var colref = sheet.querySelector('col[min="' + col + '"]');
+                        colref.setAttribute('width', style.width);
+                        colref.setAttribute('customWidth', true);
                     }
                 }
 
@@ -1002,14 +1026,16 @@
                     row += selection.nthRow
                 ) {
                     if (style.height !== undefined) {
-                        $('row[r="' + row + '"]', sheet)
-                            .attr('ht', style.height)
-                            .attr('customHeight', true);
+                        var rwref = sheet.querySelector('row[r="' + row + '"]');
+                        rwref.setAttribute('ht', style.height);
+                        rwref.setAttribute('customHeight', true);
                     }
                 }
             }
-            for (var i in applyTable) {
-                $(applyTable[i].join(), sheet).attr('s', i);
+        }
+        for(var i in tag_cache) {
+            if(tag_cache[i].style != tag_cache[i].initialStyle) {
+                tag_cache[i].cellRef.setAttribute('s', tag_cache[i].style);
             }
         }
     };
@@ -1097,7 +1123,6 @@
         _addXMLNode('workbook', 'definedNames', addObject, parentNode, [
             'workbook',
         ]);
-        console.log(workbook);
     };
 
     /**
